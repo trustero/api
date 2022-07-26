@@ -2,7 +2,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 syntax = "proto3";
 
-package receptor;
+package receptor.v1;
 
 option go_package = "github.com/trustero/api/go/receptor";
 
