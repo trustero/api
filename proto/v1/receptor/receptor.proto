@@ -4,7 +4,7 @@ syntax = "proto3";
 
 package receptor.v1;
 
-option go_package = "github.com/trustero/api/go/receptor";
+option go_package = "github.com/trustero/api/go/v1/receptor";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
@@ -37,23 +37,24 @@ service Receptor {
 
   /**
    Report whether the provided credential is a valid service provider credential for purpose of discovering services
-   and reporting findings.  This rpc call is typically made as callback by a receptor from a check credential receptor
-   request.
+   and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from a check
+   credential receptor request.
    */
   rpc Verified(Credential) returns (google.protobuf.Empty);
 
   /**
-   Get the receptor configuration and service provider credentials using the provided receptor object id.  This
+   Get the receptor configuration and service provider credential using the provided receptor record identifier.  This
    rpc call is typically made as a callback by a receptor prior to making a report findings or discover services
    receptor request.
    */
   rpc GetConfiguration(ReceptorOID) returns (ReceptorConfiguration);
 
   /**
-   Notify Trustero a long running report finding or discover services receptor request has completed.  The necessary
-   callback information in AsyncTask is provided as part of the receptor request invocation.
+   Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
+   contains information about the receptor request and it's corresponding result.  Information such as the
+   JobResult.receptor_object_id are passed to the receptor as part of the request.
    */
-  rpc Notify(AsyncTask) returns (google.protobuf.Empty);
+  rpc Notify(JobResult) returns (google.protobuf.Empty);
 }
 
 
@@ -168,7 +169,8 @@ message Document {
 message Struct {
 
   /**
-   Each row typically
+   Each row typically represents the configuration of a service instance.
+   @required
    */
   repeated Row rows = 1;
 
@@ -176,7 +178,7 @@ message Struct {
    A map of row column name to display name pairs.
    @required
    */
-  map<string, string> col_display_name = 2;
+  map<string, string> col_display_names = 2;
 
   /**
    An ordered list of row column names.  The order defines how each column will be rendered by default.
@@ -188,6 +190,7 @@ message Struct {
    A row of structured data
    */
   message Row {
+
     /**
      A unique service ID relative to the struct.  A row ID typically represents a unique service ID.  The
      service_id must be previously reported in the Services message.
@@ -267,49 +270,22 @@ message Services {
      Name of the service.  For example, "ECS".
      @required
      */
-    string name = 4;
+    string name = 1;
 
     /**
      Unique service ID.  For example, ECS's UUID.
      @required
      */
-    string instance_id = 5;
+    string instance_id = 2;
   }
 
 }
 
 /**
- Trustero uses asynchronous tasks to track receptor requests.  Trustero initiate a receptor request providing a
- receptor_object_id, a tracer_id, and a command.  When the receptor request completes, the receptor calls back
- into Trustero with the task results.
- */
-message AsyncTask {
-  reserved 2;
-
-  /**
-   A tracer ID used to track the progress of the receptor request.
-   */
-  string tracer_id = 1; // REMIND AyncTask.TracerID for tracking.
-
-  /**
-   Receptor command request that completed.  One of "verify", "scan", or "discover"
-   */
-  string command = 3; // REMIND Command requested.  One of "verify" or "scan"
-
-  /**
-   Receptor command request result.  One of "success", "fail", or "error".
-   */
-  string result = 4; // REMIND Action's result.  One of "success", "fail", or "error"
-
-  /**
-   Trustero's receptor record identifier.
-   */
-  string receptor_object_id = 5; // REMIND ReceptorId
-}
-
-
-/**
   Credential to access a service provider account.
+
+  REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
+
  */
 message Credential {
 
@@ -320,47 +296,20 @@ message Credential {
   string receptor_object_id = 1;
 
   /**
+   The service provider credential being verified.
+   */
+  string credential = 2;
+
+  /**
    Report whether the service provider credential provided in this message is valid for report findings or discover
    services request.
    */
-  bool is_credentials_valid = 2;
+  bool is_credential_valid = 3;
 
   /**
    Reason for why the service provider credential in this message is invalid.
    */
-  string message = 3;
-
-  /**
-   The service provider credential being verified.
-   */
-  string credential = 4;
-}
-
-
-/**
- Trustero stored receptor configuration and service provider credential.
- */
-message ReceptorConfiguration {
-
-  /**
-   Trustero receptor record identifier.
-   */
-  string receptor_object_id = 1;  // REMIND Receptor.ID
-
-  /**
-   Credential required to access a service provider for report finding and discover services purposes.
-   */
-  string credentials = 6;  // REMIND Receptor.Credential required to access the target service.
-
-  /**
-   Additional receptor configuration to access a service provider account.
-   */
-  string config = 7;  // REMIND Receptor.config task configuration in json.
-
-  /**
-   Service provider account
-   */
-  string service_provider_account = 10;  // REMIND Receptor.TenantID
+  string message = 4;
 }
 
 
@@ -374,3 +323,66 @@ message ReceptorOID {
    */
   string receptor_object_id = 1;
 }
+
+
+/**
+ Trustero stored receptor configuration and service provider credential.
+
+ REMIND: ReceptorConfiguration is a subset of existing ntrced's Receptor record.
+
+ */
+message ReceptorConfiguration {
+
+  /**
+   Trustero receptor record identifier.
+   */
+  string receptor_object_id = 1;  // REMIND Receptor.ID
+
+  /**
+   Credential required to access a service provider for report finding and discover services purposes.
+   */
+  string credential = 2;  // REMIND Receptor.Credential required to access the target service.
+
+  /**
+   Additional receptor configuration to access a service provider account.
+   */
+  string config = 3;  // REMIND Receptor.config task configuration in json.
+
+  /**
+   Service provider account
+   */
+  string service_provider_account = 4;  // REMIND Receptor.TenantID
+}
+
+
+/**
+ Trustero uses asynchronous jobs to track receptor requests.  Trustero initiates a receptor job providing a
+ receptor_object_id, a tracer_id, and a command.  When the receptor completes the job, the receptor callback
+ into Trustero to report the job result.
+
+ REMIND:  JobResult maps to AsyncTask
+ */
+message JobResult {
+
+  /**
+   A tracer ID used to track the progress of the receptor request.
+   */
+  string tracer_id = 1; // REMIND AyncTask.TracerID for tracking.
+
+  /**
+   Receptor command request that completed.  One of "verify", "scan", or "discover"
+   */
+  string command = 2;
+
+  /**
+   Receptor command request result.  One of "success", "fail", or "error".
+   */
+  string result = 3;
+
+  /**
+   Trustero's receptor record identifier.
+   */
+  string receptor_object_id = 4; // REMIND Receptor.ID
+}
+
+
