@@ -37,7 +37,6 @@ file &#39;LICENSE.txt&#39;, which is part of this source code package.
 
 ### Credential
 Credential to access a service provider account.
-
 REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
 
 
@@ -100,12 +99,8 @@ A finding is a set of evidence(s) collected from a service provider account.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_type | [string](#string) |  | Unique receptor identifier. A receptor is expected to report findings from only one service provider type. A stable identifier that represent the type of receptor reporting this finding. The identifier is akin to a fully qualified Go package name or a Java class name. For example, &#34;github.com/trustero/receptor/gitlab&#34;.
-
-REMIND maps to Receptor.ModelID |
-| service_provider_account | [string](#string) |  | The receptor&#39;s evidence source.
-
-REMIND maps to Receptor.TenantID |
+| receptor_type | [string](#string) |  | Unique receptor identifier. A receptor is expected to report findings from only one service provider type. A stable identifier that represent the type of receptor reporting this finding. The identifier is akin to a fully qualified Go package name or a Java class name. For example, &#34;github.com/trustero/receptor/gitlab&#34;. REMIND maps to Receptor.ModelID |
+| service_provider_account | [string](#string) |  | The receptor&#39;s evidence source. REMIND maps to Receptor.TenantID |
 | evidences | [Evidence](#receptor_v1-Evidence) | repeated | One or more evidence collected by a typical receptor scan. |
 
 
@@ -119,20 +114,15 @@ REMIND maps to Receptor.TenantID |
 Trustero uses asynchronous jobs to track receptor requests.  Trustero initiates a receptor job providing a
 receptor_object_id, a tracer_id, and a command.  When the receptor completes the job, the receptor callback
 into Trustero to report the job result.
-
 REMIND:  JobResult maps to AsyncTask
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| tracer_id | [string](#string) |  | A tracer ID used to track the progress of the receptor request.
-
-REMIND AyncTask.TracerID for tracking. |
+| tracer_id | [string](#string) |  | A tracer ID used to track the progress of the receptor request. REMIND AyncTask.TracerID for tracking. |
 | command | [string](#string) |  | Receptor command request that completed. One of &#34;verify&#34;, &#34;scan&#34;, or &#34;discover&#34; |
 | result | [string](#string) |  | Receptor command request result. One of &#34;success&#34;, &#34;fail&#34;, or &#34;error&#34;. |
-| receptor_object_id | [string](#string) |  | Trustero&#39;s receptor record identifier.
-
-REMIND Receptor.ID |
+| receptor_object_id | [string](#string) |  | Trustero&#39;s receptor record identifier. REMIND Receptor.ID |
 
 
 
@@ -143,24 +133,15 @@ REMIND Receptor.ID |
 
 ### ReceptorConfiguration
 Trustero stored receptor configuration and service provider credential.
-
 REMIND: ReceptorConfiguration is a subset of existing ntrced&#39;s Receptor record.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_object_id | [string](#string) |  | Trustero receptor record identifier.
-
-REMIND Receptor.ID |
-| credential | [string](#string) |  | Credential required to access a service provider for report finding and discover services purposes.
-
-REMIND Receptor.Credential required to access the target service. |
-| config | [string](#string) |  | Additional receptor configuration to access a service provider account.
-
-REMIND Receptor.config task configuration in json. |
-| service_provider_account | [string](#string) |  | Service provider account
-
-REMIND Receptor.TenantID |
+| receptor_object_id | [string](#string) |  | Trustero receptor record identifier. REMIND Receptor.ID |
+| credential | [string](#string) |  | Credential required to access a service provider for report finding and discover services purposes. REMIND Receptor.Credential required to access the target service. |
+| config | [string](#string) |  | Additional receptor configuration to access a service provider account. REMIND Receptor.config task configuration in json. |
+| service_provider_account | [string](#string) |  | Service provider account REMIND Receptor.TenantID |
 
 
 

@@ -67,13 +67,15 @@ message Finding {
    Unique receptor identifier.  A receptor is expected to report findings from only one service provider type.  A
    stable identifier that represent the type of receptor reporting this finding.  The identifier is akin to a fully
    qualified Go package name or a Java class name.  For example, "github.com/trustero/receptor/gitlab".
+   REMIND maps to Receptor.ModelID
    */
-  string receptor_type = 1;   // REMIND maps to Receptor.ModelID
+  string receptor_type = 1;
 
   /**
    The receptor's evidence source.
+   REMIND maps to Receptor.TenantID
    */
-  string service_provider_account = 2;   // REMIND maps to Receptor.TenantID
+  string service_provider_account = 2;   
 
   /**
    One or more evidence collected by a typical receptor scan.
@@ -283,9 +285,7 @@ message Services {
 
 /**
   Credential to access a service provider account.
-
   REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
-
  */
 message Credential {
 
@@ -327,31 +327,33 @@ message ReceptorOID {
 
 /**
  Trustero stored receptor configuration and service provider credential.
-
  REMIND: ReceptorConfiguration is a subset of existing ntrced's Receptor record.
-
  */
 message ReceptorConfiguration {
 
   /**
    Trustero receptor record identifier.
+   REMIND Receptor.ID
    */
-  string receptor_object_id = 1;  // REMIND Receptor.ID
+  string receptor_object_id = 1; 
 
   /**
    Credential required to access a service provider for report finding and discover services purposes.
+   REMIND Receptor.Credential required to access the target service.
    */
-  string credential = 2;  // REMIND Receptor.Credential required to access the target service.
+  string credential = 2; 
 
   /**
    Additional receptor configuration to access a service provider account.
+   REMIND Receptor.config task configuration in json. 
    */
-  string config = 3;  // REMIND Receptor.config task configuration in json.
+  string config = 3;
 
   /**
    Service provider account
+   REMIND Receptor.TenantID 
    */
-  string service_provider_account = 4;  // REMIND Receptor.TenantID
+  string service_provider_account = 4;
 }
 
 
@@ -359,15 +361,15 @@ message ReceptorConfiguration {
  Trustero uses asynchronous jobs to track receptor requests.  Trustero initiates a receptor job providing a
  receptor_object_id, a tracer_id, and a command.  When the receptor completes the job, the receptor callback
  into Trustero to report the job result.
-
  REMIND:  JobResult maps to AsyncTask
  */
 message JobResult {
 
   /**
    A tracer ID used to track the progress of the receptor request.
+   REMIND AyncTask.TracerID for tracking.
    */
-  string tracer_id = 1; // REMIND AyncTask.TracerID for tracking.
+  string tracer_id = 1;
 
   /**
    Receptor command request that completed.  One of "verify", "scan", or "discover"
@@ -381,8 +383,9 @@ message JobResult {
 
   /**
    Trustero's receptor record identifier.
+   REMIND Receptor.ID
    */
-  string receptor_object_id = 4; // REMIND Receptor.ID
+  string receptor_object_id = 4;
 }
 
 
