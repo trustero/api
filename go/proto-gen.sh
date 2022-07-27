@@ -7,17 +7,17 @@ which protoc > /dev/null || {
 
 GO_PATH_BIN=$(go env GOPATH)/bin
 PROTOC_FLAGS="--experimental_allow_proto3_optional"
-PROTO_MODULES="receptor"
-PROTOS_SRC_DIR="../../proto/v1"
+PROTO_MODULES="receptor_v1"
+PROTOS_SRC_DIR="../proto/"
 
 export GO111MODULE=on
 export PATH=$PATH:$GO_PATH_BIN
 
-outDir="./v1"
+outDir="."
 mkdir -p $outDir
 
 for module in $PROTO_MODULES; do
-  proto_files=$(find ../../proto/v1/"${module}" -name "*.proto")
+  proto_files=$(find ../proto/"${module}" -name "*.proto")
 
   for proto in $proto_files; do
     protoc $PROTOC_FLAGS \

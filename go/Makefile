@@ -1,4 +1,4 @@
-include ../../make/globals.mk
+include ../make/globals.mk
 GO_PATH_BIN := $(shell go env GOPATH)/bin
 .PHONY: foo
 MODULE := "trustero-api-go"
@@ -8,14 +8,14 @@ deps:
 	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest;
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest;
 
-build: deps
-ifneq ($(shell git diff --quiet HEAD ${REF} -- ../../proto/v1 || echo "changed"),)
+protoc-build: deps
+ifneq ($(shell git diff --quiet HEAD ${REF} -- ../proto || echo "changed"),)
 	$(call outmsg, $(MODULE), "API Change detected")
-	@$(MAKE) proto-gen
 else
-	@[ -d api ] || $(MAKE) proto-gen
+	@$(MAKE) proto-gen
 endif
 
+build: protoc-build
 
 proto-gen:
 	$(call outmsg, $(MODULE), "Generating golang proto bindings")
@@ -27,7 +27,7 @@ test:
 
 clean:
 	$(call outmsg, $(MODULE))
-	@go clean && rm -rf v1
+	@go clean
 
 fmt:
 	$(call outmsg, $(MODULE))
