@@ -1,3 +1,3 @@
 SHELL := /bin/bash
-SUB_DIRS := bindings/golang
+SUB_DIRS := go
 include ./make/globals.mk
