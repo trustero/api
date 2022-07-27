@@ -9,7 +9,7 @@ deps:
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest;
 
 build: deps
-ifneq ($(shell git diff --quiet HEAD ${REF} -- ../../protos/v1 || echo "changed"),)
+ifneq ($(shell git diff --quiet HEAD ${REF} -- ../../proto/v1 || echo "changed"),)
 	$(call outmsg, $(MODULE), "API Change detected")
 	@$(MAKE) proto-gen
 else
