@@ -12,6 +12,13 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
+<<<<<<< HEAD
 .idea
+=======
+<<<<<<< HEAD
+>>>>>>> dc43dbb (add .idea to .gitignore, add go dir)
 # vendor/
 bindings/golang/v1/*
+=======
+.idea
+>>>>>>> 9b74e67 (add .idea to .gitignore, add go dir)
