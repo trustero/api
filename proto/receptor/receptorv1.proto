@@ -4,7 +4,7 @@ syntax = "proto3";
 
 package receptor.v1;
 
-option go_package = "github.com/trustero/api/go/v1/receptor";
+option go_package = "github.com/trustero/api/go/receptorv1";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
