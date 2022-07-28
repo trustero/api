@@ -44,18 +44,19 @@ service Receptor {
    */
   rpc Discovered(Services) returns (google.protobuf.StringValue);
 
+  
+  /**
+  Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
+  call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
+  */
+  rpc Report(Finding) returns (google.protobuf.StringValue);
+  
   /**
     Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
     contains information about the receptor request and it's corresponding result.  Information such as the
     JobResult.receptor_object_id are passed to the receptor as part of the request.
    */
   rpc Notify(JobResult) returns (google.protobuf.Empty);
-
-    /**
-    Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
-    call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
-   */
-  rpc Report(Finding) returns (google.protobuf.StringValue);
 }
 
 
