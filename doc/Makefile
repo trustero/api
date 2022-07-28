@@ -2,7 +2,7 @@ include ../make/globals.mk
 GO_PATH_BIN := $(shell go env GOPATH)/bin
 .PHONY: foo
 MODULE := "api-gen-doc"
-export DOC_DIR = ./md
+export DOC_DIR = .
 export PROTOS_SRC_DIR = ../proto
 
 deps:
@@ -21,7 +21,7 @@ test:
 
 clean:
 	$(call outmsg, $(MODULE))
-	@rm -rf ${DOC_DIR}
+	@rm -rf ${DOC_DIR}/*.md
 
 fmt:
 	$(call not-supported-msg, $(MODULE))
