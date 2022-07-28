@@ -44,13 +44,13 @@ service Receptor {
    */
   rpc Discovered(Services) returns (google.protobuf.StringValue);
 
-  
+
   /**
   Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
   call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
   */
   rpc Report(Finding) returns (google.protobuf.StringValue);
-  
+
   /**
     Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
     contains information about the receptor request and it's corresponding result.  Information such as the
@@ -77,7 +77,7 @@ message Finding {
    The receptor's evidence source.
    REMIND maps to Receptor.TenantID
    */
-  string service_provider_account = 2;   
+  string service_provider_account = 2;
 
   /**
    One or more evidence collected by a typical receptor scan.
@@ -113,13 +113,8 @@ message Evidence {
    The raw API request used to generate this evidence.  The raw API request and response are used to prove to
    examiners this evidence correlates to real service instance configuration.
    */
-  string raw_api_request = 4;
 
-  /**
-   The raw API response used to generate this evidence.  The raw API request and response is used to prove to
-   examiners this evidence correlates to real service instance configuration.
-   */
-  string raw_api_response = 5;
+  repeated Source sources = 4;
 
   /**
    The evidence can be an unstructured (Document) or structured (Struct) type.
@@ -135,6 +130,20 @@ message Evidence {
      A structured evidence
      */
     Struct struct = 7;
+  }
+
+  message Source{
+    /**
+ The raw API request used to generate this evidence.  The raw API request and response are used to prove to
+ examiners this evidence correlates to real service instance configuration.
+ */
+
+    string raw_api_request = 1;
+    /**
+     The raw API response used to generate this evidence.  The raw API request and response is used to prove to
+     examiners this evidence correlates to real service instance configuration.
+     */
+    string raw_api_response = 2;
   }
 }
 
@@ -337,13 +346,13 @@ message ReceptorConfiguration {
    Trustero receptor record identifier.
    REMIND Receptor.ID
    */
-  string receptor_object_id = 1; 
+  string receptor_object_id = 1;
 
   /**
    Credential required to access a service provider for report finding and discover services purposes.
    REMIND Receptor.Credential required to access the target service.
    */
-  string credential = 2; 
+  string credential = 2;
 
   /**
    Additional receptor configuration to access a service provider account.

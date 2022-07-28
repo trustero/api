@@ -9,9 +9,7 @@ import (
 	"github.com/trustero/api/go/receptor_v1"
 )
 
-type VerifyFunc func(credentials, config string) (ok bool, err error)
-
-var Verify VerifyFunc = func(string, string) (bool, error) { return true, nil }
+var Verify VerifyFunc = func(map[string]string) (bool, error) { return true, nil }
 
 var verifyCmd = &cobra.Command{
 	Use:   "verify <access_token>",
