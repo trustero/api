@@ -28,11 +28,7 @@ service Receptor {
    credential receptor request.
    */
   rpc Verified(Credential) returns (google.protobuf.Empty);
-  /**
-   Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
-   call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
-   */
-  rpc Report(Finding) returns (google.protobuf.StringValue);
+
 
   /**
    Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
@@ -55,6 +51,12 @@ service Receptor {
    JobResult.receptor_object_id are passed to the receptor as part of the request.
    */
   rpc Notify(JobResult) returns (google.protobuf.Empty);
+
+    /**
+   Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
+   call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
+   */
+   rpc Report(Finding) returns (google.protobuf.StringValue);
 }
 
 
