@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/trustero/api/go/client"
-	"github.com/trustero/api/go/config"
 	receptor "github.com/trustero/api/go/receptor_v1"
 )
 
@@ -42,7 +41,6 @@ The scan mode conducts a discovery scan of service configuration against its
 target service.  And the scanall mode performs a scan for each account with
 the receptor enabled.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		config.InitLog(LogLevel, LogFile)
 		client.InitGRPCClient(Cert, CertServerOverride)
 	},
 }
