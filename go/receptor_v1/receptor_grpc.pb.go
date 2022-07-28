@@ -25,15 +25,6 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReceptorClient interface {
 	//*
-	//Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
-	//call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
-	Report(ctx context.Context, in *Finding, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
-	//*
-	//Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
-	//call returns a string value service listing ID or an error specifying why Trustero failed to process the service
-	//listing.
-	Discovered(ctx context.Context, in *Services, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
-	//*
 	//Report whether the provided credential is a valid service provider credential for purpose of discovering services
 	//and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from a check
 	//credential receptor request.
@@ -43,6 +34,15 @@ type ReceptorClient interface {
 	//rpc call is typically made as a callback by a receptor prior to making a report findings or discover services
 	//receptor request.
 	GetConfiguration(ctx context.Context, in *ReceptorOID, opts ...grpc.CallOption) (*ReceptorConfiguration, error)
+	//*
+	//Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
+	//call returns a string value service listing ID or an error specifying why Trustero failed to process the service
+	//listing.
+	Discovered(ctx context.Context, in *Services, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
+	//*
+	//Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
+	//call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
+	Report(ctx context.Context, in *Finding, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
 	//*
 	//Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
 	//contains information about the receptor request and it's corresponding result.  Information such as the
@@ -56,24 +56,6 @@ type receptorClient struct {
 
 func NewReceptorClient(cc grpc.ClientConnInterface) ReceptorClient {
 	return &receptorClient{cc}
-}
-
-func (c *receptorClient) Report(ctx context.Context, in *Finding, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
-	out := new(wrapperspb.StringValue)
-	err := c.cc.Invoke(ctx, "/receptor_v1.Receptor/Report", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *receptorClient) Discovered(ctx context.Context, in *Services, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
-	out := new(wrapperspb.StringValue)
-	err := c.cc.Invoke(ctx, "/receptor_v1.Receptor/Discovered", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *receptorClient) Verified(ctx context.Context, in *Credential, opts ...grpc.CallOption) (*emptypb.Empty, error) {
@@ -94,6 +76,24 @@ func (c *receptorClient) GetConfiguration(ctx context.Context, in *ReceptorOID, 
 	return out, nil
 }
 
+func (c *receptorClient) Discovered(ctx context.Context, in *Services, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
+	out := new(wrapperspb.StringValue)
+	err := c.cc.Invoke(ctx, "/receptor_v1.Receptor/Discovered", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *receptorClient) Report(ctx context.Context, in *Finding, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
+	out := new(wrapperspb.StringValue)
+	err := c.cc.Invoke(ctx, "/receptor_v1.Receptor/Report", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *receptorClient) Notify(ctx context.Context, in *JobResult, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/receptor_v1.Receptor/Notify", in, out, opts...)
@@ -108,15 +108,6 @@ func (c *receptorClient) Notify(ctx context.Context, in *JobResult, opts ...grpc
 // for forward compatibility
 type ReceptorServer interface {
 	//*
-	//Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
-	//call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
-	Report(context.Context, *Finding) (*wrapperspb.StringValue, error)
-	//*
-	//Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
-	//call returns a string value service listing ID or an error specifying why Trustero failed to process the service
-	//listing.
-	Discovered(context.Context, *Services) (*wrapperspb.StringValue, error)
-	//*
 	//Report whether the provided credential is a valid service provider credential for purpose of discovering services
 	//and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from a check
 	//credential receptor request.
@@ -126,6 +117,15 @@ type ReceptorServer interface {
 	//rpc call is typically made as a callback by a receptor prior to making a report findings or discover services
 	//receptor request.
 	GetConfiguration(context.Context, *ReceptorOID) (*ReceptorConfiguration, error)
+	//*
+	//Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
+	//call returns a string value service listing ID or an error specifying why Trustero failed to process the service
+	//listing.
+	Discovered(context.Context, *Services) (*wrapperspb.StringValue, error)
+	//*
+	//Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
+	//call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
+	Report(context.Context, *Finding) (*wrapperspb.StringValue, error)
 	//*
 	//Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
 	//contains information about the receptor request and it's corresponding result.  Information such as the
@@ -137,17 +137,17 @@ type ReceptorServer interface {
 type UnimplementedReceptorServer struct {
 }
 
-func (UnimplementedReceptorServer) Report(context.Context, *Finding) (*wrapperspb.StringValue, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Report not implemented")
-}
-func (UnimplementedReceptorServer) Discovered(context.Context, *Services) (*wrapperspb.StringValue, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Discovered not implemented")
-}
 func (UnimplementedReceptorServer) Verified(context.Context, *Credential) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Verified not implemented")
 }
 func (UnimplementedReceptorServer) GetConfiguration(context.Context, *ReceptorOID) (*ReceptorConfiguration, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConfiguration not implemented")
+}
+func (UnimplementedReceptorServer) Discovered(context.Context, *Services) (*wrapperspb.StringValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Discovered not implemented")
+}
+func (UnimplementedReceptorServer) Report(context.Context, *Finding) (*wrapperspb.StringValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Report not implemented")
 }
 func (UnimplementedReceptorServer) Notify(context.Context, *JobResult) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Notify not implemented")
@@ -162,42 +162,6 @@ type UnsafeReceptorServer interface {
 
 func RegisterReceptorServer(s grpc.ServiceRegistrar, srv ReceptorServer) {
 	s.RegisterService(&Receptor_ServiceDesc, srv)
-}
-
-func _Receptor_Report_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Finding)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ReceptorServer).Report(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/receptor_v1.Receptor/Report",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReceptorServer).Report(ctx, req.(*Finding))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Receptor_Discovered_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Services)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ReceptorServer).Discovered(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/receptor_v1.Receptor/Discovered",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReceptorServer).Discovered(ctx, req.(*Services))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Receptor_Verified_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -236,6 +200,42 @@ func _Receptor_GetConfiguration_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Receptor_Discovered_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Services)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReceptorServer).Discovered(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/receptor_v1.Receptor/Discovered",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReceptorServer).Discovered(ctx, req.(*Services))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Receptor_Report_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Finding)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReceptorServer).Report(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/receptor_v1.Receptor/Report",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReceptorServer).Report(ctx, req.(*Finding))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Receptor_Notify_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(JobResult)
 	if err := dec(in); err != nil {
@@ -262,20 +262,20 @@ var Receptor_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ReceptorServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Report",
-			Handler:    _Receptor_Report_Handler,
-		},
-		{
-			MethodName: "Discovered",
-			Handler:    _Receptor_Discovered_Handler,
-		},
-		{
 			MethodName: "Verified",
 			Handler:    _Receptor_Verified_Handler,
 		},
 		{
 			MethodName: "GetConfiguration",
 			Handler:    _Receptor_GetConfiguration_Handler,
+		},
+		{
+			MethodName: "Discovered",
+			Handler:    _Receptor_Discovered_Handler,
+		},
+		{
+			MethodName: "Report",
+			Handler:    _Receptor_Report_Handler,
 		},
 		{
 			MethodName: "Notify",

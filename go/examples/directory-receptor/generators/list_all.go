@@ -1,8 +1,9 @@
 package generators
 
 import (
-	"github.com/trustero/monorepo/receptor-sdk/client/api/model"
+	"github.com/trustero/api/go/receptor_v1"
 	"os/exec"
+	"time"
 )
 
 type ListAll struct{}
@@ -24,7 +25,7 @@ func (m ListAll) EvidenceModelId() string {
 	return "tre-100000"
 }
 
-func (m ListAll) GenerateEvidence(credentials string) (ev []interface{}, sources []*model.AddEvidenceRequest_Source, err error) {
+func (m ListAll) GenerateEvidence(credentials string) (ev []interface{}, sources []*receptor_v1.Evidence_Source, err error) {
 	var creds Credentials
 	if creds, err = NewCredentials(credentials); err != nil {
 		return
@@ -34,5 +35,35 @@ func (m ListAll) GenerateEvidence(credentials string) (ev []interface{}, sources
 		return
 	}
 	println(string(output))
+	ev = append(ev, &Directory{
+		Id:        "100000",
+		CreatedAt: time.Now(),
+		IsFolder:  true,
+		Owner:     "Root",
+	})
+	ev = append(ev, &Directory{
+		Id:        "100000",
+		CreatedAt: time.Now(),
+		IsFolder:  true,
+		Owner:     "Root",
+	})
+	ev = append(ev, &Directory{
+		Id:        "100000",
+		CreatedAt: time.Now(),
+		IsFolder:  true,
+		Owner:     "Root",
+	})
+	ev = append(ev, &Directory{
+		Id:        "100000",
+		CreatedAt: time.Now(),
+		IsFolder:  true,
+		Owner:     "Root",
+	})
+	ev = append(ev, &Directory{
+		Id:        "100000",
+		CreatedAt: time.Now(),
+		IsFolder:  true,
+		Owner:     "Root",
+	})
 	return
 }

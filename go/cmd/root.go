@@ -60,7 +60,7 @@ func Execute() {
 
 var commands = []*cobra.Command{
 	verifyCmd,
-	addEvidenceCmd,
+	scanCmd,
 }
 
 func init() {

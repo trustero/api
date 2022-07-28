@@ -81,10 +81,26 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | caption | [string](#string) |  | Human readable English string that identifies this evidence. It&#39;s important the caption is stable for all scans of the same evidence type. |
 | description | [string](#string) |  | Human readable English string describing the content of this evidence. |
 | service_name | [string](#string) |  | The name of service this evidence was collected from. For example, &#34;S3&#34;. The service name must be one of the service types reported in Services struct (See the message Service definition). |
-| raw_api_request | [string](#string) |  | The raw API request used to generate this evidence. The raw API request and response are used to prove to examiners this evidence correlates to real service instance configuration. |
-| raw_api_response | [string](#string) |  | The raw API response used to generate this evidence. The raw API request and response is used to prove to examiners this evidence correlates to real service instance configuration. |
+| sources | [Evidence.Source](#receptor_v1-Evidence-Source) | repeated |  |
 | doc | [Document](#receptor_v1-Document) |  | An unstructured evidence. |
 | struct | [Struct](#receptor_v1-Struct) |  | A structured evidence |
+
+
+
+
+
+
+<a name="receptor_v1-Evidence-Source"></a>
+
+### Evidence.Source
+The raw API request used to generate this evidence.  The raw API request and response are used to prove to
+examiners this evidence correlates to real service instance configuration.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| raw_api_request | [string](#string) |  |  |
+| raw_api_response | [string](#string) |  | The raw API response used to generate this evidence. The raw API request and response is used to prove to examiners this evidence correlates to real service instance configuration. |
 
 
 
@@ -316,10 +332,10 @@ can be in opaque document format or structured document format.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Report | [Finding](#receptor_v1-Finding) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report a finding. A receptor or a Trustero client application reports its findings on a periodic basis. This call returns a string value collection ID or an error specifying why Trustero failed to process the finding. |
-| Discovered | [Services](#receptor_v1-Services) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report known services. A receptor or a Trustero client application reports its known services on demand. This call returns a string value service listing ID or an error specifying why Trustero failed to process the service listing. |
 | Verified | [Credential](#receptor_v1-Credential) | [.google.protobuf.Empty](#google-protobuf-Empty) | Report whether the provided credential is a valid service provider credential for purpose of discovering services and reporting findings. This rpc call is typically made as callback by a receptor to trustero from a check credential receptor request. |
 | GetConfiguration | [ReceptorOID](#receptor_v1-ReceptorOID) | [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration) | Get the receptor configuration and service provider credential using the provided receptor record identifier. This rpc call is typically made as a callback by a receptor prior to making a report findings or discover services receptor request. |
+| Discovered | [Services](#receptor_v1-Services) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report known services. A receptor or a Trustero client application reports its known services on demand. This call returns a string value service listing ID or an error specifying why Trustero failed to process the service listing. |
+| Report | [Finding](#receptor_v1-Finding) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report a finding. A receptor or a Trustero client application reports its findings on a periodic basis. This call returns a string value collection ID or an error specifying why Trustero failed to process the finding. |
 | Notify | [JobResult](#receptor_v1-JobResult) | [.google.protobuf.Empty](#google-protobuf-Empty) | Notify Trustero a long running report finding or discover services receptor request has completed. JobResult contains information about the receptor request and it&#39;s corresponding result. Information such as the JobResult.receptor_object_id are passed to the receptor as part of the request. |
 
  

@@ -5,39 +5,34 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"github.com/trustero/api/go/client"
+	"github.com/trustero/api/go/receptor_v1"
 	"time"
 
 	yaml2 "github.com/ghodss/yaml"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/trustero/monorepo/receptor-sdk/client"
-	"github.com/trustero/monorepo/receptor-sdk/client/api/agent"
-	"github.com/trustero/monorepo/receptor-sdk/client/api/evidence"
-	"github.com/trustero/monorepo/receptor-sdk/pkg"
 )
 
-type EvidenceFinderFunc func(credentials string) (ev []interface{}, err error)
-type GetEvidenceFindersFunc func() (ev []EvidenceFinderFunc)
+type ReporterFunc func(serviceCredentials map[string]string) (ev []interface{}, err error)
 
-var EvidenceGenerators []pkg.EvidenceGenerator
+var Reporters []ReporterFunc
 
-var runAddEvidence bool
+var runReporters bool
 
-const cmdName = "cmd"
-
-var addEvidenceCmd = &cobra.Command{
+var scanCmd = &cobra.Command{
 	Use:   "cmd <access_token>",
 	Short: "Scan for control evidence and discover services on a receptor target endpoint.",
 	Long:  ``,
 	Args:  cobra.MaximumNArgs(1),
-	RunE:  addEvidenceImpl,
+	RunE:  scan,
 }
 
 func init() {
-	addEvidenceCmd.PersistentFlags().BoolVarP(&runAddEvidence, cmdName, "", false, "Find and report evidence of control compliance from the reported services")
+	scanCmd.PersistentFlags().BoolVarP(&runReporters, "find-evidence", "", false, "Find and report evidence of control compliance from the reported services")
 }
 
-func addEvidenceImpl(_ *cobra.Command, args []string) (err error) {
+func scan(_ *cobra.Command, args []string) (err error) {
 	var credentials string
 	// Get credentials from per-receptor customized way to enter credentials.
 	// This is used primarily for testing.
@@ -57,7 +52,7 @@ func addEvidenceImpl(_ *cobra.Command, args []string) (err error) {
 	}
 
 	// Get credentials from ntrced
-	err = runReceptorCmd(args[0], credentials, func(ctx context.Context, rc agent.ReceptorClient, credentials, config string) (err error) {
+	err = runReceptorCmd(args[0], credentials, func(ctx context.Context, rc receptor_v1.ReceptorClient, credentials, config string) (err error) {
 		err = AddEvidence(credentials)
 		if len(Notify) == 0 {
 			return
@@ -70,7 +65,9 @@ func addEvidenceImpl(_ *cobra.Command, args []string) (err error) {
 
 func AddEvidence(credentials string) (err error) {
 	// First, verify credentials are valid before scanning
-	isCredValid, verifyError := Verify(credentials, "")
+	var credMap map[string]string
+	credMap, err = unmarshalCreds(credentials)
+	isCredValid, verifyError := Verify(credMap)
 	if verifyError != nil {
 		log.Err(verifyError).Msg("error verifying credentials")
 		err = verifyError
@@ -104,7 +101,7 @@ func AddEvidence(credentials string) (err error) {
 	}
 	defer cancel()
 
-	for _, evidenceGenerator := range EvidenceGenerators {
+	for _, evidenceGenerator := range Reporters {
 		var genericEvidence []interface{}
 		var sources []*model.AddEvidenceRequest_Source
 		if genericEvidence, sources, err = evidenceGenerator.GenerateEvidence(credentials); err != nil {
@@ -134,4 +131,9 @@ func AddEvidence(credentials string) (err error) {
 		}
 	}
 	return
+}
+
+func unmarshalCreds(credentials string) (map[string]string, error) {
+	panic("ANKIT!!! HELP!")
+	return map[string]string{}, nil
 }
