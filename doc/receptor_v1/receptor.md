@@ -5,8 +5,10 @@
 
 - [receptor_v1/receptor.proto](#receptor_v1_receptor-proto)
     - [Credential](#receptor_v1-Credential)
+    - [Credential.CredentialEntry](#receptor_v1-Credential-CredentialEntry)
     - [Document](#receptor_v1-Document)
     - [Evidence](#receptor_v1-Evidence)
+    - [Evidence.Source](#receptor_v1-Evidence-Source)
     - [Finding](#receptor_v1-Finding)
     - [JobResult](#receptor_v1-JobResult)
     - [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration)
@@ -43,9 +45,25 @@ REMIND:  Credential maps to receptor.VerifyResult record with the addition of cr
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | receptor_object_id | [string](#string) |  | Trustero&#39;s receptor record identifier. This identifier is typically provided to the receptor as part of a reporting findings or discover services request. |
-| credential | [string](#string) |  | The service provider credential being verified. |
+| credential | [Credential.CredentialEntry](#receptor_v1-Credential-CredentialEntry) | repeated | The service provider credential being verified. |
 | is_credential_valid | [bool](#bool) |  | Report whether the service provider credential provided in this message is valid for report findings or discover services request. |
 | message | [string](#string) |  | Reason for why the service provider credential in this message is invalid. |
+
+
+
+
+
+
+<a name="receptor_v1-Credential-CredentialEntry"></a>
+
+### Credential.CredentialEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [string](#string) |  |  |
 
 
 
@@ -81,7 +99,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | caption | [string](#string) |  | Human readable English string that identifies this evidence. It&#39;s important the caption is stable for all scans of the same evidence type. |
 | description | [string](#string) |  | Human readable English string describing the content of this evidence. |
 | service_name | [string](#string) |  | The name of service this evidence was collected from. For example, &#34;S3&#34;. The service name must be one of the service types reported in Services struct (See the message Service definition). |
-| sources | [Evidence.Source](#receptor_v1-Evidence-Source) | repeated |  |
+| sources | [Evidence.Source](#receptor_v1-Evidence-Source) | repeated | The raw API request used to generate this evidence. The raw API request and response are used to prove to examiners this evidence correlates to real service instance configuration. |
 | doc | [Document](#receptor_v1-Document) |  | An unstructured evidence. |
 | struct | [Struct](#receptor_v1-Struct) |  | A structured evidence |
 
@@ -93,13 +111,12 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 <a name="receptor_v1-Evidence-Source"></a>
 
 ### Evidence.Source
-The raw API request used to generate this evidence.  The raw API request and response are used to prove to
-examiners this evidence correlates to real service instance configuration.
+
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| raw_api_request | [string](#string) |  |  |
+| raw_api_request | [string](#string) |  | The raw API request used to generate this evidence. The raw API request and response are used to prove to examiners this evidence correlates to real service instance configuration. |
 | raw_api_response | [string](#string) |  | The raw API response used to generate this evidence. The raw API request and response is used to prove to examiners this evidence correlates to real service instance configuration. |
 
 
@@ -298,12 +315,6 @@ Column value types can be any protobuf scalar or google.proto.Timestamp.
 | int64_value | [int64](#int64) |  |  |
 | uint32_value | [uint32](#uint32) |  |  |
 | uint64_value | [uint64](#uint64) |  |  |
-| sint32_value | [sint32](#sint32) |  |  |
-| sint64_value | [sint64](#sint64) |  |  |
-| fixed32_value | [fixed32](#fixed32) |  |  |
-| fixed64_value | [fixed64](#fixed64) |  |  |
-| sfixed32_value | [sfixed32](#sfixed32) |  |  |
-| sfixed64_value | [sfixed64](#sfixed64) |  |  |
 | bool_value | [bool](#bool) |  |  |
 | string_value | [string](#string) |  |  |
 | timestamp_value | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |

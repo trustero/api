@@ -1,0 +1,39 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release-candidate
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-go
+      - name: Test
+        run: |
+          make deps test
+        working-directory: ${{ inputs.working-directory}}
+
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-go
+      - name: Check Formatting
+        run: |
+          if [ "$(gofmt -l . | wc -l)" -gt 0 ]; then
+            echo
+            echo "Run `go fmt ./...` to format the following files:";
+            gofmt -l .
+            exit 1
+          fi
+        working-directory: ${{ inputs.working-directory}}
