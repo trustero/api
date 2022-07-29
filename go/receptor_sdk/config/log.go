@@ -1,14 +1,13 @@
-package cmd
+package config
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/natefinch/lumberjack"
 	"io"
 	"os"
 	"path"
 	"time"
-
-	"github.com/natefinch/lumberjack"
 
 	grpczerolog "github.com/cheapRoc/grpc-zerolog"
 	"github.com/rs/zerolog"
@@ -51,17 +50,15 @@ func InitLog(levelStr string, logFile string) {
 
 	var writers []io.Writer
 
-	// create stderr log writer
+	// create log writer
 	writers = append(writers, zerolog.ConsoleWriter{
 		Out:             os.Stderr,
 		FormatTimestamp: consoleFormatTimestamp,
 		FormatCaller:    consoleFormatCaller,
 		NoColor:         true})
-
 	noColor = true
 
 	if logFile != "" {
-		// create log file writer
 		writers = append(writers, rollingLog(logFile, 3, 1, 1))
 	}
 
