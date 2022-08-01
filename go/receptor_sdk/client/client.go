@@ -51,7 +51,6 @@ func InitFactory(server *Server) ScopedClientFactory {
 	if rootCAs, err = x509.SystemCertPool(); err != nil {
 		log.Warn().Msg("error loading system cert pool. Assigning and empty cert pool")
 		rootCAs = x509.NewCertPool()
-		err = nil
 	}
 
 	if server.Cert == "dev" {

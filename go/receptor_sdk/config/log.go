@@ -16,14 +16,7 @@ import (
 )
 
 const (
-	colorBlack = iota + 30
-	colorRed
-	colorGreen
-	colorYellow
-	colorBlue
-	colorMagenta
-	colorCyan
-	colorWhite
+	colorCyan = 36
 
 	colorBold     = 1
 	colorDarkGray = 90
@@ -32,7 +25,7 @@ const (
 var tz *time.Location
 var noColor bool
 
-// Setup server logging using zerolog
+// InitLog Setup server logging using zerolog
 func InitLog(levelStr string, logFile string) {
 
 	// Use current timezone when printing console log messages
@@ -148,7 +141,7 @@ func consoleFormatTimestamp(i interface{}) string {
 		}
 	}
 	if noColor {
-		return fmt.Sprintf("%s", t)
+		return t
 	}
 	return colorize(t, colorDarkGray, noColor)
 }

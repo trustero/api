@@ -37,12 +37,6 @@ func Verify(_ *cobra.Command, args []string) (err error) {
 func doVerify(ctx context.Context, rc receptor_v1.ReceptorClient, receptorAccountConfiguration *receptor_v1.ReceptorConfiguration) (err error) {
 	var ok bool
 	var message string
-	var credentials interface{}
-	if credentials, err = Config.UnmarshallCredentials(receptorAccountConfiguration.Credential); err != nil {
-		return
-	}
-	ok, err = Config.Verify(credentials)
-
 	if ok, message, err = verifyWithMessage(receptorAccountConfiguration.Credential); err != nil {
 		return
 	}

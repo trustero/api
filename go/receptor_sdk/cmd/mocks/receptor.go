@@ -19,10 +19,10 @@ func (m *Config) Discover(serviceCredentials interface{}) (services []*cmd.Servi
 	return args.Get(0).([]*cmd.Service), args.Error(1)
 }
 
-// MarshallCredentials deserializes the credentials json string and returns the result as a struct pointer.
+// UnmarshallCredentials deserializes the credentials json string and returns the result as a struct pointer.
 func (m *Config) UnmarshallCredentials(credentials string) (result interface{}, err error) {
 	args := m.Called(credentials)
-	return args.Get(0).(interface{}), args.Error(1)
+	return args.Get(0), args.Error(1)
 }
 
 func (m *Config) GetReporters() []cmd.Reporter {

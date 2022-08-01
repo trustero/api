@@ -11,19 +11,23 @@ concurrency:
   cancel-in-progress: true
 
 
-
 jobs:
-  test:
+  Build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-go
-      - name: Test
-        run: |
-          make deps test
-        working-directory: ${{ inputs.working-directory}}
+      - run: |
+          make all
 
-  fmt:
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-go
+      - run: |
+          make deps test
+  Lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -36,4 +40,6 @@ jobs:
             gofmt -l .
             exit 1
           fi
-        working-directory: ${{ inputs.working-directory}}
+        working-directory: go
+
+
