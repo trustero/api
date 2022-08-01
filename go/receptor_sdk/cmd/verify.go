@@ -2,79 +2,64 @@ package cmd
 
 import (
 	"context"
-	"github.com/rs/zerolog/log"
+
 	"github.com/spf13/cobra"
-	"github.com/trustero/api/go/receptor_sdk/client"
+	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/trustero/api/go/receptor_v1"
 )
 
+// Set up the 'verify' CLI subcommand.
 var verifyCmd = &cobra.Command{
-	Use:     "verify <access_token>",
-	Short:   "Verify receptor configured credentials on the receptor target endpoint.",
-	Long:    ``,
-	Args:    cobra.MaximumNArgs(1),
-	PreRunE: verifyConfig,
-	RunE:    Verify,
+	Use:   "verify <trustero_access_token>|'dryrun'",
+	Short: "Verify read-only access to a service provider account.",
+	Long: `
+Verify read-only access to a service provider account.  Verify command
+decodes the base64 URL encoded credentials from the '--credentials' command
+line flag and check it's validity.  If 'dryrun' is specified instead of a
+Trustero access token, the verify command will not report the results to
+Trustero and instead print the results to console.`,
+	Args: cobra.MaximumNArgs(1),
+	RunE: verify,
 }
 
-func Verify(_ *cobra.Command, args []string) (err error) {
-	// Get credentials from per-receptor customized way to enter credentials.
-	// This is used primarily for testing.
-	if credentials := Config.CredentialsFromFlags(); credentials != nil {
-		return onDebug(credentials, func(credentials interface{}) (err error) {
-			_, err = Config.Verify(credentials)
+func init() {
+	addReceptorFlags(verifyCmd)
+}
+
+// Cobra executes this function on verify command.
+func verify(_ *cobra.Command, args []string) (err error) {
+	// Run receptor's Verify function and report results to Trustero
+	err = invokeWithContext(args[0],
+		func(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
+
+			// Call receptor's Verify method
+			verifyResult := toVerifyResult(receptorImpl.Verify(credentials))
+
+			// Notify behavior is different for the verify command.  When the '--notify' command line
+			// flag is provided on a verify command, verify only notify Trustero of the command
+			// status and does NOT invoke the Verified Trustero RPC method to save the credential
+			// in the receptor record.
+			if len(receptor_sdk.Notify) > 0 {
+				_ = notify(rc, "verify", verifyResult.Message, err)
+				return
+			}
+
+			// Let Trustero know if the service provider account credentials are valid.
+			_, err = rc.Verified(context.Background(), verifyResult)
 			return
 		})
-	}
-
-	server.Token = args[0]
-	client.InitFactory(server)
-	err = client.Factory.AuthScope(Config.ReceptorModelId(), doVerify)
-
 	return
 }
 
-func doVerify(ctx context.Context, rc receptor_v1.ReceptorClient, receptorAccountConfiguration *receptor_v1.ReceptorConfiguration) (err error) {
-	var ok bool
+func toVerifyResult(ok bool, err error) *receptor_v1.Credential {
 	var message string
-	var credentials interface{}
-	if credentials, err = Config.UnmarshallCredentials(receptorAccountConfiguration.Credential); err != nil {
-		return
-	}
-	ok, err = Config.Verify(credentials)
-
-	if ok, message, err = verifyWithMessage(receptorAccountConfiguration.Credential); err != nil {
-		return
-	}
-	if NoSave {
-		log.Debug().Msg(message)
-		return
-	}
-	// Save verify results
-	if _, err = rc.Verified(ctx, &receptor_v1.Credential{ReceptorObjectId: ReceptorId, Message: message, IsCredentialValid: ok}); err != nil || len(Notify) == 0 {
-		return
-	}
-	_ = notify("verify", message, err)
-	return
-}
-
-func verify(jsonCredentials string) (ok bool, err error) {
-	var credentials interface{}
-	if credentials, err = Config.UnmarshallCredentials(jsonCredentials); err != nil {
-		return
-	}
-	ok, err = Config.Verify(credentials)
-	return
-}
-
-func verifyWithMessage(jsonCredentials string) (ok bool, message string, err error) {
-	if ok, err = verify(jsonCredentials); err != nil {
+	if err != nil {
 		message = "error"
 	} else if ok {
 		message = "successful"
 	} else {
 		message = "failed"
 	}
-	log.Debug().Msgf("verify %s.  %#v\n", message, err)
-	return
+
+	return &receptor_v1.Credential{ReceptorObjectId: receptor_sdk.ReceptorId, Message: message, IsCredentialValid: ok}
 }

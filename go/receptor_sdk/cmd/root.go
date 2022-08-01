@@ -1,54 +1,63 @@
 package cmd
 
 import (
-	"context"
-	"fmt"
-	"github.com/trustero/api/go/receptor_sdk/client"
-	"github.com/trustero/api/go/receptor_sdk/config"
+	"encoding/base64"
+	"errors"
 	"strings"
 
 	"github.com/rs/zerolog/log"
+	"golang.org/x/net/context"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/trustero/api/go/receptor_sdk"
+	"github.com/trustero/api/go/receptor_sdk/client"
 	receptor "github.com/trustero/api/go/receptor_v1"
 )
 
-var (
-	cfgFile            string
-	LogLevel           string
-	LogFile            string
-	ModelID            string
-	NoSave             bool
-	Notify             string
-	Credentials        string
-	serviceExcludeList string
-	ReceptorId         string
-	TenantID           string
-	server             = &client.Server{}
-)
+var cfgFile string                     // Configuration file as an alternative to command line flags
+var serviceProviderAccount string      // Receptor's configured service provider account
+var receptorImpl receptor_sdk.Receptor // Receptor implementation
 
-// RootCmd represents the base command when called without any subcommands
+// RootCmd is the base command when called without any subcommands such as 'scan' or 'verify'.
+// The RoodCmd command does nothing when invoked without a subcommand.
 var RootCmd = &cobra.Command{
-	Use:   "", // override to receptor type
-	Short: "Run a receptor in one of 3 modes: verify, scan, and scanall.",
+	Use:   "", // Set to this receptor's type
+	Short: "Run a receptor in one of 2 modes: verify or scan.",
 	Long: `
-Run a receptor in one of 3 modes: verify, scan, and scanall.  The verify mode
-mock the configured receptor credentials against its intended target service.
-The scan mode conducts a discovery scan of service configuration against its
-target service.  And the scanall mode performs a scan for each account with
-the receptor enabled.`,
+Run a receptor in one of 2 modes: verify or scan.  The verify mode checks the
+validity of the given service provider account credential.  The scan mode either
+discovers services enabled in the service provider account or reports the service
+provider account's service configurations.  In the latter case, scan is invoked
+with the --find-evidence flag.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		config.InitLog(LogLevel, LogFile)
+		// If the first argument is 'dryrun' then do not report the command
+		// results to Trustero.  Instead, display the results to console.
+		if len(args) > 0 && args[0] != "dryrun" {
+			client.InitGRPCClient(receptor_sdk.Cert, receptor_sdk.CertServerOverride)
+		} else {
+			receptor_sdk.NoSave = true
+		}
+	},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		if client.ServerConn != nil {
+			if err := client.ServerConn.CloseClient(); err != nil {
+				log.Error().Msg(err.Error())
+			}
+		}
 	},
 }
 
-var Config Receptor
-
-func Execute() {
+// Execute the command
+func Execute(r receptor_sdk.Receptor) {
+	receptorImpl = r
+	receptor_sdk.ModelID = receptorImpl.GetReceptorType()
+	RootCmd.Use = receptor_sdk.ModelID
 	cobra.CheckErr(RootCmd.Execute())
 }
 
+// Setup verify and scan subcommands.
 var commands = []*cobra.Command{
 	verifyCmd,
 	scanCmd,
@@ -58,14 +67,13 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file (default is $HOME/.receptor.yaml)")
-	RootCmd.PersistentFlags().StringVarP(&server.Host, "host", "s", "localhost", "Trustero GRPC API endpoint host name. If host is set to 'prod.api.infra.trustero.com', port, cert, and certoverride flags will be set to match.")
-	RootCmd.PersistentFlags().IntVarP(&server.Port, "port", "p", 8888, "Trustero GRPC API endpoint port number.")
-	RootCmd.PersistentFlags().StringVarP(&server.Cert, "cert", "c", "dev", "Server cert ca to use - dev or prod.")
-	RootCmd.PersistentFlags().StringVarP(&server.CertServerOverride, "certoverride", "o", "dev.ntrce.co", "Server cert ca server override.")
-	RootCmd.PersistentFlags().StringVarP(&LogLevel, "level", "l", "error", "Log level, one of trace, debug, info, warn, error, fatal, or panic.")
-	RootCmd.PersistentFlags().StringVarP(&LogFile, "log-file", "", "", "Log file path")
-	RootCmd.PersistentFlags().StringVarP(&serviceExcludeList, "exclude", "", "", "Comma-separated list of services types to exclude")
-	RootCmd.PersistentFlags().StringVarP(&ReceptorId, "receptor-id", "r", "", "Unique identifier for the receptor record.")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.Host, "host", "s", "localhost", "Trustero GRPC API endpoint host name. If host is set to 'prod.api.infra.trustero.com', port, cert, and certoverride flags will be set to match.")
+	RootCmd.PersistentFlags().IntVarP(&receptor_sdk.Port, "port", "p", 8888, "Trustero GRPC API endpoint port number.")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.Cert, "cert", "c", "dev", "Server cert ca to use - dev or prod.")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.CertServerOverride, "certoverride", "o", "dev.ntrce.co", "Server cert ca server override.")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.LogLevel, "level", "l", "error", "Log level from most to least verbose: trace, debug, info, warn, error, fatal, or panic.")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.LogFile, "log-file", "", "", "Log file path")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.ReceptorId, "receptor-id", "r", "", "Unique identifier to the Trustero receptor record holding the service provider account credentials.")
 
 	if err := viper.BindPFlag("host", RootCmd.PersistentFlags().Lookup("host")); err != nil {
 		log.Error().Msg(err.Error())
@@ -100,13 +108,26 @@ func init() {
 }
 
 func addReceptorFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().BoolVarP(&NoSave, "nosave", "n", false, "Print command results to console in yaml instead of saving them to prod.api.infra.trustero.com.")
-	cmd.PersistentFlags().StringVarP(&Notify, "notify", "", "", "Notify prod.api.infra.trustero.com the result of the command.")
-	cmd.PersistentFlags().StringVarP(&Credentials, "credentials", "", "", "Base64 URL encoded service credentials in receptor native format.")
+	cmd.PersistentFlags().BoolVarP(&receptor_sdk.NoSave, "nosave", "n", false, "Print command results to console (stdout) in yaml instead of sending to Trustero.")
+	cmd.PersistentFlags().StringVarP(&receptor_sdk.Notify, "notify", "", "", "The tracer ID to use when notifying Trustero the result of the command.")
+	cmd.PersistentFlags().StringVarP(&receptor_sdk.CredentialsBase64URL, "credentials", "", "", "Base64 URL encoded service provider credential in receptor native format.")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Find home directory.
+		home, err := homedir.Dir()
+		cobra.CheckErr(err)
+
+		// Search config in home directory with name ".receptor" (without extension).
+		viper.AddConfigPath(home)
+		viper.SetConfigName(".receptor")
+	}
+
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
@@ -114,39 +135,111 @@ func initConfig() {
 		log.Debug().Msgf("Using config file: %s", viper.ConfigFileUsed())
 	}
 
+	// Initialize zerolog
+	InitLog(receptor_sdk.LogLevel, receptor_sdk.LogFile)
+
 	// Set GRPC host related flags if we see Host set to api.infra.trustero.com
-	if strings.HasSuffix(server.Host, ".api.infra.trustero.com") {
-		server.Port = 8443
-		server.Cert = "infra"
-		server.CertServerOverride = ""
+	if strings.HasSuffix(receptor_sdk.Host, ".api.infra.trustero.com") {
+		receptor_sdk.Port = 8443
+		receptor_sdk.Cert = "infra"
+		receptor_sdk.CertServerOverride = ""
 	}
 }
 
-func notify(command, result string, e error) (err error) {
-	at := receptor.JobResult{
-		TracerId:         Notify,
-		ReceptorObjectId: ReceptorId,
+type commandInContext func(rc receptor.ReceptorClient, credentials interface{}) error
+
+func invokeWithContext(token string, run commandInContext) (err error) {
+	var (
+		rc            receptor.ReceptorClient
+		credentialStr string
+		credentialObj interface{}
+	)
+
+	// Get Trustero GRPC client
+	if rc, err = getReceptorClient(token); err != nil {
+		return
+	}
+
+	// Get service provider account credentialStr from CLI
+	credentialStr, err = getCredentialStringFromCLI()
+	if err != nil {
+		return
+	}
+
+	// If credentialStr not provided on CLI, get it from Trustero server
+	if len(credentialStr) == 0 {
+		// Get service provider account credentialStr and config from Trustero.
+		var receptorInfo *receptor.ReceptorConfiguration
+		if receptorInfo, err = getReceptorConfig(rc); err != nil {
+			return err
+		}
+		credentialStr = receptorInfo.GetCredential()
+		serviceProviderAccount = receptorInfo.ServiceProviderAccount
+	}
+
+	// Unmarshal credential
+	credentialObj, err = receptorImpl.UnmarshalCredentials(credentialStr)
+
+	// Invoke receptor's method
+	if err == nil {
+		err = run(rc, credentialObj)
+	}
+	return
+}
+
+func getReceptorClient(token string) (rc receptor.ReceptorClient, err error) {
+	if receptor_sdk.NoSave {
+		// Mock client
+		rc = &MockReceptorClient{}
+	} else {
+		// Connect to Trustero
+		if err = client.ServerConn.Dial(token, receptor_sdk.Host, receptor_sdk.Port); err != nil {
+			return
+		}
+		// Get client
+		rc = client.ServerConn.GetReceptorClient()
+	}
+	return
+}
+
+func getReceptorConfig(rc receptor.ReceptorClient) (config *receptor.ReceptorConfiguration, err error) {
+	config, err = rc.GetConfiguration(context.Background(), &receptor.ReceptorOID{ReceptorObjectId: receptor_sdk.ReceptorId})
+	return
+}
+
+func notify(rc receptor.ReceptorClient, command, result string, e error) (err error) {
+	if e != nil {
+		result = "error"
+	}
+
+	res := receptor.JobResult{
+		TracerId:         receptor_sdk.Notify,
+		ReceptorObjectId: receptor_sdk.ReceptorId,
 		Command:          command,
 		Result:           result}
 
-	err = client.Factory.AuthScope(Config.ReceptorModelId(),
-		func(ctx context.Context, client receptor.ReceptorClient, _ *receptor.ReceptorConfiguration) (err error) {
-			if e != nil {
-				result = "error"
-			}
-			_, err = client.Notify(ctx, &at)
-			return
-		})
+	_, err = rc.Notify(context.Background(), &res)
 
 	return
 }
 
-func verifyConfig(_ *cobra.Command, args []string) (err error) {
-	if Config == nil {
-		err = fmt.Errorf("receptor not configured")
+func getCredentialStringFromCLI() (credentials string, err error) {
+	// Extract credentials from CLI flags
+	if len(receptor_sdk.CredentialsBase64URL) > 0 {
+		// Get credentials from the --credentials flag
+		var creds []byte
+		if creds, err = base64.URLEncoding.DecodeString(receptor_sdk.CredentialsBase64URL); err != nil {
+			return
+		}
+		credentials = string(creds)
+	} else {
+		// Construct credentials from custom CLI flags.
+		credentials = receptor_sdk.CredentialsFromFlags()
 	}
-	if Config.CredentialsFromFlags() == nil && len(args) == 0 {
-		err = fmt.Errorf("credentials not provided")
+
+	if len(credentials) == 0 {
+		err = errors.New("no credentials provided")
 	}
+
 	return
 }
