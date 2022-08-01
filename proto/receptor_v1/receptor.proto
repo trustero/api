@@ -300,7 +300,7 @@ message Credential {
   /**
    The service provider credential being verified.
    */
-  map<string,string> credential = 2;
+  string credential = 2;
 
   /**
    Report whether the service provider credential provided in this message is valid for report findings or discover

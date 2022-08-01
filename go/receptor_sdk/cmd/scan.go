@@ -2,98 +2,70 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
+
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/trustero/api/go/receptor_sdk/client"
+	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/trustero/api/go/receptor_v1"
 )
 
-type ReporterFunc func(serviceCredentials map[string]string) (ev []interface{}, err error)
-
-var runReporters bool
-
+// Set up the 'scan' CLI subcommand.
 var scanCmd = &cobra.Command{
-	Use:     "cmd <access_token>",
-	Short:   "Scan for control evidence and discover services on a receptor target endpoint.",
-	Long:    ``,
-	Args:    cobra.MaximumNArgs(1),
-	PreRunE: verifyConfig,
-	RunE:    scan,
+	Use:   "scan <trustero_access_token>|'dryrun'",
+	Short: "Scan for services or evidence in a service provider account.",
+	Long: `
+Scan for services and evidences in-use in a service provider account.  Scan
+command decodes the base64 URL encoded credentials from the '--credentials'
+command line flag and check it's validity.  If 'dryrun' is specified instead
+of a Trustero access token, the scan command will not report the results to
+Trustero and instead print the results to console.`,
+	Args: cobra.MaximumNArgs(1),
+	RunE: scan,
 }
 
 func init() {
-	scanCmd.PersistentFlags().BoolVarP(&runReporters, "find-evidence", "", false, "Find and report evidence of control compliance from the reported services")
+	scanCmd.PersistentFlags().BoolVarP(&receptor_sdk.FindEvidence, "find-evidence", "", false,
+		"Also scan for evidences in a service provider account.")
+	addReceptorFlags(scanCmd)
 }
 
+// Cobra executes this function on verify command.
 func scan(_ *cobra.Command, args []string) (err error) {
-	// Get credentials from per-receptor customized way to enter credentials.
-	// This is used primarily for testing.
-	if credentials := Config.CredentialsFromFlags(); credentials != nil {
-		return onDebug(credentials, func(m interface{}) (err error) {
-			var evidences []*receptor_v1.Evidence
-			if evidences, err = getReports(credentials); err != nil {
+	// Run receptor's Verify function and report results to Trustero
+	err = invokeWithContext(args[0],
+		func(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
+			defer func() {
+				if len(receptor_sdk.Notify) == 0 {
+					return
+				}
+				if receptor_sdk.FindEvidence {
+					notify(rc, "scan", "successful", err)
+				} else {
+					notify(rc, "discover", "successful", err)
+				}
+			}()
+
+			// Verify credentials.
+			var ok bool
+			if ok, err = receptorImpl.Verify(credentials); err != nil {
+				log.Err(err).Msg("error verifying credentials")
 				return
 			}
-			for _, report := range evidences {
-				jsoned, _ := json.Marshal(report)
-				log.Debug().Msg(string(jsoned))
+
+			// Let Trustero know the credentials have been verified.
+			_, err = rc.Verified(context.Background(), toVerifyResult(ok, err))
+
+			// Discover services in-use in the service provider account
+			if err = discover(rc, credentials); err != nil {
+				return
 			}
+
+			// Report evidence discovered in the service provider account
+			if receptor_sdk.FindEvidence {
+				err = report(rc, credentials)
+			}
+
 			return
 		})
-	}
-	server.Token = args[0]
-	client.InitFactory(server)
-	err = client.Factory.AuthScope(Config.ReceptorModelId(), doScan)
-	return
-}
-
-func doScan(ctx context.Context, rc receptor_v1.ReceptorClient, serviceCredentials *receptor_v1.ReceptorConfiguration) (err error) {
-	var credentials interface{}
-	if credentials, err = Config.UnmarshallCredentials(serviceCredentials.Credential); err != nil {
-		return
-	}
-
-	// First, verify credentials are valid before scanning
-	var ok bool
-	if ok, err = Config.Verify(credentials); err != nil {
-		log.Err(err).Msg("error verifying credentials")
-		return
-	} else if !ok {
-		// Don't continue scanning if the credentials are invalid
-		log.Debug().Msg("invalid credentials - aborting scan")
-		return
-	}
-	var reports []*receptor_v1.Evidence
-	if reports, err = getReports(credentials); err != nil {
-		return
-	}
-	if _, err = rc.Report(ctx, &receptor_v1.Finding{
-		Evidences: reports,
-	}); err != nil || len(Notify) == 0 {
-		return
-	}
-	_ = notify("scan", "completed", err)
-	return
-}
-
-func getReports(credentials interface{}) (evidence []*receptor_v1.Evidence, err error) {
-	for _, reporter := range Config.GetReporters() {
-		var reports []interface{}
-		var sources []*Source
-		if reports, sources, err = reporter.Report(credentials); err != nil {
-			return
-		}
-		if len(reports) == 0 && len(sources) == 0 {
-			continue
-		}
-
-		evidence = append(evidence, &receptor_v1.Evidence{
-			Sources:      sources,
-			Caption:      reporter.Caption(),
-			ServiceName:  Config.ServiceModelId(),
-			EvidenceType: &receptor_v1.Evidence_Struct{},
-		})
-	}
 	return
 }
