@@ -1,0 +1,32 @@
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+syntax = "proto3";
+
+package receptor_v1;
+
+option go_package = "github.com/trustero/api/go/receptor_v1";
+
+
+/**
+ An unstructured evidence provided as a MIME document.
+ */
+message Document {
+  /**
+   A unique service ID relative to the document.  A row ID typically represents a unique service ID.  The
+   service_id must be previously reported in the Services message.
+   @required
+   */
+  string service_id = 1;
+
+  /**
+   Document type defined using MIME (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types).
+   @required
+   */
+  string mime = 2;
+
+  /**
+   Opaque document body.  The document body must match the type defined by the mime attribute.
+   @required
+   */
+  bytes body = 3;
+}
