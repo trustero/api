@@ -1,0 +1,72 @@
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+syntax = "proto3";
+
+package receptor_v1;
+
+option go_package = "github.com/trustero/api/go/receptor_v1";
+
+import "receptor_v1/document.proto";
+import "receptor_v1/struct.proto";
+
+
+/**
+ An evidence is a unstructured or structured document that represent the how a service is being used within a
+ service provider account.  For example, the configuration of an S3 bucket in AWS.
+ */
+message Evidence {
+
+  /**
+   Human readable English string that identifies this evidence.  It's important the caption is stable for all
+   scans of the same evidence type.
+   */
+  string caption = 1;
+
+  /**
+   Human readable English string describing the content of this evidence.
+   */
+  string description = 2;
+
+  /**
+   The name of service this evidence was collected from.  For example, "S3".  The service name must be one
+   of the service types reported in Services struct (See the message Service definition).
+   */
+  string service_name = 3;
+
+  /**
+   The raw API request used to generate this evidence.  The raw API request and response are used to prove to
+   examiners this evidence correlates to real service instance configuration.
+   */
+
+  repeated Source sources = 4;
+
+  /**
+   The evidence can be an unstructured (Document) or structured (Struct) type.
+   */
+  oneof evidence_type {
+
+    /**
+     An unstructured evidence.
+     */
+    Document doc = 6;
+
+    /**
+     A structured evidence
+     */
+    Struct struct = 7;
+  }
+
+  message Source{
+    /**
+ The raw API request used to generate this evidence.  The raw API request and response are used to prove to
+ examiners this evidence correlates to real service instance configuration.
+ */
+
+    string raw_api_request = 1;
+    /**
+     The raw API response used to generate this evidence.  The raw API request and response is used to prove to
+     examiners this evidence correlates to real service instance configuration.
+     */
+    string raw_api_response = 2;
+  }
+}

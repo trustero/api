@@ -1,0 +1,81 @@
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+syntax = "proto3";
+
+package receptor_v1;
+
+option go_package = "github.com/trustero/api/go/receptor_v1";
+import "google/protobuf/timestamp.proto";
+
+
+/**
+ A structured evidence defined in tabular form.  Each struct typically represent a service type (see Evidence
+ message definition).  Each struct consists of rows of data.  Each row typically represent a service instance and
+ its configurations.  A row  contains column name and column value pairs.  All rows in a struct must have the same
+ column name-value pairs.
+ */
+message Struct {
+
+  /**
+   Each row typically represents the configuration of a service instance.
+   @required
+   */
+  repeated Row rows = 1;
+
+  /**
+   A map of row column name to display name pairs.
+   @required
+   */
+  map<string, string> col_display_names = 2;
+
+  /**
+   An ordered list of row column names.  The order defines how each column will be rendered by default.
+   @required
+   */
+  repeated string col_display_order = 3;
+
+  /**
+   A row of structured data
+   */
+  message Row {
+
+    /**
+     A unique service ID relative to the struct.  A row ID typically represents a unique service ID.  The
+     service_id must be previously reported in the Services message.
+     @required
+     */
+    string service_id = 1;
+
+    /**
+     Columns of the row in column name to value pairs.  All rows in a struct must have the same column names and
+     corresponding value types.
+     @required
+     */
+    map<string, Value> cols = 2;
+
+    /**
+     Column value types can be any protobuf scalar or google.proto.Timestamp.
+     @required
+     */
+    message Value {
+      oneof value_type {
+        double double_value = 1;
+        float float_value = 2;
+        int32 int32_value = 3;
+        int64 int64_value = 4;
+        uint32 uint32_value = 5;
+        uint64 uint64_value = 6;
+        sint32 sint32_value = 7;
+        sint64 sint64_value = 8;
+        fixed32 fixed32_value = 9;
+        fixed64 fixed64_value = 10;
+        sfixed32 sfixed32_value = 11;
+        sfixed64 sfixed64_value = 12;
+        bool bool_value = 13;
+        string string_value = 14;
+        google.protobuf.Timestamp timestamp_value = 15;
+      }
+    }
+  }
+
+}
