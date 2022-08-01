@@ -8,7 +8,7 @@ option go_package = "github.com/trustero/api/go/receptor_v1";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
-import "receptor_v1/finding.proto";
+import "google/protobuf/timestamp.proto";
 
 
 /**
@@ -43,7 +43,6 @@ service Receptor {
    */
   rpc Discovered(Services) returns (google.protobuf.StringValue);
 
-
   /**
    Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
    call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
@@ -56,6 +55,185 @@ service Receptor {
    JobResult.receptor_object_id are passed to the receptor as part of the request.
    */
   rpc Notify(JobResult) returns (google.protobuf.Empty);
+}
+
+
+/**
+ A finding is a set of evidence(s) collected from a service provider account.
+ */
+message Finding {
+
+  /**
+   Unique receptor identifier.  A receptor is expected to report findings from only one service provider type.  A
+   stable identifier that represent the type of receptor reporting this finding.  The identifier is akin to a fully
+   qualified Go package name or a Java class name.  For example, "github.com/trustero/receptor/gitlab".
+   REMIND maps to Receptor.ModelID
+   */
+  string receptor_type = 1;
+
+  /**
+   The receptor's evidence source.
+   REMIND maps to Receptor.TenantID
+   */
+  string service_provider_account = 2;
+
+  /**
+   One or more evidence collected by a typical receptor scan.
+   */
+  repeated Evidence evidences = 3;
+}
+
+
+/**
+ An evidence is a unstructured or structured document that represent the how a service is being used within a
+ service provider account.  For example, the configuration of an S3 bucket in AWS.
+ */
+message Evidence {
+
+  /**
+   Human readable English string that identifies this evidence.  It's important the caption is stable for all
+   scans of the same evidence type.
+   */
+  string caption = 1;
+
+  /**
+   Human readable English string describing the content of this evidence.
+   */
+  string description = 2;
+
+  /**
+   The name of service this evidence was collected from.  For example, "S3".  The service name must be one
+   of the service types reported in Services struct (See the message Service definition).
+   */
+  string service_name = 3;
+
+  /**
+   The raw API request used to generate this evidence.  The raw API request and response are used to prove to
+   examiners this evidence correlates to real service instance configuration.
+   */
+  repeated Source sources = 4;
+
+  /**
+   The evidence can be an unstructured (Document) or structured (Struct) type.
+   */
+  oneof evidence_type {
+
+    /**
+     An unstructured evidence.
+     */
+    Document doc = 6;
+
+    /**
+     A structured evidence
+     */
+    Struct struct = 7;
+  }
+
+  message Source {
+    /**
+     The raw API request used to generate this evidence.  The raw API request and response are used to prove to
+     examiners this evidence correlates to real service instance configuration.
+     */
+    string raw_api_request = 1;
+
+    /**
+     The raw API response used to generate this evidence.  The raw API request and response is used to prove to
+     examiners this evidence correlates to real service instance configuration.
+     */
+    string raw_api_response = 2;
+  }
+}
+
+
+/**
+ An unstructured evidence provided as a MIME document.
+ */
+message Document {
+  /**
+   A unique service ID relative to the document.  A row ID typically represents a unique service ID.  The
+   service_id must be previously reported in the Services message.
+   @required
+   */
+  string service_id = 1;
+
+  /**
+   Document type defined using MIME (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types).
+   @required
+   */
+  string mime = 2;
+
+  /**
+   Opaque document body.  The document body must match the type defined by the mime attribute.
+   @required
+   */
+  bytes body = 3;
+}
+
+
+/**
+ A structured evidence defined in tabular form.  Each struct typically represent a service type (see Evidence
+ message definition).  Each struct consists of rows of data.  Each row typically represent a service instance and
+ its configurations.  A row  contains column name and column value pairs.  All rows in a struct must have the same
+ column name-value pairs.
+ */
+message Struct {
+
+  /**
+   Each row typically represents the configuration of a service instance.
+   @required
+   */
+  repeated Row rows = 1;
+
+  /**
+   A map of row column name to display name pairs.
+   @required
+   */
+  map<string, string> col_display_names = 2;
+
+  /**
+   An ordered list of row column names.  The order defines how each column will be rendered by default.
+   @required
+   */
+  repeated string col_display_order = 3;
+
+  /**
+   A row of structured data
+   */
+  message Row {
+
+    /**
+     A unique service ID relative to the struct.  A row ID typically represents a unique service ID.  The
+     service_id must be previously reported in the Services message.
+     @required
+     */
+    string service_id = 1;
+
+    /**
+     Columns of the row in column name to value pairs.  All rows in a struct must have the same column names and
+     corresponding value types.
+     @required
+     */
+    map<string, Value> cols = 2;
+
+    /**
+     Column value types can be any protobuf scalar or google.proto.Timestamp.
+     @required
+     */
+    message Value {
+      oneof value_type {
+        double double_value = 1;
+        float float_value = 2;
+        int32 int32_value = 3;
+        int64 int64_value = 4;
+        uint32 uint32_value = 5;
+        uint64 uint64_value = 6;
+        bool bool_value = 7;
+        string string_value = 8;
+        google.protobuf.Timestamp timestamp_value = 9;
+      }
+    }
+  }
+
 }
 
 
