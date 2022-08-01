@@ -30,6 +30,7 @@ func TestVerifyWithTestCredentials(t *testing.T) {
 	err := cmd.Verify(nil, nil)
 
 	assert.Nil(t, err)
+	mockConfig.AssertExpectations(t)
 }
 
 func TestVerify(t *testing.T) {

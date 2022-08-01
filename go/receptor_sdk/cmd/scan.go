@@ -19,14 +19,14 @@ var scanCmd = &cobra.Command{
 	Long:    ``,
 	Args:    cobra.MaximumNArgs(1),
 	PreRunE: verifyConfig,
-	RunE:    scan,
+	RunE:    Scan,
 }
 
 func init() {
 	scanCmd.PersistentFlags().BoolVarP(&runReporters, "find-evidence", "", false, "Find and report evidence of control compliance from the reported services")
 }
 
-func scan(_ *cobra.Command, args []string) (err error) {
+func Scan(_ *cobra.Command, args []string) (err error) {
 	// Get credentials from per-receptor customized way to enter credentials.
 	// This is used primarily for testing.
 	if credentials := Config.CredentialsFromFlags(); credentials != nil {
@@ -78,7 +78,8 @@ func doScan(ctx context.Context, rc receptor_v1.ReceptorClient, serviceCredentia
 }
 
 func getReports(credentials interface{}) (evidence []*receptor_v1.Evidence, err error) {
-	for _, reporter := range Config.GetReporters() {
+	reporters := Config.GetReporters()
+	for _, reporter := range reporters {
 		var reports []interface{}
 		var sources []*Source
 		if reports, sources, err = reporter.Report(credentials); err != nil {
@@ -87,12 +88,18 @@ func getReports(credentials interface{}) (evidence []*receptor_v1.Evidence, err 
 		if len(reports) == 0 && len(sources) == 0 {
 			continue
 		}
+		var reportStruct *receptor_v1.Struct
+		if reportStruct, err = receptor_v1.NewStruct(reports); err != nil {
+			return
+		}
 
 		evidence = append(evidence, &receptor_v1.Evidence{
-			Sources:      sources,
-			Caption:      reporter.Caption(),
-			ServiceName:  Config.ServiceModelId(),
-			EvidenceType: &receptor_v1.Evidence_Struct{},
+			Sources:     sources,
+			Caption:     reporter.Caption(),
+			ServiceName: Config.ServiceModelId(),
+			EvidenceType: &receptor_v1.Evidence_Struct{
+				Struct: reportStruct,
+			},
 		})
 	}
 	return
