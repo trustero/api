@@ -3,7 +3,7 @@ package generators
 import (
 	"os/exec"
 
-	"github.com/trustero/monorepo/receptor-sdk/client/api/model"
+	"github.com/trustero/api/receptor_sdk/client/api/model"
 )
 
 type FolderSize struct{}

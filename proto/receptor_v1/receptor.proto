@@ -23,38 +23,36 @@ import "google/protobuf/timestamp.proto";
 service Receptor {
 
   /**
-    Report whether the provided credential is a valid service provider credential for purpose of discovering services
-    and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from a check
-    credential receptor request.
+   Report whether the provided credential is a valid service provider credential for purpose of discovering services
+   and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from a check
+   credential receptor request.
    */
   rpc Verified(Credential) returns (google.protobuf.Empty);
 
-
   /**
-    Get the receptor configuration and service provider credential using the provided receptor record identifier.  This
-    rpc call is typically made as a callback by a receptor prior to making a report findings or discover services
-    receptor request.
+   Get the receptor configuration and service provider credential using the provided receptor record identifier.  This
+   rpc call is typically made as a callback by a receptor prior to making a report findings or discover services
+   receptor request.
   */
   rpc GetConfiguration(ReceptorOID) returns (ReceptorConfiguration);
 
   /**
-    Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
-    call returns a string value service listing ID or an error specifying why Trustero failed to process the service
-    listing.
+   Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
+   call returns a string value service listing ID or an error specifying why Trustero failed to process the service
+   listing.
    */
   rpc Discovered(Services) returns (google.protobuf.StringValue);
 
-
   /**
-  Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
-  call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
+   Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
+   call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
   */
   rpc Report(Finding) returns (google.protobuf.StringValue);
 
   /**
-    Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
-    contains information about the receptor request and it's corresponding result.  Information such as the
-    JobResult.receptor_object_id are passed to the receptor as part of the request.
+   Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
+   contains information about the receptor request and it's corresponding result.  Information such as the
+   JobResult.receptor_object_id are passed to the receptor as part of the request.
    */
   rpc Notify(JobResult) returns (google.protobuf.Empty);
 }
@@ -113,7 +111,6 @@ message Evidence {
    The raw API request used to generate this evidence.  The raw API request and response are used to prove to
    examiners this evidence correlates to real service instance configuration.
    */
-
   repeated Source sources = 4;
 
   /**
@@ -132,13 +129,13 @@ message Evidence {
     Struct struct = 7;
   }
 
-  message Source{
+  message Source {
     /**
- The raw API request used to generate this evidence.  The raw API request and response are used to prove to
- examiners this evidence correlates to real service instance configuration.
- */
-
+     The raw API request used to generate this evidence.  The raw API request and response are used to prove to
+     examiners this evidence correlates to real service instance configuration.
+     */
     string raw_api_request = 1;
+
     /**
      The raw API response used to generate this evidence.  The raw API request and response is used to prove to
      examiners this evidence correlates to real service instance configuration.
@@ -230,15 +227,9 @@ message Struct {
         int64 int64_value = 4;
         uint32 uint32_value = 5;
         uint64 uint64_value = 6;
-        sint32 sint32_value = 7;
-        sint64 sint64_value = 8;
-        fixed32 fixed32_value = 9;
-        fixed64 fixed64_value = 10;
-        sfixed32 sfixed32_value = 11;
-        sfixed64 sfixed64_value = 12;
-        bool bool_value = 13;
-        string string_value = 14;
-        google.protobuf.Timestamp timestamp_value = 15;
+        bool bool_value = 7;
+        string string_value = 8;
+        google.protobuf.Timestamp timestamp_value = 9;
       }
     }
   }

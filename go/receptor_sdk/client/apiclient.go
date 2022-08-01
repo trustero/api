@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/trustero/api/go/config"
+	"github.com/trustero/api/go/receptor_sdk/config"
 	"github.com/trustero/api/go/receptor_v1"
 	"google.golang.org/grpc/credentials/oauth"
 
@@ -19,15 +19,15 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-var Ntrced *NtrcedClient
+var ServerConn *ServerConnection
 
-type NtrcedClient struct {
-	Client        *grpc.ClientConn
+type ServerConnection struct {
+	Connection    *grpc.ClientConn
 	TlsDialOption grpc.DialOption
 }
 
 func InitGRPCClient(cert, override string) {
-	Ntrced = &NtrcedClient{}
+	ServerConn = &ServerConnection{}
 
 	rootCAs, err := x509.SystemCertPool()
 	if err != nil {
@@ -42,37 +42,49 @@ func InitGRPCClient(cert, override string) {
 		}
 	}
 
-	Ntrced.TlsDialOption = grpc.WithTransportCredentials(
+	ServerConn.TlsDialOption = grpc.WithTransportCredentials(
 		credentials.NewTLS(&tls.Config{
 			ServerName: override,
 			RootCAs:    rootCAs,
 		}))
 }
 
-func (n *NtrcedClient) Dial(token, host string, port int) (err error) {
+func (sc *ServerConnection) Dial(token, host string, port int) (err error) {
 	// Dial options
 	grpcCred := oauth.NewOauthAccess(&oauth2.Token{AccessToken: token})
 	opts := []grpc.DialOption{
+		grpc.WithUnaryInterceptor(logUnaryCall),
 		grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(grpcCred),
-		n.TlsDialOption,
+		sc.TlsDialOption,
 	}
 
 	// Connect to local server
 	addr := host + ":" + strconv.Itoa(port)
-	n.Client, err = grpc.Dial(addr, opts...)
+	sc.Connection, err = grpc.Dial(addr, opts...)
 	return
 }
 
-func (n *NtrcedClient) CloseClient() error {
-	if n.Client != nil {
-		return n.Client.Close()
+func (sc *ServerConnection) CloseClient() error {
+	if sc.Connection != nil {
+		return sc.Connection.Close()
 	}
 	return nil
 }
 
-func (n *NtrcedClient) GetReceptorClient() (receptor_v1.ReceptorClient, context.Context, context.CancelFunc) {
-	agt := receptor_v1.NewReceptorClient(n.Client)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	return agt, ctx, cancel
+func (sc *ServerConnection) GetReceptorClient() (rc receptor_v1.ReceptorClient) {
+	rc = receptor_v1.NewReceptorClient(sc.Connection)
+	return
+}
+
+func logUnaryCall(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	start := time.Now()
+	callId := RandString(8)
+	log.Trace().Msgf("grpc begin [%s-%s]", method, callId)
+	defer func() {
+		elapsed := time.Now().Sub(start)
+		log.Info().Msgf("grpc end [%s-%s], elapsed time: %fs", method, callId, elapsed.Seconds())
+	}()
+
+	return invoker(ctx, method, req, reply, cc, opts...)
 }
