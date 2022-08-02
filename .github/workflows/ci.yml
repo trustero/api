@@ -1,0 +1,42 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release-candidate
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-go
+      - name: Build
+        run: |
+          make all
+
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-go
+      - name: Test
+        run: |
+          make deps test
+
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-go
+      - name: Check Formatting
+        run: |
+          make lint
+        working-directory: go

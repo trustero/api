@@ -1,9 +1,10 @@
 name: Spellcheck
 on:
-  pull_request:
-    paths:
-    - '**.go'
-    - '**.md'
+  workflow_call: # Spellcheck currently broken. See: https://intersticelabs.atlassian.net/browse/AP-3754
+#  pull_request:
+#    paths:
+#    - '**.go'
+#    - '**.md'
 jobs:
   spelling:
     runs-on: ubuntu-latest
