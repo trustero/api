@@ -1,6 +1,6 @@
 include ../make/globals.mk
 GO_PATH_BIN := $(shell go env GOPATH)/bin
-.PHONY: foo
+.PHONY: foo _proto-clean
 MODULE := "trustero-api-go"
 
 deps:
@@ -17,7 +17,7 @@ endif
 
 build: protoc-build
 
-proto-gen:
+proto-gen: _proto-clean
 	$(call outmsg, $(MODULE), "Generating golang proto bindings")
 	@./proto-gen.sh
 
@@ -27,9 +27,19 @@ test:
 	@go test $(shell go list ./... | grep -v /examples/ ) -coverprofile coverage.txt
 	@grep -Ev '\.pb\.' coverage.txt > coverage.txt.tmp && mv coverage.txt.tmp coverage.txt
 
-clean:
+clean: _proto-clean
 	$(call outmsg, $(MODULE))
 	@go clean
+	@find . -name "*.pb.*" -type f -delete
+	@find . -type d -empty -delete
+
+
+# _proto-clean
+# The protoc compiler will not cleanup generated files if a proto file is deleted.
+# To ensure  that there are no leftover files we need to delete all generated files before running the protoc compiler.
+_proto-clean:
+	@find . -name "*.pb.*" -type f -delete
+	@find . -type d -empty -delete
 
 fmt:
 	$(call outmsg, $(MODULE))
