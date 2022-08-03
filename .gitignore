@@ -16,3 +16,4 @@
 .idea
 .vscode
 build/
+**/coverage.txt

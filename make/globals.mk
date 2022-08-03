@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-TOP_TARGETS :=	all clean build deps fmt test run
+TOP_TARGETS :=	all clean build deps fmt test run lint
 
 PROTOS_CHANGED := $(if $(shell git diff --quiet HEAD ${REF} -- $(CURDIR)/protos) || echo "changed", "true",)
 
