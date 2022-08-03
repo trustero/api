@@ -29,7 +29,7 @@ func TestNewStruct(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, newStruct)
 	assert.NotNil(t, newStruct.GetRows())
-	assert.NotNil(t, newStruct.GetRows())
+	assert.Equal(t, newStruct.GetRows()[0].ServiceId, "123")
 	assert.NotNil(t, newStruct.GetColDisplayOrder())
 	assert.NotNil(t, newStruct.GetColDisplayNames())
 }

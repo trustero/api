@@ -50,6 +50,7 @@ func NewTrTag(anyVal interface{}) (tag *TrTag, err error) {
 			idIdx = i
 		}
 	}
+	tag.Id = reflectedValue.Field(idIdx).String()
 
 	return
 }
