@@ -1,6 +1,6 @@
 include ../make/globals.mk
 GO_PATH_BIN := $(shell go env GOPATH)/bin
-.PHONY: foo
+.PHONY: proto-gen-doc
 MODULE := "api-doc"
 export DOC_DIR = .
 export PROTOS_SRC_DIR = ../proto
