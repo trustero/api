@@ -6,9 +6,12 @@ import (
 	"reflect"
 	"sort"
 	"strconv"
+	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/trustero/api/go/receptor_v1"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
@@ -21,6 +24,7 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 
 	// Report discovered evidence to Trustero
 	var finding receptor_v1.Finding
+
 	finding.ReceptorType = receptorImpl.GetReceptorType()
 	finding.ServiceProviderAccount = serviceProviderAccount
 
@@ -59,6 +63,9 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 			}
 			reportStruct.Rows = append(reportStruct.Rows, rowToStructRow(row, serviceIdFieldName, rowFieldNames))
 		}
+
+		// Append to Finding
+		finding.Evidences = append(finding.Evidences, &reportEvidence)
 	}
 
 	// Report evidence findings to Trustero
@@ -78,24 +85,27 @@ func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (service
 	fieldOrderKeys := []int{}
 	for i := 0; i < rowType.NumField(); i++ {
 		field := rowType.Field(i)
+		tags := expandFieldTag(field)
 		rowFieldNames = append(rowFieldNames, field.Name)
 
 		// Is it the id field?
-		if val, ok := field.Tag.Lookup("id"); ok {
-			serviceIdFieldName = val
+		if _, ok := tags["id"]; ok {
+			serviceIdFieldName = field.Name
 		}
 
 		// Get the field order
-		if val, ok := field.Tag.Lookup("order"); ok {
-			if i, err := strconv.Atoi(val); err != nil {
+		if val, ok := tags["order"]; ok {
+			if i, err := strconv.Atoi(val); err == nil {
 				fieldOrder[i] = field.Name
 				fieldOrderKeys = append(fieldOrderKeys, i)
 			}
 		}
 
 		// Get display name
-		if val, ok := field.Tag.Lookup("name"); ok {
+		if val, ok := tags["display"]; ok {
 			reportStruct.ColDisplayNames[field.Name] = val
+		} else {
+			reportStruct.ColDisplayNames[field.Name] = field.Name
 		}
 	}
 
@@ -116,13 +126,20 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 	rowValue := reflect.Indirect(reflect.ValueOf(row))
 	for _, fieldName := range rowFieldNames {
 		v := rowValue.FieldByName(fieldName)
-		t := v.Type().PkgPath() + "." + v.Type().Name()
 
-		if t == "time.Time" {
+		if dateTime, ok := v.Interface().(time.Time); ok {
 			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
 				ValueType: &receptor_v1.Struct_Row_Value_TimestampValue{
-					// REMIND
-					// TimestampValue: &timestamppb.New(v.Pointer()),
+					TimestampValue: timestamppb.New(dateTime),
+				},
+			}
+			continue
+		}
+
+		if dateTime, ok := v.Interface().(*time.Time); ok && dateTime != nil {
+			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
+				ValueType: &receptor_v1.Struct_Row_Value_TimestampValue{
+					TimestampValue: timestamppb.New(*dateTime),
 				},
 			}
 			continue
@@ -185,7 +202,8 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 		case reflect.Struct:
 		case reflect.UnsafePointer:
 		case reflect.Uintptr:
-			// REMIND, need to clean this up.  Look at using Interface, Pointer, and/or Struct to convert time.Time to timestamppb.Timestamp
+		default:
+			log.Warn().Msg("unsupported evidence row field (" + fieldName + ") type")
 			break
 		}
 	}

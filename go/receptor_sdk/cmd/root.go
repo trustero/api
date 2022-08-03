@@ -66,14 +66,14 @@ var commands = []*cobra.Command{
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file (default is $HOME/.receptor.yaml)")
-	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.Host, "host", "s", "localhost", "Trustero GRPC API endpoint host name. If host is set to 'prod.api.infra.trustero.com', port, cert, and certoverride flags will be set to match.")
-	RootCmd.PersistentFlags().IntVarP(&receptor_sdk.Port, "port", "p", 8888, "Trustero GRPC API endpoint port number.")
-	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.Cert, "cert", "c", "dev", "Server cert ca to use - dev or prod.")
-	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.CertServerOverride, "certoverride", "o", "dev.ntrce.co", "Server cert ca server override.")
-	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.LogLevel, "level", "l", "error", "Log level from most to least verbose: trace, debug, info, warn, error, fatal, or panic.")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file, defaults to $HOME/.receptor.yaml")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.Host, "host", "s", "localhost", "Trustero GRPC API endpoint host name")
+	RootCmd.PersistentFlags().IntVarP(&receptor_sdk.Port, "port", "p", 8888, "Trustero GRPC API endpoint port number")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.Cert, "cert", "c", "dev", "Server cert ca to use - dev or prod")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.CertServerOverride, "certoverride", "o", "dev.ntrce.co", "Server cert ca server override")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.LogLevel, "level", "l", "error", "trace, debug, info, warn, error, fatal, or panic")
 	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.LogFile, "log-file", "", "", "Log file path")
-	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.ReceptorId, "receptor-id", "r", "", "Unique identifier to the Trustero receptor record holding the service provider account credentials.")
+	RootCmd.PersistentFlags().StringVarP(&receptor_sdk.ReceptorId, "receptor-id", "r", "", "Trustero receptor configuration identifier")
 
 	if err := viper.BindPFlag("host", RootCmd.PersistentFlags().Lookup("host")); err != nil {
 		log.Error().Msg(err.Error())
@@ -108,9 +108,9 @@ func init() {
 }
 
 func addReceptorFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().BoolVarP(&receptor_sdk.NoSave, "nosave", "n", false, "Print command results to console (stdout) in yaml instead of sending to Trustero.")
-	cmd.PersistentFlags().StringVarP(&receptor_sdk.Notify, "notify", "", "", "The tracer ID to use when notifying Trustero the result of the command.")
-	cmd.PersistentFlags().StringVarP(&receptor_sdk.CredentialsBase64URL, "credentials", "", "", "Base64 URL encoded service provider credential in receptor native format.")
+	cmd.PersistentFlags().BoolVarP(&receptor_sdk.NoSave, "nosave", "n", false, "Send results to console instead of Trustero")
+	cmd.PersistentFlags().StringVarP(&receptor_sdk.Notify, "notify", "", "", "Notify Trustero with Tracer ID on command completion")
+	cmd.PersistentFlags().StringVarP(&receptor_sdk.CredentialsBase64URL, "credentials", "", "", "Base64 URL encoded service provider credential")
 }
 
 // initConfig reads in config file and ENV variables if set.

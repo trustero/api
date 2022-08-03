@@ -7,6 +7,7 @@
     - [Credential](#receptor_v1-Credential)
     - [Document](#receptor_v1-Document)
     - [Evidence](#receptor_v1-Evidence)
+    - [Evidence.Source](#receptor_v1-Evidence-Source)
     - [Finding](#receptor_v1-Finding)
     - [JobResult](#receptor_v1-JobResult)
     - [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration)
@@ -81,7 +82,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | caption | [string](#string) |  | Human readable English string that identifies this evidence. It&#39;s important the caption is stable for all scans of the same evidence type. |
 | description | [string](#string) |  | Human readable English string describing the content of this evidence. |
 | service_name | [string](#string) |  | The name of service this evidence was collected from. For example, &#34;S3&#34;. The service name must be one of the service types reported in Services struct (See the message Service definition). |
-| sources | [Evidence.Source](#receptor_v1-Evidence-Source) | repeated |  |
+| sources | [Evidence.Source](#receptor_v1-Evidence-Source) | repeated | The raw API request used to generate this evidence. The raw API request and response are used to prove to examiners this evidence correlates to real service instance configuration. |
 | doc | [Document](#receptor_v1-Document) |  | An unstructured evidence. |
 | struct | [Struct](#receptor_v1-Struct) |  | A structured evidence |
 
@@ -93,13 +94,12 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 <a name="receptor_v1-Evidence-Source"></a>
 
 ### Evidence.Source
-The raw API request used to generate this evidence.  The raw API request and response are used to prove to
-examiners this evidence correlates to real service instance configuration.
+
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| raw_api_request | [string](#string) |  |  |
+| raw_api_request | [string](#string) |  | The raw API request used to generate this evidence. The raw API request and response are used to prove to examiners this evidence correlates to real service instance configuration. |
 | raw_api_response | [string](#string) |  | The raw API response used to generate this evidence. The raw API request and response is used to prove to examiners this evidence correlates to real service instance configuration. |
 
 
@@ -115,7 +115,7 @@ A finding is a set of evidence(s) collected from a service provider account.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_type | [string](#string) |  | Unique receptor identifier. A receptor is expected to report findings from only one service provider type. A stable identifier that represent the type of receptor reporting this finding. The identifier is akin to a fully qualified Go package name or a Java class name. For example, &#34;github.com/trustero/receptor/gitlab&#34;. REMIND maps to Receptor.ModelID |
+| receptor_type | [string](#string) |  | Unique receptor identifier. A receptor is expected to report findings from only one service provider type. A stable identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encoded string that includes an organization name and the service provider name. For example: &#34;trustero_gitlab&#34;. |
 | service_provider_account | [string](#string) |  | The receptor&#39;s evidence source. REMIND maps to Receptor.TenantID |
 | evidences | [Evidence](#receptor_v1-Evidence) | repeated | One or more evidence collected by a typical receptor scan. |
 
@@ -190,7 +190,7 @@ collected.  Each service instance_id should be associated with at least one Evid
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_type | [string](#string) |  | Unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is akin to a fully qualified Go package name or a Java class name. For example, &#34;github.com/trustero/receptor/gitlab&#34;. @required |
+| receptor_type | [string](#string) |  | Unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encode string that includes the organization name and a service provider name. For example &#34;trustero_gitlab&#34;. @required |
 | service_provider_account | [string](#string) |  | The service provider of this list of services. @required |
 | services | [Services.Service](#receptor_v1-Services-Service) | repeated | A list of service instances. @required |
 
@@ -298,12 +298,6 @@ Column value types can be any protobuf scalar or google.proto.Timestamp.
 | int64_value | [int64](#int64) |  |  |
 | uint32_value | [uint32](#uint32) |  |  |
 | uint64_value | [uint64](#uint64) |  |  |
-| sint32_value | [sint32](#sint32) |  |  |
-| sint64_value | [sint64](#sint64) |  |  |
-| fixed32_value | [fixed32](#fixed32) |  |  |
-| fixed64_value | [fixed64](#fixed64) |  |  |
-| sfixed32_value | [sfixed32](#sfixed32) |  |  |
-| sfixed64_value | [sfixed64](#sfixed64) |  |  |
 | bool_value | [bool](#bool) |  |  |
 | string_value | [string](#string) |  |  |
 | timestamp_value | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |

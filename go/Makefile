@@ -1,7 +1,9 @@
+DESTDIR := ./build
+SUB_DIRS := receptor_v1 receptor_sdk examples
 include ../make/globals.mk
 GO_PATH_BIN := $(shell go env GOPATH)/bin
-.PHONY: foo
-MODULE := "trustero-api-go"
+.PHONY: protoc-build
+MODULE := "api-go"
 
 deps:
 	$(call outmsg, $(MODULE))
@@ -9,7 +11,7 @@ deps:
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest;
 
 protoc-build: deps
-ifneq ($(shell git diff --quiet HEAD ${REF} -- ../proto || echo "changed"),)
+ifneq ($PROTOS_CHANGED,)
 	$(call outmsg, $(MODULE), "API Change detected")
 else
 	@$(MAKE) proto-gen
@@ -25,13 +27,13 @@ test:
 	$(call outmsg, $(MODULE))
 	@go test  -failfast -short ./pkg/...
 
-clean:
+clean: rmdirs
 	$(call outmsg, $(MODULE))
 	@go clean
 
 fmt:
 	$(call outmsg, $(MODULE))
-	@go fmt -x ./...
+	@go fmt ./...
 
 run:
 	$(call not-supported-msg,$(MODULE))
