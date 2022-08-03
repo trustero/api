@@ -1,3 +1,5 @@
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 package cmd
 
 import (
@@ -6,9 +8,12 @@ import (
 	"reflect"
 	"sort"
 	"strconv"
+	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/trustero/api/go/receptor_v1"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
@@ -21,6 +26,7 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 
 	// Report discovered evidence to Trustero
 	var finding receptor_v1.Finding
+
 	finding.ReceptorType = receptorImpl.GetReceptorType()
 	finding.ServiceProviderAccount = serviceProviderAccount
 
@@ -59,6 +65,9 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 			}
 			reportStruct.Rows = append(reportStruct.Rows, rowToStructRow(row, serviceIdFieldName, rowFieldNames))
 		}
+
+		// Append to Finding
+		finding.Evidences = append(finding.Evidences, &reportEvidence)
 	}
 
 	// Report evidence findings to Trustero
@@ -78,24 +87,27 @@ func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (service
 	fieldOrderKeys := []int{}
 	for i := 0; i < rowType.NumField(); i++ {
 		field := rowType.Field(i)
+		tags := expandFieldTag(field)
 		rowFieldNames = append(rowFieldNames, field.Name)
 
 		// Is it the id field?
-		if val, ok := field.Tag.Lookup("id"); ok {
-			serviceIdFieldName = val
+		if _, ok := tags[idField]; ok {
+			serviceIdFieldName = field.Name
 		}
 
 		// Get the field order
-		if val, ok := field.Tag.Lookup("order"); ok {
-			if i, err := strconv.Atoi(val); err != nil {
+		if val, ok := tags[orderField]; ok {
+			if i, err := strconv.Atoi(val); err == nil {
 				fieldOrder[i] = field.Name
 				fieldOrderKeys = append(fieldOrderKeys, i)
 			}
 		}
 
 		// Get display name
-		if val, ok := field.Tag.Lookup("name"); ok {
+		if val, ok := tags[displayField]; ok {
 			reportStruct.ColDisplayNames[field.Name] = val
+		} else {
+			reportStruct.ColDisplayNames[field.Name] = field.Name
 		}
 	}
 
@@ -116,13 +128,20 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 	rowValue := reflect.Indirect(reflect.ValueOf(row))
 	for _, fieldName := range rowFieldNames {
 		v := rowValue.FieldByName(fieldName)
-		t := v.Type().PkgPath() + "." + v.Type().Name()
 
-		if t == "time.Time" {
+		if dateTime, ok := v.Interface().(time.Time); ok {
 			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
 				ValueType: &receptor_v1.Struct_Row_Value_TimestampValue{
-					// REMIND
-					// TimestampValue: &timestamppb.New(v.Pointer()),
+					TimestampValue: timestamppb.New(dateTime),
+				},
+			}
+			continue
+		}
+
+		if dateTime, ok := v.Interface().(*time.Time); ok && dateTime != nil {
+			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
+				ValueType: &receptor_v1.Struct_Row_Value_TimestampValue{
+					TimestampValue: timestamppb.New(*dateTime),
 				},
 			}
 			continue
@@ -136,10 +155,13 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 				},
 			}
 			break
-		case reflect.Int:
-		case reflect.Int8:
-		case reflect.Int16:
-		case reflect.Int32:
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32:
+			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
+				ValueType: &receptor_v1.Struct_Row_Value_Int32Value{
+					Int32Value: int32(v.Int()),
+				},
+			}
+			break
 		case reflect.Int64:
 			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
 				ValueType: &receptor_v1.Struct_Row_Value_Int64Value{
@@ -147,10 +169,13 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 				},
 			}
 			break
-		case reflect.Uint:
-		case reflect.Uint8:
-		case reflect.Uint16:
-		case reflect.Uint32:
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
+			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
+				ValueType: &receptor_v1.Struct_Row_Value_Uint32Value{
+					Uint32Value: uint32(v.Uint()),
+				},
+			}
+			break
 		case reflect.Uint64:
 			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
 				ValueType: &receptor_v1.Struct_Row_Value_Uint64Value{
@@ -158,8 +183,7 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 				},
 			}
 			break
-		case reflect.Float32:
-		case reflect.Float64:
+		case reflect.Float32, reflect.Float64:
 			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
 				ValueType: &receptor_v1.Struct_Row_Value_DoubleValue{
 					DoubleValue: v.Float(),
@@ -173,19 +197,8 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 				},
 			}
 			break
-		case reflect.Complex64:
-		case reflect.Complex128:
-		case reflect.Array:
-		case reflect.Chan:
-		case reflect.Func:
-		case reflect.Interface:
-		case reflect.Map:
-		case reflect.Pointer:
-		case reflect.Slice:
-		case reflect.Struct:
-		case reflect.UnsafePointer:
-		case reflect.Uintptr:
-			// REMIND, need to clean this up.  Look at using Interface, Pointer, and/or Struct to convert time.Time to timestamppb.Timestamp
+		default:
+			log.Warn().Msg("unsupported evidence row field (" + fieldName + ") type")
 			break
 		}
 	}

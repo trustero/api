@@ -1,21 +1,25 @@
+DESTDIR := ../build
 include ../make/globals.mk
 GO_PATH_BIN := $(shell go env GOPATH)/bin
-.PHONY: foo _proto-clean
-MODULE := "trustero-api-go"
+.PHONY: protoc-build _proto-clean
+MODULE := "api-go"
+
 
 deps:
 	$(call outmsg, $(MODULE))
 	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest;
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest;
 
-protoc-build: deps
-ifneq ($(shell git diff --quiet HEAD ${REF} -- ../proto || echo "changed"),)
-	$(call outmsg, $(MODULE), "API Change detected")
-else
-	@$(MAKE) proto-gen
-endif
+protoc-build: deps proto-gen
+#ifneq ($PROTOS_CHANGED,)
+#	$(call outmsg, $(MODULE), "API Change detected")
+#else
+#	@$(MAKE) proto-gen
+#endif
 
-build: protoc-build
+build: protoc-build mkdirs
+	$(call outmsg, $(MODULE), "Building examples")
+	@find . -name main.go -exec ../make/go_build_example.sh {} \;
 
 proto-gen: _proto-clean
 	$(call outmsg, $(MODULE), "Generating golang proto bindings")
@@ -27,12 +31,11 @@ test:
 	@go test $(shell go list ./... | grep -v /examples/ ) -coverprofile coverage.txt
 	@grep -Ev '\.pb\.' coverage.txt > coverage.txt.tmp && mv coverage.txt.tmp coverage.txt
 
-clean: _proto-clean
+
+clean: _proto-clean rmdirs
 	$(call outmsg, $(MODULE))
 	@go clean
-	@find . -name "*.pb.*" -type f -delete
 	@find . -type d -empty -delete
-
 
 # _proto-clean
 # The protoc compiler will not cleanup generated files if a proto file is deleted.

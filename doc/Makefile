@@ -1,7 +1,7 @@
 include ../make/globals.mk
 GO_PATH_BIN := $(shell go env GOPATH)/bin
 .PHONY: foo
-MODULE := "api-gen-doc"
+MODULE := "api-doc"
 export DOC_DIR = .
 export PROTOS_SRC_DIR = ../proto
 
@@ -13,7 +13,7 @@ build: deps proto-gen-doc
 	$(call outmsg, $(MODULE), "Build done")
 
 proto-gen-doc:
-	$(call outmsg, $(MODULE), "Generate API reference documentation")
+	$(call outmsg, $(MODULE), "Generate Protobuf API reference documentation")
 	@./proto-gen-doc.sh
 
 test:

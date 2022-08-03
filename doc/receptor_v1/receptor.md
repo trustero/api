@@ -38,7 +38,7 @@ file &#39;LICENSE.txt&#39;, which is part of this source code package.
 
 ### Credential
 Credential to access a service provider account.
-REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
+//REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
 
 
 | Field | Type | Label | Description |
@@ -115,7 +115,7 @@ A finding is a set of evidence(s) collected from a service provider account.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_type | [string](#string) |  | Unique receptor identifier. A receptor is expected to report findings from only one service provider type. A stable identifier that represent the type of receptor reporting this finding. The identifier is akin to a fully qualified Go package name or a Java class name. For example, &#34;github.com/trustero/receptor/gitlab&#34;. REMIND maps to Receptor.ModelID |
+| receptor_type | [string](#string) |  | Unique receptor identifier. A receptor is expected to report findings from only one service provider type. A stable identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encoded string that includes an organization name and the service provider name. For example: &#34;trustero_gitlab&#34;. |
 | service_provider_account | [string](#string) |  | The receptor&#39;s evidence source. REMIND maps to Receptor.TenantID |
 | evidences | [Evidence](#receptor_v1-Evidence) | repeated | One or more evidence collected by a typical receptor scan. |
 
@@ -190,7 +190,7 @@ collected.  Each service instance_id should be associated with at least one Evid
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_type | [string](#string) |  | Unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is akin to a fully qualified Go package name or a Java class name. For example, &#34;github.com/trustero/receptor/gitlab&#34;. @required |
+| receptor_type | [string](#string) |  | Unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encode string that includes the organization name and a service provider name. For example &#34;trustero_gitlab&#34;. @required |
 | service_provider_account | [string](#string) |  | The service provider of this list of services. @required |
 | services | [Services.Service](#receptor_v1-Services-Service) | repeated | A list of service instances. @required |
 

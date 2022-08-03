@@ -2,9 +2,9 @@ SHELL := /bin/bash
 
 TOP_TARGETS :=	all clean build deps fmt test run lint
 
-PROTOS_CHANGED := $(if $(shell git diff --quiet HEAD ${REF} -- $(CURDIR)/trustero-api/protos) || echo "changed", "true",)
+PROTOS_CHANGED := $(if $(shell git diff --quiet HEAD ${REF} -- $(CURDIR)/protos) || echo "changed", "true",)
 
-.PHONY: $(TOP_TARGETS) $(SUB_DIRS) _foo-build
+.PHONY: $(TOP_TARGETS) $(SUB_DIRS) go_build mkdirs rmdirs
 
 all: clean deps build fmt
 
@@ -78,3 +78,15 @@ define not-supported-msg
 			$(shell printf "%*.*s" 0 $(pad_len) $(pad)) \
 			"[$(strip $1)]"
 endef
+
+ifeq (, $(DESTDIR))
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+mkfile_dir := $(dir $(mkfile_path))
+DESTDIR := $(mkfile_dir)/../build
+endif
+
+mkdirs:
+	@[ -d $(DESTDIR) ] || mkdir $(DESTDIR)
+
+rmdirs:
+	@rm -rf $(DESTDIR) 2> /dev/null

@@ -15,4 +15,5 @@
 # vendor/
 .idea
 .vscode
+build/
 **/coverage.txt

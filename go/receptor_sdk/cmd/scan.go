@@ -1,3 +1,5 @@
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 package cmd
 
 import (
@@ -11,7 +13,7 @@ import (
 
 // Set up the 'scan' CLI subcommand.
 var scanCmd = &cobra.Command{
-	Use:   "scan <trustero_access_token>|'dryrun'",
+	Use:   "scan <trustero_access_token>|dryrun",
 	Short: "Scan for services or evidence in a service provider account.",
 	Long: `
 Scan for services and evidences in-use in a service provider account.  Scan
@@ -19,14 +21,13 @@ command decodes the base64 URL encoded credentials from the '--credentials'
 command line flag and check it's validity.  If 'dryrun' is specified instead
 of a Trustero access token, the scan command will not report the results to
 Trustero and instead print the results to console.`,
-	Args: cobra.MaximumNArgs(1),
+	Args: cobra.MinimumNArgs(1),
 	RunE: scan,
 }
 
 func init() {
 	scanCmd.PersistentFlags().BoolVarP(&receptor_sdk.FindEvidence, "find-evidence", "", false,
-		"Also scan for evidences in a service provider account.")
-	addReceptorFlags(scanCmd)
+		"Scan for evidences in a service provider account")
 }
 
 // Cobra executes this function on verify command.

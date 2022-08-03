@@ -1,3 +1,5 @@
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 package cmd
 
 import (
@@ -10,7 +12,7 @@ import (
 
 // Set up the 'verify' CLI subcommand.
 var verifyCmd = &cobra.Command{
-	Use:   "verify <trustero_access_token>|'dryrun'",
+	Use:   "verify <trustero_access_token>|dryrun",
 	Short: "Verify read-only access to a service provider account.",
 	Long: `
 Verify read-only access to a service provider account.  Verify command
@@ -18,12 +20,8 @@ decodes the base64 URL encoded credentials from the '--credentials' command
 line flag and check it's validity.  If 'dryrun' is specified instead of a
 Trustero access token, the verify command will not report the results to
 Trustero and instead print the results to console.`,
-	Args: cobra.MaximumNArgs(1),
+	Args: cobra.MinimumNArgs(1),
 	RunE: verify,
-}
-
-func init() {
-	addReceptorFlags(verifyCmd)
 }
 
 // Cobra executes this function on verify command.

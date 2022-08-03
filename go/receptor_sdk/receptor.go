@@ -1,3 +1,5 @@
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 package receptor_sdk
 
 import (
@@ -24,8 +26,8 @@ var (
 type Receptor interface {
 	// GetReceptorType returns the receptor's type.  A receptor is expected to report findings from only one service
 	// provider type.  Receptor type is a stable identifier that represent the type of receptor reporting this finding.
-	// The identifier is akin to a fully qualified Go package name or a Java class name.  For example,
-	// "github.com/trustero/receptor/gitlab".
+	//  The identifier is a simple URL encoded string that includes an organization name and the service provider name.
+	//  For example: "trustero_gitlab".
 	GetReceptorType() (receptorType string)
 
 	// UnmarshalCredentials converts the service provider account credential json string into a Go object used by
