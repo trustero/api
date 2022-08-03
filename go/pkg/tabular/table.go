@@ -1,3 +1,5 @@
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 package tabular
 
 // BlankHeaderSentinel This is used as a placeholder value for when we want to insert an actual blank header value.

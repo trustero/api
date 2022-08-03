@@ -38,7 +38,7 @@ file &#39;LICENSE.txt&#39;, which is part of this source code package.
 
 ### Credential
 Credential to access a service provider account.
-REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
+//REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
 
 
 | Field | Type | Label | Description |

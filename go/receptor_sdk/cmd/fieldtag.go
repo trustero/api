@@ -1,3 +1,5 @@
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 package cmd
 
 import (
@@ -5,9 +7,16 @@ import (
 	"strings"
 )
 
+const (
+	tagName      = "trustero"
+	idField      = "id"
+	displayField = "display"
+	orderField   = "order"
+)
+
 func expandFieldTag(field reflect.StructField) (tags map[string]string) {
 	tags = map[string]string{}
-	if val, ok := field.Tag.Lookup("trustero"); ok {
+	if val, ok := field.Tag.Lookup(tagName); ok {
 		tags = getTags(val)
 	}
 	return

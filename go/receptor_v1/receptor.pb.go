@@ -35,9 +35,8 @@ type Finding struct {
 
 	//*
 	//Unique receptor identifier.  A receptor is expected to report findings from only one service provider type.  A
-	//stable identifier that represent the type of receptor reporting this finding.  The identifier is akin to a fully
-	//qualified Go package name or a Java class name.  For example, "github.com/trustero/receptor/gitlab".
-	//REMIND maps to Receptor.ModelID
+	//stable identifier that represent the type of receptor reporting this finding.  The identifier is a simple URL
+	//encoded string that includes an organization name and the service provider name.  For example: "trustero_gitlab".
 	ReceptorType string `protobuf:"bytes,1,opt,name=receptor_type,json=receptorType,proto3" json:"receptor_type,omitempty"`
 	//*
 	//The receptor's evidence source.
@@ -398,8 +397,8 @@ type Services struct {
 
 	//*
 	//Unique receptor type.  A stable string identifier that represent the type of receptor reporting this finding.  The
-	//identifier is akin to a fully qualified Go package name or a Java class name.  For example,
-	//"github.com/trustero/receptor/gitlab".
+	//identifier is a simple URL encode string that includes the organization name and a service provider name.  For
+	//example "trustero_gitlab".
 	//@required
 	ReceptorType string `protobuf:"bytes,1,opt,name=receptor_type,json=receptorType,proto3" json:"receptor_type,omitempty"`
 	//*
@@ -467,7 +466,7 @@ func (x *Services) GetServices() []*Services_Service {
 
 //*
 //Credential to access a service provider account.
-//REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
+////REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
 type Credential struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

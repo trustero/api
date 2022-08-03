@@ -1,3 +1,5 @@
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 package cmd
 
 import (
@@ -89,12 +91,12 @@ func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (service
 		rowFieldNames = append(rowFieldNames, field.Name)
 
 		// Is it the id field?
-		if _, ok := tags["id"]; ok {
+		if _, ok := tags[idField]; ok {
 			serviceIdFieldName = field.Name
 		}
 
 		// Get the field order
-		if val, ok := tags["order"]; ok {
+		if val, ok := tags[orderField]; ok {
 			if i, err := strconv.Atoi(val); err == nil {
 				fieldOrder[i] = field.Name
 				fieldOrderKeys = append(fieldOrderKeys, i)
@@ -102,7 +104,7 @@ func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (service
 		}
 
 		// Get display name
-		if val, ok := tags["display"]; ok {
+		if val, ok := tags[displayField]; ok {
 			reportStruct.ColDisplayNames[field.Name] = val
 		} else {
 			reportStruct.ColDisplayNames[field.Name] = field.Name
@@ -153,10 +155,13 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 				},
 			}
 			break
-		case reflect.Int:
-		case reflect.Int8:
-		case reflect.Int16:
-		case reflect.Int32:
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32:
+			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
+				ValueType: &receptor_v1.Struct_Row_Value_Int32Value{
+					Int32Value: int32(v.Int()),
+				},
+			}
+			break
 		case reflect.Int64:
 			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
 				ValueType: &receptor_v1.Struct_Row_Value_Int64Value{
@@ -164,10 +169,13 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 				},
 			}
 			break
-		case reflect.Uint:
-		case reflect.Uint8:
-		case reflect.Uint16:
-		case reflect.Uint32:
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
+			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
+				ValueType: &receptor_v1.Struct_Row_Value_Uint32Value{
+					Uint32Value: uint32(v.Uint()),
+				},
+			}
+			break
 		case reflect.Uint64:
 			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
 				ValueType: &receptor_v1.Struct_Row_Value_Uint64Value{
@@ -175,8 +183,7 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 				},
 			}
 			break
-		case reflect.Float32:
-		case reflect.Float64:
+		case reflect.Float32, reflect.Float64:
 			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
 				ValueType: &receptor_v1.Struct_Row_Value_DoubleValue{
 					DoubleValue: v.Float(),
@@ -190,18 +197,6 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 				},
 			}
 			break
-		case reflect.Complex64:
-		case reflect.Complex128:
-		case reflect.Array:
-		case reflect.Chan:
-		case reflect.Func:
-		case reflect.Interface:
-		case reflect.Map:
-		case reflect.Pointer:
-		case reflect.Slice:
-		case reflect.Struct:
-		case reflect.UnsafePointer:
-		case reflect.Uintptr:
 		default:
 			log.Warn().Msg("unsupported evidence row field (" + fieldName + ") type")
 			break

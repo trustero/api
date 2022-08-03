@@ -79,16 +79,11 @@ define not-supported-msg
 			"[$(strip $1)]"
 endef
 
-
 ifeq (, $(DESTDIR))
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 mkfile_dir := $(dir $(mkfile_path))
 DESTDIR := $(mkfile_dir)/../build
 endif
-
-go_build: mkdirs
-	@go build -ldflags '-s -w' -o $(DESTDIR)/$(EXE) . ;\
-	[ -e $(DESTDIR)/$(EXE) ] && chmod 755 $(DESTDIR)/$(EXE)
 
 mkdirs:
 	@[ -d $(DESTDIR) ] || mkdir $(DESTDIR)
