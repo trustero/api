@@ -50,26 +50,29 @@ func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
 	return
 }
 
-func (r *Receptor) Discover(credentials interface{}) (services []*receptor_sdk.Service, err error) {
+func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_sdk.Service, err error) {
 	c := credentials.(*Receptor)
 	var git *gitlab.Client
-	if git, err = gitlab.NewClient(c.Token); err == nil {
-		services = []*receptor_sdk.Service{}
 
+	services := receptor_sdk.NewServices()
+	if git, err = gitlab.NewClient(c.Token); err == nil {
 		// Get group members.  "User" is the Service.Name and the user name is the Service.InstanceId
 		var members []*gitlab.GroupMember
 		members, _, err = git.Groups.ListGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{})
 		for _, member := range members {
-			services = append(services, receptor_sdk.NewService("User", member.Username))
+			services.AddService("User", member.Username)
 		}
 	}
-	return
+	return services.Services, err
 }
 
 func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {
 	c := credentials.(*Receptor)
+	report := receptor_sdk.NewReport()
 	var git *gitlab.Client
 	if git, err = gitlab.NewClient(c.Token); err == nil {
+
+		// Report GitLab group member information
 		var user *gitlab.User
 		var members []*gitlab.GroupMember
 		members, _, err = git.Groups.ListGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{})
@@ -79,9 +82,10 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 			evidence.AddSource("git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})", user)
 			evidence.AddRow(*newGitLabUser(user))
 		}
-		evidences = append(evidences, evidence)
+
+		report.AddEvidence(evidence)
 	}
-	return
+	return report.Evidences, err
 }
 
 func newGitLabUser(user *gitlab.User) (guser *GitLabUser) {
