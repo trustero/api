@@ -25,9 +25,8 @@ type Receptor struct {
 	GroupID string
 }
 
-func (r *Receptor) GetReceptorType() (receptorType string) {
-	receptorType = "example_gitlab"
-	return
+func (r *Receptor) GetReceptorType() string {
+	return "example_gitlab"
 }
 
 func (r *Receptor) UnmarshalCredentials(credentials string) (obj interface{}, err error) {
@@ -88,8 +87,8 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 	return report.Evidences, err
 }
 
-func newGitLabUser(user *gitlab.User) (guser *GitLabUser) {
-	guser = &GitLabUser{
+func newGitLabUser(user *gitlab.User) *GitLabUser {
+	return &GitLabUser{
 		Username:         user.Username,
 		Name:             user.Name,
 		IsAdmin:          user.IsAdmin,
@@ -97,8 +96,6 @@ func newGitLabUser(user *gitlab.User) (guser *GitLabUser) {
 		TwoFactorEnabled: user.TwoFactorEnabled,
 		LastActivityOn:   (*time.Time)(user.LastActivityOn),
 	}
-
-	return
 }
 
 func main() {
