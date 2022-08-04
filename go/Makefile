@@ -11,11 +11,6 @@ deps:
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest;
 
 protoc-build: deps proto-gen
-#ifneq ($PROTOS_CHANGED,)
-#	$(call outmsg, $(MODULE), "API Change detected")
-#else
-#	@$(MAKE) proto-gen
-#endif
 
 build: protoc-build mkdirs
 	$(call outmsg, $(MODULE), "Building examples")
