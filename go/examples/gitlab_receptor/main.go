@@ -99,23 +99,21 @@ func newGitLabUser(user *gitlab.User) *GitLabUser {
 }
 
 func main() {
-	var token string
-	var groupId string
+	receptor := &Receptor{}
 
 	// Add convenience token
-	cmd.RootCmd.PersistentFlags().StringVarP(&token, "token", "t", "", "GitLab user access token")
-	cmd.RootCmd.PersistentFlags().StringVarP(&groupId, "gid", "g", "", "GitLab group id")
+	cmd.RootCmd.PersistentFlags().StringVarP(&receptor.Token, "token", "t", "", "GitLab user access token")
+	cmd.RootCmd.PersistentFlags().StringVarP(&receptor.GroupID, "gid", "g", "", "GitLab group id")
 
 	// Get credentials from flags
-	receptor_sdk.CredentialsFromFlags = func() (j string) {
-		j = ""
-		if len(token) > 0 {
-			b, err := json.Marshal(&Receptor{Token: token, GroupID: groupId})
+	receptor_sdk.CredentialsFromFlags = func() string {
+		if len(receptor.Token) > 0 {
+			b, err := json.Marshal(receptor)
 			if err == nil {
-				j = string(b)
+				return string(b)
 			}
 		}
-		return
+		return ""
 	}
 
 	cmd.Execute(&Receptor{})
