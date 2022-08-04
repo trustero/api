@@ -19,15 +19,8 @@ import (
 )
 
 const (
-	colorBlack = iota + 30
-	colorRed
-	colorGreen
-	colorYellow
-	colorBlue
-	colorMagenta
-	colorCyan
+	colorCyan = 36
 	colorWhite
-
 	colorBold     = 1
 	colorDarkGray = 90
 )
@@ -153,7 +146,7 @@ func consoleFormatTimestamp(i interface{}) string {
 		}
 	}
 	if noColor {
-		return fmt.Sprintf("%s", t)
+		return t
 	}
 	return colorize(t, colorDarkGray, noColor)
 }
