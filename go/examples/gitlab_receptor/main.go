@@ -14,10 +14,11 @@ import (
 type GitLabUser struct {
 	Username         string     `trustero:"id:;display:Username;order:1"`
 	Name             string     `trustero:"display:Name;order:2"`
-	IsAdmin          bool       `trustero:"display:Admin;order:3"`
-	CreatedAt        *time.Time `trustero:"display:Created On;order:4"`
-	TwoFactorEnabled bool       `trustero:"display:MFA Enabled;order:5"`
-	LastActivityOn   *time.Time `trustero:"display:Last Activity On;order:6"`
+	Group            string     `trustero:"display:Group;order:3"`
+	IsAdmin          bool       `trustero:"display:Admin;order:4"`
+	CreatedAt        *time.Time `trustero:"display:Created On;order:5"`
+	TwoFactorEnabled bool       `trustero:"display:MFA Enabled;order:6"`
+	LastActivityOn   *time.Time `trustero:"display:Last Activity On;order:7"`
 }
 
 type Receptor struct {
@@ -71,15 +72,20 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 	var git *gitlab.Client
 	if git, err = gitlab.NewClient(c.Token); err == nil {
 
-		// Report GitLab group member information
-		var user *gitlab.User
-		var members []*gitlab.GroupMember
+		// Report GitLab group member information as evidence
+		var (
+			user    *gitlab.User
+			group   *gitlab.Group
+			members []*gitlab.GroupMember
+		)
+		group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{})
 		members, _, err = git.Groups.ListGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{})
-		evidence := receptor_sdk.NewEvidence("User", "GitLab Users", "")
+		evidence := receptor_sdk.NewEvidence("GitLab", "Group Members",
+			"List of GitLab group members includes whether a member has multi-factor authentication on and if they have group admin privilege.")
 		for _, member := range members {
 			user, _, err = git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})
 			evidence.AddSource("git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})", user)
-			evidence.AddRow(*newGitLabUser(user))
+			evidence.AddRow(*newGitLabUser(user, group))
 		}
 
 		report.AddEvidence(evidence)
@@ -87,10 +93,11 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 	return report.Evidences, err
 }
 
-func newGitLabUser(user *gitlab.User) *GitLabUser {
+func newGitLabUser(user *gitlab.User, group *gitlab.Group) *GitLabUser {
 	return &GitLabUser{
 		Username:         user.Username,
 		Name:             user.Name,
+		Group:            group.Name,
 		IsAdmin:          user.IsAdmin,
 		CreatedAt:        user.CreatedAt,
 		TwoFactorEnabled: user.TwoFactorEnabled,
