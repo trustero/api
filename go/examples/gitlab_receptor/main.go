@@ -21,6 +21,8 @@ type GitLabUser struct {
 	LastActivityOn   *time.Time `trustero:"display:Last Activity On;order:7"`
 }
 
+const SERVICE_NAME = "GitLab"
+
 type Receptor struct {
 	Token   string
 	GroupID string
@@ -37,15 +39,13 @@ func (r *Receptor) UnmarshalCredentials(credentials string) (obj interface{}, er
 
 func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
 	c := credentials.(*Receptor)
-	ok = false
+	ok = true
 	var git *gitlab.Client
 	if git, err = gitlab.NewClient(c.Token); err == nil {
-		if _, _, err = git.Groups.ListGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{}); err != nil {
+		if _, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{}); err != nil {
+			ok = false
 			return
 		}
-	}
-	if err == nil {
-		ok = true
 	}
 	return
 }
@@ -56,12 +56,10 @@ func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_sdk.Servi
 
 	services := receptor_sdk.NewServices()
 	if git, err = gitlab.NewClient(c.Token); err == nil {
-		// Get group members.  "User" is the Service.Name and the user name is the Service.InstanceId
-		var members []*gitlab.GroupMember
-		members, _, err = git.Groups.ListGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{})
-		for _, member := range members {
-			services.AddService("User", member.Username)
-		}
+		// Get Group's name
+		var group *gitlab.Group
+		group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{})
+		services.AddService(SERVICE_NAME, group.Name)
 	}
 	return services.Services, err
 }
@@ -80,7 +78,7 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 		)
 		group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{})
 		members, _, err = git.Groups.ListGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{})
-		evidence := receptor_sdk.NewEvidence("GitLab", "Group Members",
+		evidence := receptor_sdk.NewEvidence(SERVICE_NAME, "Group Members",
 			"List of GitLab group members includes whether a member has multi-factor authentication on and if they have group admin privilege.")
 		for _, member := range members {
 			user, _, err = git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})
