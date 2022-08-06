@@ -71,24 +71,33 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 	if git, err = gitlab.NewClient(c.Token); err == nil {
 
 		// Report GitLab group member information as evidence
-		var (
-			user    *gitlab.User
-			group   *gitlab.Group
-			members []*gitlab.GroupMember
-		)
-		group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{})
-		members, _, err = git.Groups.ListGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{})
-		evidence := receptor_sdk.NewEvidence(SERVICE_NAME, "Group Members",
-			"List of GitLab group members includes whether a member has multi-factor authentication on and if they have group admin privilege.")
-		for _, member := range members {
-			user, _, err = git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})
-			evidence.AddSource("git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})", user)
-			evidence.AddRow(*newGitLabUser(user, group))
+		var ev *receptor_sdk.Evidence
+		if ev, err = r.getMemberEvidence(c, git); err == nil {
+			report.AddEvidence(ev)
 		}
-
-		report.AddEvidence(evidence)
 	}
 	return report.Evidences, err
+}
+
+func (r *Receptor) getMemberEvidence(credentials interface{}, git *gitlab.Client) (evidence *receptor_sdk.Evidence, err error) {
+	c := credentials.(*Receptor)
+	evidence = receptor_sdk.NewEvidence(SERVICE_NAME, "Group Members",
+		"List of GitLab group members includes whether a member has multi-factor authentication on and if they have group admin privilege.")
+	var (
+		user    *gitlab.User
+		group   *gitlab.Group
+		members []*gitlab.GroupMember
+	)
+	if group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{}); err == nil {
+		if members, _, err = git.Groups.ListGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{}); err == nil {
+			for _, member := range members {
+				user, _, err = git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})
+				evidence.AddSource("git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})", user)
+				evidence.AddRow(*newGitLabUser(user, group))
+			}
+		}
+	}
+	return
 }
 
 func newGitLabUser(user *gitlab.User, group *gitlab.Group) *GitLabUser {
