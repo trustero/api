@@ -82,14 +82,14 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 func (r *Receptor) getMemberEvidence(credentials interface{}, git *gitlab.Client) (evidence *receptor_sdk.Evidence, err error) {
 	c := credentials.(*Receptor)
 	evidence = receptor_sdk.NewEvidence(SERVICE_NAME, "Group Members",
-		"List of GitLab group members includes whether a member has multi-factor authentication on and if they have group admin privilege.")
+		"List of GitLab group and inherited members includes whether a member has multi-factor authentication on and if they have group admin privilege.")
 	var (
 		user    *gitlab.User
 		group   *gitlab.Group
 		members []*gitlab.GroupMember
 	)
 	if group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{}); err == nil {
-		if members, _, err = git.Groups.ListGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{}); err == nil {
+		if members, _, err = git.Groups.ListAllGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{}); err == nil {
 			for _, member := range members {
 				user, _, err = git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})
 				evidence.AddSource("git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})", user)
