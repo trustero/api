@@ -206,7 +206,7 @@ message ServiceEntities {
 // collected evidence that aren't relevant to specific audit contexts.
 message ServiceEntity {
 
-  // Service_type_id of the entity source.  This is a Trustero assigned identifier for a known service such as
+  // Service_name of the entity source.  This is a Trustero assigned identifier for a known service such as
   // "GitLab" or AWS "ECS".
   // @required
   string service_name = 1;
