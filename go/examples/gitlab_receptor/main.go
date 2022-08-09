@@ -25,7 +25,8 @@ type GitLabUser struct {
 
 const (
 	serviceName  = "GitLab"
-	groupSubtype = "Group"
+	groupEntity  = "Group"
+	memberEntity = "Member"
 )
 
 type Receptor struct {
@@ -35,6 +36,10 @@ type Receptor struct {
 
 func (r *Receptor) GetReceptorType() string {
 	return "example_gitlab"
+}
+
+func (r *Receptor) GetKnownServices() []string {
+	return []string{serviceName}
 }
 
 func (r *Receptor) UnmarshalCredentials(credentials string) (obj interface{}, err error) {
@@ -55,18 +60,18 @@ func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
 	return
 }
 
-func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.Service, err error) {
+func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.ServiceEntity, err error) {
 	c := credentials.(*Receptor)
 	var git *gitlab.Client
 
-	services := receptor_sdk.NewServices()
+	services := receptor_sdk.NewServiceEntities()
 	if git, err = gitlab.NewClient(c.Token); err == nil {
 		// Get Group's name
 		var group *gitlab.Group
 		group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{})
-		services.AddService("remind_service_id e.g. trs2", groupSubtype, group.Name, strconv.Itoa(group.ID))
+		services.AddService(serviceName, groupEntity, group.Name, strconv.Itoa(group.ID))
 	}
-	return services.Services, err
+	return services.Entities, err
 }
 
 func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {
@@ -86,7 +91,7 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 
 func (r *Receptor) getMemberEvidence(credentials interface{}, git *gitlab.Client) (evidence *receptor_sdk.Evidence, err error) {
 	c := credentials.(*Receptor)
-	evidence = receptor_sdk.NewEvidence(serviceName, "Group Members",
+	evidence = receptor_sdk.NewEvidence(serviceName, memberEntity, "Group Members",
 		"List of GitLab group and inherited members includes whether a member has multi-factor authentication on and if they have group admin privilege.")
 	var (
 		user    *gitlab.User

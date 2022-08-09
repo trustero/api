@@ -13,8 +13,8 @@
     - [ReceptorOID](#receptor_v1-ReceptorOID)
     - [Row](#receptor_v1-Row)
     - [Row.ColsEntry](#receptor_v1-Row-ColsEntry)
-    - [Service](#receptor_v1-Service)
-    - [Services](#receptor_v1-Services)
+    - [ServiceEntities](#receptor_v1-ServiceEntities)
+    - [ServiceEntity](#receptor_v1-ServiceEntity)
     - [Source](#receptor_v1-Source)
     - [Struct](#receptor_v1-Struct)
     - [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry)
@@ -38,7 +38,6 @@ file &#39;LICENSE.txt&#39;, which is part of this source code package.
 
 ### Credential
 Credential is returned by a Verified request noting if a given service provider account credential is  valid.
-REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
 
 
 | Field | Type | Label | Description |
@@ -61,7 +60,6 @@ Document is an unstructured evidence provided as a MIME document.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| service_id | [string](#string) |  | Service_id is a unique service ID relative to the document. A row ID typically represents a unique service ID. The service_id must be previously reported in the Services message. @required |
 | mime | [string](#string) |  | Mime is the document type defined using MIME. (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) @required |
 | body | [bytes](#bytes) |  | Body is the opaque document body. The document body must match the type defined by the mime attribute. @required |
 
@@ -81,7 +79,8 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | ----- | ---- | ----- | ----------- |
 | caption | [string](#string) |  | Caption is a human readable English string that identifies this evidence. It&#39;s important the caption is stable for all scans of the same evidence type. |
 | description | [string](#string) |  | Description is a human readable English string describing the content of this evidence. |
-| service_name | [string](#string) |  | Service_name is the name of service this evidence was collected from. For example, &#34;S3&#34;. The service_name must be one of the service subtype_name reported in Service struct (See the message Service definition). |
+| service_name | [string](#string) |  | Service_name is the name of service this evidence was collected from. For example, &#34;S3&#34; or &#34;GitLab&#34; |
+| entity_type | [string](#string) |  | Entity_type specifies the row type and should correspond to a ServiceEntity. An entity_type typically represents a specific configurable entity such as AWS ECS &#34;Cluster&#34;. @required |
 | sources | [Source](#receptor_v1-Source) | repeated | Sources are raw service provider API requests and responses used to generate this evidence. The raw API requests and responses serve as proof the evidence correlates to real service instance configuration. |
 | doc | [Document](#receptor_v1-Document) |  | Document is an unstructured evidence. |
 | struct | [Struct](#receptor_v1-Struct) |  | Struct is a structured evidence. |
@@ -169,8 +168,8 @@ Row is a row of structured data.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| service_id | [string](#string) |  | Service_id is a unique service ID relative to the struct. A row ID typically represents a unique service ID. The service_id must be previously reported in the Services message. @required |
-| cols | [Row.ColsEntry](#receptor_v1-Row-ColsEntry) | repeated | Cols are columns of the row in column name to value pairs. All rows in a struct must have the same column names and corresponding value types. @required |
+| entity_instance_id | [string](#string) |  | Entity_instance_id of a discovered entity instance. For example, an AWS &#34;ECS&#34; cluster UUID or GitLab &#34;repository&#34; ID. |
+| cols | [Row.ColsEntry](#receptor_v1-Row-ColsEntry) | repeated | Cols are columns of the row in column name to value pairs. All rows in a struct must have the same column names and corresponding value types. In addition, one of the key-value pair in the cols map must be the entity_instance_id, a unique instance of this row&#39;s Struct.entity_type. @required |
 
 
 
@@ -193,38 +192,41 @@ Row is a row of structured data.
 
 
 
-<a name="receptor_v1-Service"></a>
+<a name="receptor_v1-ServiceEntities"></a>
 
-### Service
-Service is a discovered service instance definition.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| type_id | [string](#string) |  | Type_id of the service. This is a Trustero assigned identifier for a known service such as &#34;GitLab&#34; or AWS &#34;ECS&#34;. [REMIND] for a list of service type_name to type_id mapping. @required |
-| subtype_name | [string](#string) |  | Subtype_name of the service. A subtype of a service is an configurable object type such as a GitLab &#34;repository&#34; or AWS ECS &#34;cluster&#34;. The instance_name and instance_id must represent an instance of the subtype. For example, &#34;Java 1.5&#34; maybe a valid GitLab repository name or &#34;Elastic front end cluster&#34; maybe a valid AWS ECS cluster name. @required |
-| instance_name | [string](#string) |  | Instance_name of a discovered service instance. For example, an AWS &#34;ECS&#34; cluster name or a GitLab &#34;repository&#34; name. Instance_name of a service instance may change for a given service instance but it&#39;s service_id is stable. @required |
-| instance_id | [string](#string) |  | Instance_id of a discovered service instance is the stable identifier of the service instance. For example, an AWS &#34;ECS&#34; cluster UUID or GitLab &#34;repository&#34; ID. @required |
-
-
-
-
-
-
-<a name="receptor_v1-Services"></a>
-
-### Services
-Services are service instances configured within a service provider account.  For example, all service instances
-configured in an AWS account which may include S3 buckets, ECS clusters, RDS database instances, etc.  The boundary
-of a service instance such as a ECS cluster or an ECS container instance is dependent on how the findings are
-collected.  Each service instance_id should be associated with at least one Evidence.
+### ServiceEntities
+ServiceEntities are configurable entities within a service provider account.  For example, service entities in
+an AWS account include S3 buckets, ECS clusters, RDS database instances, etc.  The boundary of a service entity
+depends on how a receptor represents it&#39;s findings.  Each service instance_id should be associated with at least
+one Evidence.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | receptor_type | [string](#string) |  | Receptor_type is a unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encode string that includes the organization name and a service provider name. For example &#34;trustero_gitlab&#34;. @required |
 | service_provider_account | [string](#string) |  | Service_provider_account is the service provider account where the services are configured in. @required |
-| services | [Service](#receptor_v1-Service) | repeated | Services is a list of service instances configured in the service provider account. @required |
+| entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Services is a list of service instances configured in the service provider account. @required |
+
+
+
+
+
+
+<a name="receptor_v1-ServiceEntity"></a>
+
+### ServiceEntity
+ServiceEntity is a discovered service entity instance which represents a configurable entity provided by the
+service.  For example, an AWS ECS cluster or a GitLab repository.  These service entities are associated with
+detailed configurations collected by Receptor.Reported() calls.  Service entities allows Trustero to filter
+collected evidence that aren&#39;t relevant to specific audit contexts.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| service_name | [string](#string) |  | Service_type_id of the entity source. This is a Trustero assigned identifier for a known service such as &#34;GitLab&#34; or AWS &#34;ECS&#34;. @required |
+| entity_type | [string](#string) |  | Entity_type a service is an configurable object type such as a GitLab &#34;repository&#34; or AWS ECS &#34;cluster&#34;. The instance_name and instance_id must represent an instance of the subtype. For example, &#34;Java 1.5&#34; maybe a valid GitLab repository name or &#34;Elastic front end cluster&#34; maybe a valid AWS ECS cluster name. @required |
+| entity_instance_name | [string](#string) |  | Entity_instance_name of a discovered service instance. For example, an AWS &#34;ECS&#34; cluster name or a GitLab &#34;repository&#34; name. Entity_instance_name of an entity may change for a given service instance but it&#39;s entity_instance_id is stable. @required |
+| entity_instance_id | [string](#string) |  | Entity_instance_id of a discovered entity instance. For example, an AWS &#34;ECS&#34; cluster UUID or GitLab &#34;repository&#34; ID. @required |
 
 
 
@@ -328,7 +330,7 @@ configuration can be in opaque document format or structured document format.
 | ----------- | ------------ | ------------- | ------------|
 | Verified | [Credential](#receptor_v1-Credential) | [.google.protobuf.Empty](#google-protobuf-Empty) | Report whether the provided credential is a valid service provider credential for purpose of discovering services and reporting findings. This rpc call is typically made as callback by a receptor to trustero from a check credential receptor request. |
 | GetConfiguration | [ReceptorOID](#receptor_v1-ReceptorOID) | [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration) | Get the receptor configuration and service provider credential using the provided receptor record identifier. This rpc call is typically made as a callback by a receptor prior to making a report findings or discover services receptor request. |
-| Discovered | [Services](#receptor_v1-Services) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report known services. A receptor or a Trustero client application reports its known services on demand. This call returns a string value service listing ID or an error specifying why Trustero failed to process the service listing. |
+| Discovered | [ServiceEntities](#receptor_v1-ServiceEntities) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report known services. A receptor or a Trustero client application reports its known services on demand. This call returns a string value service listing ID or an error specifying why Trustero failed to process the service listing. |
 | Report | [Finding](#receptor_v1-Finding) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report a finding. A receptor or a Trustero client application reports its findings on a periodic basis. This call returns a string value collection ID or an error specifying why Trustero failed to process the finding. |
 | Notify | [JobResult](#receptor_v1-JobResult) | [.google.protobuf.Empty](#google-protobuf-Empty) | Notify Trustero a long running report finding or discover services receptor request has completed. JobResult contains information about the receptor request and it&#39;s corresponding result. Information such as the JobResult.receptor_object_id are passed to the receptor as part of the request. |
 

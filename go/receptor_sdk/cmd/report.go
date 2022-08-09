@@ -42,20 +42,21 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 			Caption:      evidence.Caption,
 			Description:  evidence.Description,
 			ServiceName:  evidence.ServiceName,
+			EntityType:   evidence.EntityType,
 			Sources:      evidence.Sources,
 			EvidenceType: &receptor_v1.Evidence_Struct{Struct: &reportStruct},
 		}
 
 		// Convert rows
-		var serviceIdFieldName string
+		var entityIdFieldName string
 		var rowFieldNames []string
 		for idx, row := range evidence.Rows {
 			if idx == 0 {
-				if serviceIdFieldName, rowFieldNames, err = extractMetaData(row, &reportStruct); err != nil {
+				if entityIdFieldName, rowFieldNames, err = extractMetaData(row, &reportStruct); err != nil {
 					return // fail to extract metadata, likely an invalid row type
 				}
 			}
-			reportStruct.Rows = append(reportStruct.Rows, rowToStructRow(row, serviceIdFieldName, rowFieldNames))
+			reportStruct.Rows = append(reportStruct.Rows, rowToStructRow(row, entityIdFieldName, rowFieldNames))
 		}
 
 		// Append to Finding
@@ -68,7 +69,7 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 	return
 }
 
-func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (serviceIdFieldName string, rowFieldNames []string, err error) {
+func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (entityIdFieldName string, rowFieldNames []string, err error) {
 	rowFieldNames = []string{}
 	rowType := reflect.TypeOf(row)
 	if err = assertStruct(rowType); err != nil {
@@ -84,7 +85,7 @@ func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (service
 
 		// Is it the id field?
 		if _, ok := tags[idField]; ok {
-			serviceIdFieldName = field.Name
+			entityIdFieldName = field.Name
 		}
 
 		// Get the field order
@@ -111,10 +112,10 @@ func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (service
 	return
 }
 
-func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []string) (reportRow *receptor_v1.Row) {
+func rowToStructRow(row interface{}, entityIdFieldName string, rowFieldNames []string) (reportRow *receptor_v1.Row) {
 	reportRow = &receptor_v1.Row{
-		ServiceId: getField(row, serviceIdFieldName),
-		Cols:      map[string]*receptor_v1.Value{},
+		EntityInstanceId: getField(row, entityIdFieldName),
+		Cols:             map[string]*receptor_v1.Value{},
 	}
 
 	rowValue := reflect.Indirect(reflect.ValueOf(row))
