@@ -32,6 +32,9 @@ type Receptor interface {
 	//  For example: "trustero_gitlab".
 	GetReceptorType() (receptorType string)
 
+	// GetKnownServices returns a list of service names this receptor will be providing evidence for.
+	GetKnownServices() (serviceNames []string)
+
 	// UnmarshalCredentials converts the service provider account credential json string into a Go object used by
 	// the receptor's Verify, Discover, and Report methods.
 	UnmarshalCredentials(credentials string) (obj interface{}, err error)
@@ -40,10 +43,9 @@ type Receptor interface {
 	// <receptor> verify
 	Verify(credentials interface{}) (ok bool, err error)
 
-	// Discover returns the list of services that can be used to generate evidence. This method is invoked from
-	// the following CLI:
+	// Discover returns the list of services entities in-use. This method is invoked from the following CLI:
 	// <receptor> scan
-	Discover(credentials interface{}) (services []*receptor_v1.Service, err error)
+	Discover(credentials interface{}) (services []*receptor_v1.ServiceEntity, err error)
 
 	// Report returns the list of discovered evidence.  This method is invoked from the following CLI:
 	// <receptor> scan --find-evidence
@@ -69,7 +71,8 @@ type Receptor interface {
 //     Username string  `trustero:"id;display:User Name;order:1"`
 // }
 type Evidence struct {
-	ServiceName string                // Service name where this evidence wa gathered. For example, "S3".
+	ServiceName string                // ServiceName where this evidence wa gathered. For example, "S3".
+	EntityType  string                // EntityType of rows of evidence.  For example, "bucket".
 	Caption     string                // Caption identifies the evidence.
 	Description string                // Description provides additional information on origins of the evidence.
 	Sources     []*receptor_v1.Source // Sources of raw API request and response used to gather the evidence.

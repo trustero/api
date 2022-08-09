@@ -43,7 +43,7 @@ func (rc *MockReceptorClient) GetConfiguration(ctx context.Context, in *receptor
 	return
 }
 
-func (rc *MockReceptorClient) Discovered(ctx context.Context, in *receptor.Services, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
+func (rc *MockReceptorClient) Discovered(ctx context.Context, in *receptor.ServiceEntities, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
 	s = &wrapperspb.StringValue{Value: ""}
 	var yamld string
 	if yamld, err = toYaml(in); err == nil {

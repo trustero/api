@@ -28,9 +28,10 @@ func (r *Report) AddEvidence(evidence *Evidence) *Report {
 }
 
 // NewEvidence is a helper to instantiate a new Evidence struct.
-func NewEvidence(serviceName, caption, description string) *Evidence {
+func NewEvidence(serviceName, entityType, caption, description string) *Evidence {
 	return &Evidence{
 		ServiceName: serviceName,
+		EntityType:  entityType,
 		Caption:     caption,
 		Description: description,
 		Sources:     []*receptor_v1.Source{},
@@ -78,27 +79,27 @@ func (ev *Evidence) AddRow(row interface{}) *Evidence {
 	return ev
 }
 
-type Services receptor_v1.Services
+type ServiceEntities receptor_v1.ServiceEntities
 
-// NewServices instantiate a new service
-func NewServices() *Services {
-	return (*Services)(&receptor_v1.Services{})
+// NewServiceEntities instantiate a new service
+func NewServiceEntities() *ServiceEntities {
+	return (*ServiceEntities)(&receptor_v1.ServiceEntities{})
 }
 
 // AddService adds a services to discovered services
-func (s *Services) AddService(typeName, typeId, instanceName, instanceId string) *Services {
+func (s *ServiceEntities) AddService(typeName, typeId, instanceName, instanceId string) *ServiceEntities {
 	if len(typeName) > 0 && len(typeId) > 0 && len(instanceName) > 0 && len(instanceId) > 0 {
-		s.Services = append(s.Services, newService(typeName, typeId, instanceName, instanceId))
+		s.Entities = append(s.Entities, newService(typeName, typeId, instanceName, instanceId))
 	}
 	return s
 }
 
 // NewService is a helper to instantiate a new Source struct
-func newService(typeId, subtypeName, instanceName, instanceId string) *receptor_v1.Service {
-	return &receptor_v1.Service{
-		TypeId:       typeId,
-		SubtypeName:  subtypeName,
-		InstanceName: instanceName,
-		InstanceId:   instanceId,
+func newService(serviceName, entityType, entityInstanceName, entityInstanceId string) *receptor_v1.ServiceEntity {
+	return &receptor_v1.ServiceEntity{
+		ServiceName:        serviceName,
+		EntityType:         entityType,
+		EntityInstanceName: entityInstanceName,
+		EntityInstanceId:   entityInstanceId,
 	}
 }

@@ -37,7 +37,7 @@ type ReceptorClient interface {
 	// Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
 	// call returns a string value service listing ID or an error specifying why Trustero failed to process the service
 	// listing.
-	Discovered(ctx context.Context, in *Services, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
+	Discovered(ctx context.Context, in *ServiceEntities, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
 	// Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
 	// call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
 	Report(ctx context.Context, in *Finding, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
@@ -73,7 +73,7 @@ func (c *receptorClient) GetConfiguration(ctx context.Context, in *ReceptorOID, 
 	return out, nil
 }
 
-func (c *receptorClient) Discovered(ctx context.Context, in *Services, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
+func (c *receptorClient) Discovered(ctx context.Context, in *ServiceEntities, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
 	out := new(wrapperspb.StringValue)
 	err := c.cc.Invoke(ctx, "/receptor_v1.Receptor/Discovered", in, out, opts...)
 	if err != nil {
@@ -115,7 +115,7 @@ type ReceptorServer interface {
 	// Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
 	// call returns a string value service listing ID or an error specifying why Trustero failed to process the service
 	// listing.
-	Discovered(context.Context, *Services) (*wrapperspb.StringValue, error)
+	Discovered(context.Context, *ServiceEntities) (*wrapperspb.StringValue, error)
 	// Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
 	// call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
 	Report(context.Context, *Finding) (*wrapperspb.StringValue, error)
@@ -135,7 +135,7 @@ func (UnimplementedReceptorServer) Verified(context.Context, *Credential) (*empt
 func (UnimplementedReceptorServer) GetConfiguration(context.Context, *ReceptorOID) (*ReceptorConfiguration, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConfiguration not implemented")
 }
-func (UnimplementedReceptorServer) Discovered(context.Context, *Services) (*wrapperspb.StringValue, error) {
+func (UnimplementedReceptorServer) Discovered(context.Context, *ServiceEntities) (*wrapperspb.StringValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Discovered not implemented")
 }
 func (UnimplementedReceptorServer) Report(context.Context, *Finding) (*wrapperspb.StringValue, error) {
@@ -193,7 +193,7 @@ func _Receptor_GetConfiguration_Handler(srv interface{}, ctx context.Context, de
 }
 
 func _Receptor_Discovered_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Services)
+	in := new(ServiceEntities)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func _Receptor_Discovered_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/receptor_v1.Receptor/Discovered",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReceptorServer).Discovered(ctx, req.(*Services))
+		return srv.(ReceptorServer).Discovered(ctx, req.(*ServiceEntities))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -63,6 +63,7 @@ func Execute(r receptor_sdk.Receptor) {
 var commands = []*cobra.Command{
 	verifyCmd,
 	scanCmd,
+	servicesCmd,
 }
 
 func init() {

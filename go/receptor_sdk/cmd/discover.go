@@ -11,16 +11,16 @@ import (
 func discover(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
 
 	// Discover services
-	var discovered []*receptor_v1.Service
+	var discovered []*receptor_v1.ServiceEntity
 	if discovered, err = receptorImpl.Discover(credentials); err != nil {
 		return
 	}
 
 	// Report discovered services to Trustero
-	var services receptor_v1.Services
+	var services receptor_v1.ServiceEntities
 	services.ReceptorType = receptorImpl.GetReceptorType()
 	services.ServiceProviderAccount = serviceProviderAccount
-	services.Services = discovered
+	services.Entities = discovered
 
 	// Report discovered services to Trustero
 	_, err = rc.Discovered(context.Background(), &services)
