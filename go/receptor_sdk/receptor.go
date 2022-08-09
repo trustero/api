@@ -4,6 +4,8 @@ package receptor_sdk
 
 import (
 	"encoding/json"
+
+	"github.com/trustero/api/go/receptor_v1"
 )
 
 // Global variables available to the receptor
@@ -41,32 +43,37 @@ type Receptor interface {
 	// Discover returns the list of services that can be used to generate evidence. This method is invoked from
 	// the following CLI:
 	// <receptor> scan
-	Discover(credentials interface{}) (services []*Service, err error)
+	Discover(credentials interface{}) (services []*receptor_v1.Service, err error)
 
 	// Report returns the list of discovered evidence.  This method is invoked from the following CLI:
 	// <receptor> scan --find-evidence
 	Report(credentials interface{}) (evidences []*Evidence, err error)
 }
 
-// Service is a discovered in-use service in a service provider account.
-type Service struct {
-	Name       string // Service name, for example "S3".
-	InstanceId string // Service identifier, for example S3 bucket name.
-}
-
-// Evidence is a discovered evidence from an in-use service.
+// Evidence is a discovered evidence from an in-use service.  All rows in the evidence are instances of the same
+// Golang struct.  Fields of this evidence row struct must be public and annotated with Trustero's field annotation
+// where:
+//
+//     Field tag name is 'trustero' with sub-tags separated by ';'
+//     Valid sub-tabs: 'id', 'display', and 'order'
+//        id specifies the field is unique identifier for the struct.
+//        display provides the human-readable name for the field.
+//        order is an integer number starting with 1, denoting the order in which the field should be displayed in a
+//        table.
+//
+// For example:
+//
+// type User struct {
+//     Name     string  `trustero:"display:Name;order:2"`
+//     IsAdmin  bool    `trustero:"display:Admin;order:3"`
+//     Username string  `trustero:"id;display:User Name;order:1"`
+// }
 type Evidence struct {
-	ServiceName string        // Service name where this evidence wa gathered. For example, "S3".
-	Caption     string        // Caption describing the evidence.  This string must be stable this type of evidence.
-	Description string        // Description of what this evidence is.
-	Sources     []*Source     // Source API requests and responses used to generate the evidence.
-	Rows        []interface{} // REMIND.  Need to describe how to annotate an evidence struct.
-}
-
-// Source contain the raw API request and response from a service provider used to generate evidence.
-type Source struct {
-	ProviderAPIRequest  string // API request
-	ProviderAPIResponse string // API response
+	ServiceName string                // Service name where this evidence wa gathered. For example, "S3".
+	Caption     string                // Caption identifies the evidence.
+	Description string                // Description provides additional information on origins of the evidence.
+	Sources     []*receptor_v1.Source // Sources of raw API request and response used to gather the evidence.
+	Rows        []interface{}         // Rows of formatted evidence represented by a Golang struct.
 }
 
 // CredentialsFromFlagsFunc

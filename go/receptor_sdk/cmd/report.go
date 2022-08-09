@@ -33,7 +33,7 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 	// Convert and append discovered evidences to reported evidences
 	for _, evidence := range discovered {
 		reportStruct := receptor_v1.Struct{
-			Rows:            []*receptor_v1.Struct_Row{},
+			Rows:            []*receptor_v1.Row{},
 			ColDisplayNames: map[string]string{},
 			ColDisplayOrder: []string{},
 		}
@@ -42,16 +42,8 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 			Caption:      evidence.Caption,
 			Description:  evidence.Description,
 			ServiceName:  evidence.ServiceName,
-			Sources:      []*receptor_v1.Evidence_Source{},
+			Sources:      evidence.Sources,
 			EvidenceType: &receptor_v1.Evidence_Struct{Struct: &reportStruct},
-		}
-
-		// Convert sources
-		for _, source := range evidence.Sources {
-			reportEvidence.Sources = append(reportEvidence.Sources, &receptor_v1.Evidence_Source{
-				RawApiRequest:  source.ProviderAPIRequest,
-				RawApiResponse: source.ProviderAPIResponse,
-			})
 		}
 
 		// Convert rows
@@ -119,10 +111,10 @@ func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (service
 	return
 }
 
-func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []string) (reportRow *receptor_v1.Struct_Row) {
-	reportRow = &receptor_v1.Struct_Row{
+func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []string) (reportRow *receptor_v1.Row) {
+	reportRow = &receptor_v1.Row{
 		ServiceId: getField(row, serviceIdFieldName),
-		Cols:      map[string]*receptor_v1.Struct_Row_Value{},
+		Cols:      map[string]*receptor_v1.Value{},
 	}
 
 	rowValue := reflect.Indirect(reflect.ValueOf(row))
@@ -130,8 +122,8 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 		v := rowValue.FieldByName(fieldName)
 
 		if dateTime, ok := v.Interface().(time.Time); ok {
-			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
-				ValueType: &receptor_v1.Struct_Row_Value_TimestampValue{
+			reportRow.Cols[fieldName] = &receptor_v1.Value{
+				ValueType: &receptor_v1.Value_TimestampValue{
 					TimestampValue: timestamppb.New(dateTime),
 				},
 			}
@@ -139,8 +131,8 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 		}
 
 		if dateTime, ok := v.Interface().(*time.Time); ok && dateTime != nil {
-			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
-				ValueType: &receptor_v1.Struct_Row_Value_TimestampValue{
+			reportRow.Cols[fieldName] = &receptor_v1.Value{
+				ValueType: &receptor_v1.Value_TimestampValue{
 					TimestampValue: timestamppb.New(*dateTime),
 				},
 			}
@@ -149,50 +141,50 @@ func rowToStructRow(row interface{}, serviceIdFieldName string, rowFieldNames []
 
 		switch v.Kind() {
 		case reflect.Bool:
-			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
-				ValueType: &receptor_v1.Struct_Row_Value_BoolValue{
+			reportRow.Cols[fieldName] = &receptor_v1.Value{
+				ValueType: &receptor_v1.Value_BoolValue{
 					BoolValue: v.Bool(),
 				},
 			}
 			break
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32:
-			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
-				ValueType: &receptor_v1.Struct_Row_Value_Int32Value{
+			reportRow.Cols[fieldName] = &receptor_v1.Value{
+				ValueType: &receptor_v1.Value_Int32Value{
 					Int32Value: int32(v.Int()),
 				},
 			}
 			break
 		case reflect.Int64:
-			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
-				ValueType: &receptor_v1.Struct_Row_Value_Int64Value{
+			reportRow.Cols[fieldName] = &receptor_v1.Value{
+				ValueType: &receptor_v1.Value_Int64Value{
 					Int64Value: v.Int(),
 				},
 			}
 			break
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
-			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
-				ValueType: &receptor_v1.Struct_Row_Value_Uint32Value{
+			reportRow.Cols[fieldName] = &receptor_v1.Value{
+				ValueType: &receptor_v1.Value_Uint32Value{
 					Uint32Value: uint32(v.Uint()),
 				},
 			}
 			break
 		case reflect.Uint64:
-			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
-				ValueType: &receptor_v1.Struct_Row_Value_Uint64Value{
+			reportRow.Cols[fieldName] = &receptor_v1.Value{
+				ValueType: &receptor_v1.Value_Uint64Value{
 					Uint64Value: v.Uint(),
 				},
 			}
 			break
 		case reflect.Float32, reflect.Float64:
-			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
-				ValueType: &receptor_v1.Struct_Row_Value_DoubleValue{
+			reportRow.Cols[fieldName] = &receptor_v1.Value{
+				ValueType: &receptor_v1.Value_DoubleValue{
 					DoubleValue: v.Float(),
 				},
 			}
 			break
 		case reflect.String:
-			reportRow.Cols[fieldName] = &receptor_v1.Struct_Row_Value{
-				ValueType: &receptor_v1.Struct_Row_Value_StringValue{
+			reportRow.Cols[fieldName] = &receptor_v1.Value{
+				ValueType: &receptor_v1.Value_StringValue{
 					StringValue: v.String(),
 				},
 			}
