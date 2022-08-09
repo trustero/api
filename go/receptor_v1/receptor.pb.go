@@ -752,7 +752,7 @@ type ServiceEntity struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Service_type_id of the entity source.  This is a Trustero assigned identifier for a known service such as
+	// Service_name of the entity source.  This is a Trustero assigned identifier for a known service such as
 	// "GitLab" or AWS "ECS".
 	// @required
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
