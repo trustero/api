@@ -11,381 +11,288 @@ import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
 
 
-/**
-  A receptor, or a Trustero client application, collects findings supporting the use of a service from a service
-  provider instance.  An example of a service provider is AWS and an example of a service provider account is an
-  AWS account.  An example of a service is S3 and an example of a service instance is an S3 bucket.  Trustero
-  associates the collected evidence to support the fact an organization is following it's stated practices.  A finding
-  is comprised of a list of evidences.  Each evidence is associated with a service instance and contains its
-  configuration information. An example of a finding is an AWS S3 bucket and its configuration.  Service configuration
-  can be in opaque document format or structured document format.
-*/
+// Receptor service, or a Trustero client application, collects findings supporting the use of a service from a
+// service provider instance.  An example of a service provider is AWS and an example of a service provider account
+// is an AWS account.  An example of a service is S3 and an example of a service instance is an S3 bucket.  Trustero
+// associates the collected evidence to support the fact an organization is following it's stated practices.  A
+// finding is comprised of a list of evidences.  Each evidence is associated with a service instance and contains
+// its configuration information. An example of a finding is an AWS S3 bucket and its configuration.  Service
+// configuration can be in opaque document format or structured document format.
 service Receptor {
 
-  /**
-   Report whether the provided credential is a valid service provider credential for purpose of discovering services
-   and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from a check
-   credential receptor request.
-   */
+  // Report whether the provided credential is a valid service provider credential for purpose of discovering
+  // services and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from
+  // a check credential receptor request.
   rpc Verified(Credential) returns (google.protobuf.Empty);
 
-  /**
-   Get the receptor configuration and service provider credential using the provided receptor record identifier.  This
-   rpc call is typically made as a callback by a receptor prior to making a report findings or discover services
-   receptor request.
-  */
+  // Get the receptor configuration and service provider credential using the provided receptor record identifier.
+  // This rpc call is typically made as a callback by a receptor prior to making a report findings or discover
+  // services receptor request.
   rpc GetConfiguration(ReceptorOID) returns (ReceptorConfiguration);
 
-  /**
-   Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
-   call returns a string value service listing ID or an error specifying why Trustero failed to process the service
-   listing.
-   */
+  // Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
+  // call returns a string value service listing ID or an error specifying why Trustero failed to process the service
+  // listing.
   rpc Discovered(Services) returns (google.protobuf.StringValue);
 
-  /**
-   Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
-   call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
-  */
+  // Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
+  // call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
   rpc Report(Finding) returns (google.protobuf.StringValue);
 
-  /**
-   Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
-   contains information about the receptor request and it's corresponding result.  Information such as the
-   JobResult.receptor_object_id are passed to the receptor as part of the request.
-   */
+  // Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
+  // contains information about the receptor request and it's corresponding result.  Information such as the
+  // JobResult.receptor_object_id are passed to the receptor as part of the request.
   rpc Notify(JobResult) returns (google.protobuf.Empty);
 }
 
 
-/**
- A finding is a set of evidence(s) collected from a service provider account.
- */
+// Finding is a set of evidence(s) collected from a service provider account.
 message Finding {
 
-  /**
-   Unique receptor identifier.  A receptor is expected to report findings from only one service provider type.  A
-   stable identifier that represent the type of receptor reporting this finding.  The identifier is a simple URL
-   encoded string that includes an organization name and the service provider name.  For example: "trustero_gitlab".
-   */
+  // Unique receptor identifier.  A receptor is expected to report findings from only one service provider type.  A
+  // stable identifier that represent the type of receptor reporting this finding.  The identifier is a simple URL
+  // encoded string that includes an organization name and the service provider name.  For example: "trustero_gitlab".
   string receptor_type = 1;
 
-  /**
-   The receptor's evidence source.
-   REMIND maps to Receptor.TenantID
-   */
+  // The receptor's evidence source.
+  // REMIND maps to Receptor.TenantID
   string service_provider_account = 2;
 
-  /**
-   One or more evidence collected by a typical receptor scan.
-   */
+  // One or more evidence collected by a typical receptor scan.
   repeated Evidence evidences = 3;
 }
 
 
-/**
- An evidence is a unstructured or structured document that represent the how a service is being used within a
- service provider account.  For example, the configuration of an S3 bucket in AWS.
- */
+// Evidence is a unstructured or structured document that represent the how a service is being used within a
+// service provider account.  For example, the configuration of an S3 bucket in AWS.
 message Evidence {
 
-  /**
-   Human readable English string that identifies this evidence.  It's important the caption is stable for all
-   scans of the same evidence type.
-   */
+  // Caption is a human readable English string that identifies this evidence.  It's important the caption is stable
+  // for all scans of the same evidence type.
   string caption = 1;
 
-  /**
-   Human readable English string describing the content of this evidence.
-   */
+  // Description is a human readable English string describing the content of this evidence.
   string description = 2;
 
-  /**
-   The name of service this evidence was collected from.  For example, "S3".  The service name must be one
-   of the service types reported in Services struct (See the message Service definition).
-   */
+  // Service_name is the name of service this evidence was collected from.  For example, "S3".  The service_name must
+  // be one of the service subtype_name reported in Service struct (See the message Service definition).
   string service_name = 3;
 
-  /**
-   The raw API request used to generate this evidence.  The raw API request and response are used to prove to
-   examiners this evidence correlates to real service instance configuration.
-   */
+  // Sources are raw service provider API requests and responses used to generate this evidence.  The raw API requests
+  // and responses serve as proof the evidence correlates to real service instance configuration.
   repeated Source sources = 4;
 
-  /**
-   The evidence can be an unstructured (Document) or structured (Struct) type.
-   */
+  // Evidence_type can be either an unstructured (Document) or structured (Struct) type.
   oneof evidence_type {
 
-    /**
-     An unstructured evidence.
-     */
+    // Document is an unstructured evidence.
     Document doc = 6;
 
-    /**
-     A structured evidence
-     */
+    // Struct is a structured evidence.
     Struct struct = 7;
-  }
-
-  message Source {
-    /**
-     The raw API request used to generate this evidence.  The raw API request and response are used to prove to
-     examiners this evidence correlates to real service instance configuration.
-     */
-    string raw_api_request = 1;
-
-    /**
-     The raw API response used to generate this evidence.  The raw API request and response is used to prove to
-     examiners this evidence correlates to real service instance configuration.
-     */
-    string raw_api_response = 2;
   }
 }
 
 
-/**
- An unstructured evidence provided as a MIME document.
- */
+// Source is the raw service provider API request and response.
+message Source {
+
+  // Raw_api_request is the raw API request used to generate this evidence.
+  string raw_api_request = 1;
+
+  // Raw_api_response is the raw API response used to generate this evidence.
+  string raw_api_response = 2;
+}
+
+
+// Document is an unstructured evidence provided as a MIME document.
 message Document {
-  /**
-   A unique service ID relative to the document.  A row ID typically represents a unique service ID.  The
-   service_id must be previously reported in the Services message.
-   @required
-   */
+
+  // Service_id is a unique service ID relative to the document.  A row ID typically represents a unique service ID.
+  // The service_id must be previously reported in the Services message.
+  // @required
   string service_id = 1;
 
-  /**
-   Document type defined using MIME (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types).
-   @required
-   */
+  // Mime is the document type defined using MIME.
+  // (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)
+  // @required
   string mime = 2;
 
-  /**
-   Opaque document body.  The document body must match the type defined by the mime attribute.
-   @required
-   */
+  // Body is the opaque document body.  The document body must match the type defined by the mime attribute.
+  // @required
   bytes body = 3;
 }
 
 
-/**
- A structured evidence defined in tabular form.  Each struct typically represent a service type (see Evidence
- message definition).  Each struct consists of rows of data.  Each row typically represent a service instance and
- its configurations.  A row  contains column name and column value pairs.  All rows in a struct must have the same
- column name-value pairs.
- */
+// Struct is a structured evidence defined in tabular form.  Each struct typically represent a service type (see
+// Evidence message definition).  Each struct consists of rows of data.  Each row typically represent a service
+// instance and its configurations.  A row  contains column name and column value pairs.  All rows in a struct
+// must have the same column name-value pairs.
 message Struct {
 
-  /**
-   Each row typically represents the configuration of a service instance.
-   @required
-   */
+  // Rows of key-value pairs.  Each row typically represents the configuration of a service instance or an data
+  // type such as a member of GitLab group.
+  // @required
   repeated Row rows = 1;
 
-  /**
-   A map of row column name to display name pairs.
-   @required
-   */
+  // Col_display_names is a map of row column name to it's corresponding display name.  Display names are used
+  // by the user interface to render a field in a struct's rows.
+  // @required
   map<string, string> col_display_names = 2;
 
-  /**
-   An ordered list of row column names.  The order defines how each column will be rendered by default.
-   @required
-   */
+  // Col_display_order is an ordered list of row column names.  The order of the column names are used by the user
+  // interface to render the column order of a struct's rows.
+  // @required
   repeated string col_display_order = 3;
-
-  /**
-   A row of structured data
-   */
-  message Row {
-
-    /**
-     A unique service ID relative to the struct.  A row ID typically represents a unique service ID.  The
-     service_id must be previously reported in the Services message.
-     @required
-     */
-    string service_id = 1;
-
-    /**
-     Columns of the row in column name to value pairs.  All rows in a struct must have the same column names and
-     corresponding value types.
-     @required
-     */
-    map<string, Value> cols = 2;
-
-    /**
-     Column value types can be any protobuf scalar or google.proto.Timestamp.
-     @required
-     */
-    message Value {
-      oneof value_type {
-        double double_value = 1;
-        float float_value = 2;
-        int32 int32_value = 3;
-        int64 int64_value = 4;
-        uint32 uint32_value = 5;
-        uint64 uint64_value = 6;
-        bool bool_value = 7;
-        string string_value = 8;
-        google.protobuf.Timestamp timestamp_value = 9;
-      }
-    }
-  }
-
 }
 
 
-/**
- Service instances configured within a service provider account.  For example, all service instances configured in
- an AWS account which may include S3 buckets, ECS clusters, RDS database instances, etc.  The boundary of a
- service instance such as a ECS cluster or an ECS container instance is dependent on how the findings are
- collected.  Each service instance_id should be associated with at least one Evidence.
- */
+// Row is a row of structured data.
+message Row {
+
+  // Service_id is a unique service ID relative to the struct.  A row ID typically represents a unique service ID.
+  // The service_id must be previously reported in the Services message.
+  // @required
+  string service_id = 1;
+
+  // Cols are columns of the row in column name to value pairs.  All rows in a struct must have the same column
+  // names and corresponding value types.
+  // @required
+  map<string, Value> cols = 2;
+}
+
+
+// Value is a Struct.Row's column value.  Value types can be simple protobuf scalar or google.proto.Timestamp.
+// @required
+message Value {
+  oneof value_type {
+    double double_value = 1;
+    float float_value = 2;
+    int32 int32_value = 3;
+    int64 int64_value = 4;
+    uint32 uint32_value = 5;
+    uint64 uint64_value = 6;
+    bool bool_value = 7;
+    string string_value = 8;
+    google.protobuf.Timestamp timestamp_value = 9;
+  }
+}
+
+
+// Services are service instances configured within a service provider account.  For example, all service instances
+// configured in an AWS account which may include S3 buckets, ECS clusters, RDS database instances, etc.  The boundary
+// of a service instance such as a ECS cluster or an ECS container instance is dependent on how the findings are
+// collected.  Each service instance_id should be associated with at least one Evidence.
 message Services {
 
-  /**
-   Unique receptor type.  A stable string identifier that represent the type of receptor reporting this finding.  The
-   identifier is a simple URL encode string that includes the organization name and a service provider name.  For
-   example "trustero_gitlab".
-   @required
-   */
+  // Receptor_type is a unique receptor type.  A stable string identifier that represent the type of receptor
+  // reporting this finding.  The identifier is a simple URL encode string that includes the organization name
+  // and a service provider name.  For example "trustero_gitlab".
+  // @required
   string receptor_type = 1;
 
-  /**
-   The service provider of this list of services.
-   @required
-   */
+  // Service_provider_account is the service provider account where the services are configured in.
+  // @required
   string service_provider_account = 2;
 
-  /**
-   A list of service instances.
-   @required
-   */
+  // Services is a list of service instances configured in the service provider account.
+  // @required
   repeated Service services = 3;
-
-  /**
-   A service instance definition.
-   */
-  message Service {
-
-    /**
-     Name of the service.  For example, "ECS".
-     @required
-     */
-    string name = 1;
-
-    /**
-     Unique service ID.  For example, ECS's UUID.
-     @required
-     */
-    string instance_id = 2;
-  }
-
 }
 
-/**
-  Credential to access a service provider account.
-  //REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
- */
+
+// Service is a discovered service instance definition.
+message Service {
+
+  // Type_id of the service.  This is a Trustero assigned identifier for a known service such as "GitLab" or AWS "ECS".
+  // [REMIND] for a list of service type_name to type_id mapping.
+  // @required
+  string type_id = 1;
+
+  // Subtype_name of the service.  A subtype of a service is an configurable object type such as a GitLab "repository"
+  // or AWS ECS "cluster".  The instance_name and instance_id must represent an instance of the subtype.  For example,
+  // "Java 1.5" maybe a valid GitLab repository name or "Elastic front end cluster" maybe a valid AWS ECS cluster name.
+  // @required
+  string subtype_name = 2;
+
+  // Instance_name of a discovered service instance.  For example, an AWS "ECS" cluster name or a GitLab "repository"
+  // name.  Instance_name of a service instance may change for a given service instance but it's service_id is stable.
+  // @required
+  string instance_name = 3;
+
+  // Instance_id of a discovered service instance is the stable identifier of the service instance.  For example,
+  // an AWS "ECS" cluster UUID or GitLab "repository" ID.
+  // @required
+  string instance_id = 4;
+}
+
+
+// Credential is returned by a Verified request noting if a given service provider account credential is  valid.
+// REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
 message Credential {
 
-  /**
-   Trustero's receptor record identifier.  This identifier is typically provided to the receptor as part of a reporting
-   findings or discover services request.
-   */
+  // Receptor_object_id is Trustero's receptor record identifier.  This identifier is typically provided to the
+  // receptor as part of a reporting findings or discover services request.
   string receptor_object_id = 1;
 
-  /**
-   The service provider credential being verified.
-   */
+  // Credential is the service provider credential being verified.
   string credential = 2;
 
-  /**
-   Report whether the service provider credential provided in this message is valid for report findings or discover
-   services request.
-   */
+  // Is_credential_valid report whether the service provider credential provided to the receptor verify request
+  // is valid.
   bool is_credential_valid = 3;
 
-  /**
-   Reason for why the service provider credential in this message is invalid.
-   */
+  // Message contains the reason for why the service provider credential in this message is invalid.
   string message = 4;
 }
 
 
-/**
- Trustero receptor record identifier.
- */
+// ReceptorOID is Trustero's receptor record identifier.
 message ReceptorOID {
 
-  /**
-   Trustero string representation of a persistent record.
-   */
+  // Receptor_object_id is the string representation of a Trustero persistent record.
   string receptor_object_id = 1;
 }
 
 
-/**
- Trustero stored receptor configuration and service provider credential.
- REMIND: ReceptorConfiguration is a subset of existing ntrced's Receptor record.
- */
+// ReceptorConfiguration contains a configurations a receptor needs to access a service provider account.
+// REMIND: ReceptorConfiguration is a subset of existing ntrced's Receptor record.
 message ReceptorConfiguration {
 
-  /**
-   Trustero receptor record identifier.
-   REMIND Receptor.ID
-   */
+  // Receptor_object_id is Trustero's receptor record identifier.
+  // REMIND Receptor.ID
   string receptor_object_id = 1;
 
-  /**
-   Credential required to access a service provider for report finding and discover services purposes.
-   REMIND Receptor.Credential required to access the target service.
-   */
+  // Credential required to access a service provider for report finding and discover services purposes.
+  // REMIND Receptor.Credential required to access the target service.
   string credential = 2;
 
-  /**
-   Additional receptor configuration to access a service provider account.
-   REMIND Receptor.config task configuration in json. 
-   */
+  // Config holds additional receptor configuration to access a service provider account.
+  // REMIND Receptor.config task configuration in json.
   string config = 3;
 
-  /**
-   Service provider account
-   REMIND Receptor.TenantID 
-   */
+  // Service_provider_account is the service provider account name.
+  // REMIND Receptor.TenantID
   string service_provider_account = 4;
 }
 
 
-/**
- Trustero uses asynchronous jobs to track receptor requests.  Trustero initiates a receptor job providing a
- receptor_object_id, a tracer_id, and a command.  When the receptor completes the job, the receptor callback
- into Trustero to report the job result.
- REMIND:  JobResult maps to AsyncTask
- */
+// JobResult reports the result of a receptor request.
+// REMIND:  JobResult maps to AsyncTask
 message JobResult {
 
-  /**
-   A tracer ID used to track the progress of the receptor request.
-   REMIND AyncTask.TracerID for tracking.
-   */
+  // Tracer_id is used to track the progress of the receptor request.
+  // REMIND AyncTask.TracerID for tracking.
   string tracer_id = 1;
 
-  /**
-   Receptor command request that completed.  One of "verify", "scan", or "discover"
-   */
+  // Command is the receptor request that completed.  One of "verify", "scan", or "discover"
   string command = 2;
 
-  /**
-   Receptor command request result.  One of "success", "fail", or "error".
-   */
+  // Result is receptor request result.  One of "success", "fail", or "error".
   string result = 3;
 
-  /**
-   Trustero's receptor record identifier.
-   REMIND Receptor.ID
-   */
+  // Receptor_object_id is Trustero's receptor record identifier.
+  // REMIND Receptor.ID
   string receptor_object_id = 4;
 }
 

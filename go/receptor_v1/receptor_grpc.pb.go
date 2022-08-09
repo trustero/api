@@ -26,29 +26,24 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReceptorClient interface {
-	//*
-	//Report whether the provided credential is a valid service provider credential for purpose of discovering services
-	//and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from a check
-	//credential receptor request.
+	// Report whether the provided credential is a valid service provider credential for purpose of discovering
+	// services and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from
+	// a check credential receptor request.
 	Verified(ctx context.Context, in *Credential, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	//*
-	//Get the receptor configuration and service provider credential using the provided receptor record identifier.  This
-	//rpc call is typically made as a callback by a receptor prior to making a report findings or discover services
-	//receptor request.
+	// Get the receptor configuration and service provider credential using the provided receptor record identifier.
+	// This rpc call is typically made as a callback by a receptor prior to making a report findings or discover
+	// services receptor request.
 	GetConfiguration(ctx context.Context, in *ReceptorOID, opts ...grpc.CallOption) (*ReceptorConfiguration, error)
-	//*
-	//Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
-	//call returns a string value service listing ID or an error specifying why Trustero failed to process the service
-	//listing.
+	// Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
+	// call returns a string value service listing ID or an error specifying why Trustero failed to process the service
+	// listing.
 	Discovered(ctx context.Context, in *Services, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
-	//*
-	//Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
-	//call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
+	// Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
+	// call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
 	Report(ctx context.Context, in *Finding, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
-	//*
-	//Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
-	//contains information about the receptor request and it's corresponding result.  Information such as the
-	//JobResult.receptor_object_id are passed to the receptor as part of the request.
+	// Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
+	// contains information about the receptor request and it's corresponding result.  Information such as the
+	// JobResult.receptor_object_id are passed to the receptor as part of the request.
 	Notify(ctx context.Context, in *JobResult, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -109,29 +104,24 @@ func (c *receptorClient) Notify(ctx context.Context, in *JobResult, opts ...grpc
 // All implementations should embed UnimplementedReceptorServer
 // for forward compatibility
 type ReceptorServer interface {
-	//*
-	//Report whether the provided credential is a valid service provider credential for purpose of discovering services
-	//and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from a check
-	//credential receptor request.
+	// Report whether the provided credential is a valid service provider credential for purpose of discovering
+	// services and reporting findings.  This rpc call is typically made as callback by a receptor to trustero from
+	// a check credential receptor request.
 	Verified(context.Context, *Credential) (*emptypb.Empty, error)
-	//*
-	//Get the receptor configuration and service provider credential using the provided receptor record identifier.  This
-	//rpc call is typically made as a callback by a receptor prior to making a report findings or discover services
-	//receptor request.
+	// Get the receptor configuration and service provider credential using the provided receptor record identifier.
+	// This rpc call is typically made as a callback by a receptor prior to making a report findings or discover
+	// services receptor request.
 	GetConfiguration(context.Context, *ReceptorOID) (*ReceptorConfiguration, error)
-	//*
-	//Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
-	//call returns a string value service listing ID or an error specifying why Trustero failed to process the service
-	//listing.
+	// Report known services.  A receptor or a Trustero client application reports its known services on demand.  This
+	// call returns a string value service listing ID or an error specifying why Trustero failed to process the service
+	// listing.
 	Discovered(context.Context, *Services) (*wrapperspb.StringValue, error)
-	//*
-	//Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
-	//call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
+	// Report a finding.  A receptor or a Trustero client application reports its findings on a periodic basis.  This
+	// call returns a string value collection ID or an error specifying why Trustero failed to process the finding.
 	Report(context.Context, *Finding) (*wrapperspb.StringValue, error)
-	//*
-	//Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
-	//contains information about the receptor request and it's corresponding result.  Information such as the
-	//JobResult.receptor_object_id are passed to the receptor as part of the request.
+	// Notify Trustero a long running report finding or discover services receptor request has completed.  JobResult
+	// contains information about the receptor request and it's corresponding result.  Information such as the
+	// JobResult.receptor_object_id are passed to the receptor as part of the request.
 	Notify(context.Context, *JobResult) (*emptypb.Empty, error)
 }
 

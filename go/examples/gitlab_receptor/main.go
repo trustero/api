@@ -4,10 +4,12 @@ package main
 
 import (
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/trustero/api/go/receptor_sdk/cmd"
+	"github.com/trustero/api/go/receptor_v1"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -21,7 +23,10 @@ type GitLabUser struct {
 	LastActivityOn   *time.Time `trustero:"display:Last Activity On;order:7"`
 }
 
-const SERVICE_NAME = "GitLab"
+const (
+	serviceName  = "GitLab"
+	groupSubtype = "Group"
+)
 
 type Receptor struct {
 	Token   string
@@ -50,7 +55,7 @@ func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
 	return
 }
 
-func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_sdk.Service, err error) {
+func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.Service, err error) {
 	c := credentials.(*Receptor)
 	var git *gitlab.Client
 
@@ -59,7 +64,7 @@ func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_sdk.Servi
 		// Get Group's name
 		var group *gitlab.Group
 		group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{})
-		services.AddService(SERVICE_NAME, group.Name)
+		services.AddService("remind_service_id e.g. trs2", groupSubtype, group.Name, strconv.Itoa(group.ID))
 	}
 	return services.Services, err
 }
@@ -81,7 +86,7 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 
 func (r *Receptor) getMemberEvidence(credentials interface{}, git *gitlab.Client) (evidence *receptor_sdk.Evidence, err error) {
 	c := credentials.(*Receptor)
-	evidence = receptor_sdk.NewEvidence(SERVICE_NAME, "Group Members",
+	evidence = receptor_sdk.NewEvidence(serviceName, "Group Members",
 		"List of GitLab group and inherited members includes whether a member has multi-factor authentication on and if they have group admin privilege.")
 	var (
 		user    *gitlab.User

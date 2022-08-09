@@ -56,6 +56,12 @@ func (rc *MockReceptorClient) Discovered(ctx context.Context, in *receptor.Servi
 }
 
 func (rc *MockReceptorClient) Report(ctx context.Context, in *receptor.Finding, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
+	/* REMIND
+	for _, ev := range in.Evidences {
+		t := ev.GetStruct()
+	}
+	*/
+
 	s = &wrapperspb.StringValue{Value: ""}
 	var yamld string
 	if yamld, err = toYaml(in); err == nil {

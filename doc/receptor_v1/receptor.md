@@ -7,18 +7,18 @@
     - [Credential](#receptor_v1-Credential)
     - [Document](#receptor_v1-Document)
     - [Evidence](#receptor_v1-Evidence)
-    - [Evidence.Source](#receptor_v1-Evidence-Source)
     - [Finding](#receptor_v1-Finding)
     - [JobResult](#receptor_v1-JobResult)
     - [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration)
     - [ReceptorOID](#receptor_v1-ReceptorOID)
+    - [Row](#receptor_v1-Row)
+    - [Row.ColsEntry](#receptor_v1-Row-ColsEntry)
+    - [Service](#receptor_v1-Service)
     - [Services](#receptor_v1-Services)
-    - [Services.Service](#receptor_v1-Services-Service)
+    - [Source](#receptor_v1-Source)
     - [Struct](#receptor_v1-Struct)
     - [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry)
-    - [Struct.Row](#receptor_v1-Struct-Row)
-    - [Struct.Row.ColsEntry](#receptor_v1-Struct-Row-ColsEntry)
-    - [Struct.Row.Value](#receptor_v1-Struct-Row-Value)
+    - [Value](#receptor_v1-Value)
   
     - [Receptor](#receptor_v1-Receptor)
   
@@ -37,16 +37,16 @@ file &#39;LICENSE.txt&#39;, which is part of this source code package.
 <a name="receptor_v1-Credential"></a>
 
 ### Credential
-Credential to access a service provider account.
-//REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
+Credential is returned by a Verified request noting if a given service provider account credential is  valid.
+REMIND:  Credential maps to receptor.VerifyResult record with the addition of credential being verified.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_object_id | [string](#string) |  | Trustero&#39;s receptor record identifier. This identifier is typically provided to the receptor as part of a reporting findings or discover services request. |
-| credential | [string](#string) |  | The service provider credential being verified. |
-| is_credential_valid | [bool](#bool) |  | Report whether the service provider credential provided in this message is valid for report findings or discover services request. |
-| message | [string](#string) |  | Reason for why the service provider credential in this message is invalid. |
+| receptor_object_id | [string](#string) |  | Receptor_object_id is Trustero&#39;s receptor record identifier. This identifier is typically provided to the receptor as part of a reporting findings or discover services request. |
+| credential | [string](#string) |  | Credential is the service provider credential being verified. |
+| is_credential_valid | [bool](#bool) |  | Is_credential_valid report whether the service provider credential provided to the receptor verify request is valid. |
+| message | [string](#string) |  | Message contains the reason for why the service provider credential in this message is invalid. |
 
 
 
@@ -56,14 +56,14 @@ Credential to access a service provider account.
 <a name="receptor_v1-Document"></a>
 
 ### Document
-An unstructured evidence provided as a MIME document.
+Document is an unstructured evidence provided as a MIME document.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| service_id | [string](#string) |  | A unique service ID relative to the document. A row ID typically represents a unique service ID. The service_id must be previously reported in the Services message. @required |
-| mime | [string](#string) |  | Document type defined using MIME (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types). @required |
-| body | [bytes](#bytes) |  | Opaque document body. The document body must match the type defined by the mime attribute. @required |
+| service_id | [string](#string) |  | Service_id is a unique service ID relative to the document. A row ID typically represents a unique service ID. The service_id must be previously reported in the Services message. @required |
+| mime | [string](#string) |  | Mime is the document type defined using MIME. (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) @required |
+| body | [bytes](#bytes) |  | Body is the opaque document body. The document body must match the type defined by the mime attribute. @required |
 
 
 
@@ -73,34 +73,18 @@ An unstructured evidence provided as a MIME document.
 <a name="receptor_v1-Evidence"></a>
 
 ### Evidence
-An evidence is a unstructured or structured document that represent the how a service is being used within a
+Evidence is a unstructured or structured document that represent the how a service is being used within a
 service provider account.  For example, the configuration of an S3 bucket in AWS.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| caption | [string](#string) |  | Human readable English string that identifies this evidence. It&#39;s important the caption is stable for all scans of the same evidence type. |
-| description | [string](#string) |  | Human readable English string describing the content of this evidence. |
-| service_name | [string](#string) |  | The name of service this evidence was collected from. For example, &#34;S3&#34;. The service name must be one of the service types reported in Services struct (See the message Service definition). |
-| sources | [Evidence.Source](#receptor_v1-Evidence-Source) | repeated | The raw API request used to generate this evidence. The raw API request and response are used to prove to examiners this evidence correlates to real service instance configuration. |
-| doc | [Document](#receptor_v1-Document) |  | An unstructured evidence. |
-| struct | [Struct](#receptor_v1-Struct) |  | A structured evidence |
-
-
-
-
-
-
-<a name="receptor_v1-Evidence-Source"></a>
-
-### Evidence.Source
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| raw_api_request | [string](#string) |  | The raw API request used to generate this evidence. The raw API request and response are used to prove to examiners this evidence correlates to real service instance configuration. |
-| raw_api_response | [string](#string) |  | The raw API response used to generate this evidence. The raw API request and response is used to prove to examiners this evidence correlates to real service instance configuration. |
+| caption | [string](#string) |  | Caption is a human readable English string that identifies this evidence. It&#39;s important the caption is stable for all scans of the same evidence type. |
+| description | [string](#string) |  | Description is a human readable English string describing the content of this evidence. |
+| service_name | [string](#string) |  | Service_name is the name of service this evidence was collected from. For example, &#34;S3&#34;. The service_name must be one of the service subtype_name reported in Service struct (See the message Service definition). |
+| sources | [Source](#receptor_v1-Source) | repeated | Sources are raw service provider API requests and responses used to generate this evidence. The raw API requests and responses serve as proof the evidence correlates to real service instance configuration. |
+| doc | [Document](#receptor_v1-Document) |  | Document is an unstructured evidence. |
+| struct | [Struct](#receptor_v1-Struct) |  | Struct is a structured evidence. |
 
 
 
@@ -110,7 +94,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 <a name="receptor_v1-Finding"></a>
 
 ### Finding
-A finding is a set of evidence(s) collected from a service provider account.
+Finding is a set of evidence(s) collected from a service provider account.
 
 
 | Field | Type | Label | Description |
@@ -127,18 +111,16 @@ A finding is a set of evidence(s) collected from a service provider account.
 <a name="receptor_v1-JobResult"></a>
 
 ### JobResult
-Trustero uses asynchronous jobs to track receptor requests.  Trustero initiates a receptor job providing a
-receptor_object_id, a tracer_id, and a command.  When the receptor completes the job, the receptor callback
-into Trustero to report the job result.
+JobResult reports the result of a receptor request.
 REMIND:  JobResult maps to AsyncTask
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| tracer_id | [string](#string) |  | A tracer ID used to track the progress of the receptor request. REMIND AyncTask.TracerID for tracking. |
-| command | [string](#string) |  | Receptor command request that completed. One of &#34;verify&#34;, &#34;scan&#34;, or &#34;discover&#34; |
-| result | [string](#string) |  | Receptor command request result. One of &#34;success&#34;, &#34;fail&#34;, or &#34;error&#34;. |
-| receptor_object_id | [string](#string) |  | Trustero&#39;s receptor record identifier. REMIND Receptor.ID |
+| tracer_id | [string](#string) |  | Tracer_id is used to track the progress of the receptor request. REMIND AyncTask.TracerID for tracking. |
+| command | [string](#string) |  | Command is the receptor request that completed. One of &#34;verify&#34;, &#34;scan&#34;, or &#34;discover&#34; |
+| result | [string](#string) |  | Result is receptor request result. One of &#34;success&#34;, &#34;fail&#34;, or &#34;error&#34;. |
+| receptor_object_id | [string](#string) |  | Receptor_object_id is Trustero&#39;s receptor record identifier. REMIND Receptor.ID |
 
 
 
@@ -148,16 +130,16 @@ REMIND:  JobResult maps to AsyncTask
 <a name="receptor_v1-ReceptorConfiguration"></a>
 
 ### ReceptorConfiguration
-Trustero stored receptor configuration and service provider credential.
+ReceptorConfiguration contains a configurations a receptor needs to access a service provider account.
 REMIND: ReceptorConfiguration is a subset of existing ntrced&#39;s Receptor record.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_object_id | [string](#string) |  | Trustero receptor record identifier. REMIND Receptor.ID |
+| receptor_object_id | [string](#string) |  | Receptor_object_id is Trustero&#39;s receptor record identifier. REMIND Receptor.ID |
 | credential | [string](#string) |  | Credential required to access a service provider for report finding and discover services purposes. REMIND Receptor.Credential required to access the target service. |
-| config | [string](#string) |  | Additional receptor configuration to access a service provider account. REMIND Receptor.config task configuration in json. |
-| service_provider_account | [string](#string) |  | Service provider account REMIND Receptor.TenantID |
+| config | [string](#string) |  | Config holds additional receptor configuration to access a service provider account. REMIND Receptor.config task configuration in json. |
+| service_provider_account | [string](#string) |  | Service_provider_account is the service provider account name. REMIND Receptor.TenantID |
 
 
 
@@ -167,12 +149,62 @@ REMIND: ReceptorConfiguration is a subset of existing ntrced&#39;s Receptor reco
 <a name="receptor_v1-ReceptorOID"></a>
 
 ### ReceptorOID
-Trustero receptor record identifier.
+ReceptorOID is Trustero&#39;s receptor record identifier.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_object_id | [string](#string) |  | Trustero string representation of a persistent record. |
+| receptor_object_id | [string](#string) |  | Receptor_object_id is the string representation of a Trustero persistent record. |
+
+
+
+
+
+
+<a name="receptor_v1-Row"></a>
+
+### Row
+Row is a row of structured data.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| service_id | [string](#string) |  | Service_id is a unique service ID relative to the struct. A row ID typically represents a unique service ID. The service_id must be previously reported in the Services message. @required |
+| cols | [Row.ColsEntry](#receptor_v1-Row-ColsEntry) | repeated | Cols are columns of the row in column name to value pairs. All rows in a struct must have the same column names and corresponding value types. @required |
+
+
+
+
+
+
+<a name="receptor_v1-Row-ColsEntry"></a>
+
+### Row.ColsEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [Value](#receptor_v1-Value) |  |  |
+
+
+
+
+
+
+<a name="receptor_v1-Service"></a>
+
+### Service
+Service is a discovered service instance definition.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| type_id | [string](#string) |  | Type_id of the service. This is a Trustero assigned identifier for a known service such as &#34;GitLab&#34; or AWS &#34;ECS&#34;. [REMIND] for a list of service type_name to type_id mapping. @required |
+| subtype_name | [string](#string) |  | Subtype_name of the service. A subtype of a service is an configurable object type such as a GitLab &#34;repository&#34; or AWS ECS &#34;cluster&#34;. The instance_name and instance_id must represent an instance of the subtype. For example, &#34;Java 1.5&#34; maybe a valid GitLab repository name or &#34;Elastic front end cluster&#34; maybe a valid AWS ECS cluster name. @required |
+| instance_name | [string](#string) |  | Instance_name of a discovered service instance. For example, an AWS &#34;ECS&#34; cluster name or a GitLab &#34;repository&#34; name. Instance_name of a service instance may change for a given service instance but it&#39;s service_id is stable. @required |
+| instance_id | [string](#string) |  | Instance_id of a discovered service instance is the stable identifier of the service instance. For example, an AWS &#34;ECS&#34; cluster UUID or GitLab &#34;repository&#34; ID. @required |
 
 
 
@@ -182,33 +214,33 @@ Trustero receptor record identifier.
 <a name="receptor_v1-Services"></a>
 
 ### Services
-Service instances configured within a service provider account.  For example, all service instances configured in
-an AWS account which may include S3 buckets, ECS clusters, RDS database instances, etc.  The boundary of a
-service instance such as a ECS cluster or an ECS container instance is dependent on how the findings are
+Services are service instances configured within a service provider account.  For example, all service instances
+configured in an AWS account which may include S3 buckets, ECS clusters, RDS database instances, etc.  The boundary
+of a service instance such as a ECS cluster or an ECS container instance is dependent on how the findings are
 collected.  Each service instance_id should be associated with at least one Evidence.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_type | [string](#string) |  | Unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encode string that includes the organization name and a service provider name. For example &#34;trustero_gitlab&#34;. @required |
-| service_provider_account | [string](#string) |  | The service provider of this list of services. @required |
-| services | [Services.Service](#receptor_v1-Services-Service) | repeated | A list of service instances. @required |
+| receptor_type | [string](#string) |  | Receptor_type is a unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encode string that includes the organization name and a service provider name. For example &#34;trustero_gitlab&#34;. @required |
+| service_provider_account | [string](#string) |  | Service_provider_account is the service provider account where the services are configured in. @required |
+| services | [Service](#receptor_v1-Service) | repeated | Services is a list of service instances configured in the service provider account. @required |
 
 
 
 
 
 
-<a name="receptor_v1-Services-Service"></a>
+<a name="receptor_v1-Source"></a>
 
-### Services.Service
-A service instance definition.
+### Source
+Source is the raw service provider API request and response.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| name | [string](#string) |  | Name of the service. For example, &#34;ECS&#34;. @required |
-| instance_id | [string](#string) |  | Unique service ID. For example, ECS&#39;s UUID. @required |
+| raw_api_request | [string](#string) |  | Raw_api_request is the raw API request used to generate this evidence. |
+| raw_api_response | [string](#string) |  | Raw_api_response is the raw API response used to generate this evidence. |
 
 
 
@@ -218,17 +250,17 @@ A service instance definition.
 <a name="receptor_v1-Struct"></a>
 
 ### Struct
-A structured evidence defined in tabular form.  Each struct typically represent a service type (see Evidence
-message definition).  Each struct consists of rows of data.  Each row typically represent a service instance and
-its configurations.  A row  contains column name and column value pairs.  All rows in a struct must have the same
-column name-value pairs.
+Struct is a structured evidence defined in tabular form.  Each struct typically represent a service type (see
+Evidence message definition).  Each struct consists of rows of data.  Each row typically represent a service
+instance and its configurations.  A row  contains column name and column value pairs.  All rows in a struct
+must have the same column name-value pairs.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| rows | [Struct.Row](#receptor_v1-Struct-Row) | repeated | Each row typically represents the configuration of a service instance. @required |
-| col_display_names | [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry) | repeated | A map of row column name to display name pairs. @required |
-| col_display_order | [string](#string) | repeated | An ordered list of row column names. The order defines how each column will be rendered by default. @required |
+| rows | [Row](#receptor_v1-Row) | repeated | Rows of key-value pairs. Each row typically represents the configuration of a service instance or an data type such as a member of GitLab group. @required |
+| col_display_names | [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry) | repeated | Col_display_names is a map of row column name to it&#39;s corresponding display name. Display names are used by the user interface to render a field in a struct&#39;s rows. @required |
+| col_display_order | [string](#string) | repeated | Col_display_order is an ordered list of row column names. The order of the column names are used by the user interface to render the column order of a struct&#39;s rows. @required |
 
 
 
@@ -251,42 +283,10 @@ column name-value pairs.
 
 
 
-<a name="receptor_v1-Struct-Row"></a>
+<a name="receptor_v1-Value"></a>
 
-### Struct.Row
-A row of structured data
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| service_id | [string](#string) |  | A unique service ID relative to the struct. A row ID typically represents a unique service ID. The service_id must be previously reported in the Services message. @required |
-| cols | [Struct.Row.ColsEntry](#receptor_v1-Struct-Row-ColsEntry) | repeated | Columns of the row in column name to value pairs. All rows in a struct must have the same column names and corresponding value types. @required |
-
-
-
-
-
-
-<a name="receptor_v1-Struct-Row-ColsEntry"></a>
-
-### Struct.Row.ColsEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [Struct.Row.Value](#receptor_v1-Struct-Row-Value) |  |  |
-
-
-
-
-
-
-<a name="receptor_v1-Struct-Row-Value"></a>
-
-### Struct.Row.Value
-Column value types can be any protobuf scalar or google.proto.Timestamp.
+### Value
+Value is a Struct.Row&#39;s column value.  Value types can be simple protobuf scalar or google.proto.Timestamp.
 @required
 
 
@@ -316,13 +316,13 @@ Column value types can be any protobuf scalar or google.proto.Timestamp.
 <a name="receptor_v1-Receptor"></a>
 
 ### Receptor
-A receptor, or a Trustero client application, collects findings supporting the use of a service from a service
-provider instance.  An example of a service provider is AWS and an example of a service provider account is an
-AWS account.  An example of a service is S3 and an example of a service instance is an S3 bucket.  Trustero
-associates the collected evidence to support the fact an organization is following it&#39;s stated practices.  A finding
-is comprised of a list of evidences.  Each evidence is associated with a service instance and contains its
-configuration information. An example of a finding is an AWS S3 bucket and its configuration.  Service configuration
-can be in opaque document format or structured document format.
+Receptor service, or a Trustero client application, collects findings supporting the use of a service from a
+service provider instance.  An example of a service provider is AWS and an example of a service provider account
+is an AWS account.  An example of a service is S3 and an example of a service instance is an S3 bucket.  Trustero
+associates the collected evidence to support the fact an organization is following it&#39;s stated practices.  A
+finding is comprised of a list of evidences.  Each evidence is associated with a service instance and contains
+its configuration information. An example of a finding is an AWS S3 bucket and its configuration.  Service
+configuration can be in opaque document format or structured document format.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/rs/zerolog/log"
+	"github.com/trustero/api/go/receptor_v1"
 )
 
 // Report struct to hold collected evidence
@@ -26,13 +27,13 @@ func (r *Report) AddEvidence(evidence *Evidence) *Report {
 	return r
 }
 
-// NewEvidence is a helper to instantiate a new Evidence struct
+// NewEvidence is a helper to instantiate a new Evidence struct.
 func NewEvidence(serviceName, caption, description string) *Evidence {
 	return &Evidence{
+		ServiceName: serviceName,
 		Caption:     caption,
 		Description: description,
-		ServiceName: serviceName,
-		Sources:     []*Source{},
+		Sources:     []*receptor_v1.Source{},
 		Rows:        []interface{}{},
 	}
 }
@@ -64,41 +65,40 @@ func (ev *Evidence) AddSource(rawRequest, rawResponse interface{}) *Evidence {
 		}
 	}
 
-	ev.Sources = append(ev.Sources, &Source{
-		ProviderAPIResponse: strResponse,
-		ProviderAPIRequest:  strRequest,
+	ev.Sources = append(ev.Sources, &receptor_v1.Source{
+		RawApiResponse: strResponse,
+		RawApiRequest:  strRequest,
 	})
 	return ev
 }
 
-// AddRow appends the given Evidence row
+// AddRow appends the given Evidence row.
 func (ev *Evidence) AddRow(row interface{}) *Evidence {
 	ev.Rows = append(ev.Rows, row)
 	return ev
 }
 
-// Services struct to hold collected service
-type Services struct {
-	Services []*Service
-}
+type Services receptor_v1.Services
 
 // NewServices instantiate a new service
 func NewServices() *Services {
-	return &Services{}
+	return (*Services)(&receptor_v1.Services{})
 }
 
 // AddService adds a services to discovered services
-func (s *Services) AddService(name, id string) *Services {
-	if len(name) > 0 && len(id) > 0 {
-		s.Services = append(s.Services, NewService(name, id))
+func (s *Services) AddService(typeName, typeId, instanceName, instanceId string) *Services {
+	if len(typeName) > 0 && len(typeId) > 0 && len(instanceName) > 0 && len(instanceId) > 0 {
+		s.Services = append(s.Services, newService(typeName, typeId, instanceName, instanceId))
 	}
 	return s
 }
 
 // NewService is a helper to instantiate a new Source struct
-func NewService(name, id string) *Service {
-	return &Service{
-		Name:       name,
-		InstanceId: id,
+func newService(typeId, subtypeName, instanceName, instanceId string) *receptor_v1.Service {
+	return &receptor_v1.Service{
+		TypeId:       typeId,
+		SubtypeName:  subtypeName,
+		InstanceName: instanceName,
+		InstanceId:   instanceId,
 	}
 }
