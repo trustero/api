@@ -756,18 +756,19 @@ type ServiceEntity struct {
 	// "GitLab" or AWS "ECS".
 	// @required
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
-	// Entity_type a service is an configurable object type such as a GitLab "repository" or AWS ECS "cluster".  The
-	// instance_name and instance_id must represent an instance of the subtype.  For example, "Java 1.5" maybe a valid
-	// GitLab repository name or "Elastic front end cluster" maybe a valid AWS ECS cluster name.
+	// Entity_type is a service configurable object type such as a GitLab "repository" or AWS ECS "cluster".  The
+	// entity_instance_name and entity_instance_id must represent an instance of the subtype.  For example,
+	// "Java 1.5" maybe a valid GitLab repository name or "Elastic front end cluster" maybe a valid AWS ECS
+	// cluster name.
 	// @required
 	EntityType string `protobuf:"bytes,2,opt,name=entity_type,json=entityType,proto3" json:"entity_type,omitempty"`
-	// Entity_instance_name of a discovered service instance.  For example, an AWS "ECS" cluster name or a GitLab
-	// "repository" name.  Entity_instance_name of an entity may change for a given service instance but
+	// Entity_instance_name of a discovered service entity instance.  For example, an AWS ECS cluster name or a
+	// GitLab repository name.  Entity_instance_name of an entity may change for a given entity instance but
 	// it's entity_instance_id is stable.
 	// @required
 	EntityInstanceName string `protobuf:"bytes,3,opt,name=entity_instance_name,json=entityInstanceName,proto3" json:"entity_instance_name,omitempty"`
-	// Entity_instance_id of a discovered entity instance.  For example, an AWS "ECS" cluster UUID or GitLab
-	// "repository" ID.
+	// Entity_instance_id of a discovered entity instance.  For example, an AWS ECS cluster UUID or GitLab
+	// repository ID.
 	// @required
 	EntityInstanceId string `protobuf:"bytes,4,opt,name=entity_instance_id,json=entityInstanceId,proto3" json:"entity_instance_id,omitempty"`
 }
