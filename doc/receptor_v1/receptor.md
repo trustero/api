@@ -224,9 +224,9 @@ collected evidence that aren&#39;t relevant to specific audit contexts.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | service_name | [string](#string) |  | Service_type_id of the entity source. This is a Trustero assigned identifier for a known service such as &#34;GitLab&#34; or AWS &#34;ECS&#34;. @required |
-| entity_type | [string](#string) |  | Entity_type a service is an configurable object type such as a GitLab &#34;repository&#34; or AWS ECS &#34;cluster&#34;. The instance_name and instance_id must represent an instance of the subtype. For example, &#34;Java 1.5&#34; maybe a valid GitLab repository name or &#34;Elastic front end cluster&#34; maybe a valid AWS ECS cluster name. @required |
-| entity_instance_name | [string](#string) |  | Entity_instance_name of a discovered service instance. For example, an AWS &#34;ECS&#34; cluster name or a GitLab &#34;repository&#34; name. Entity_instance_name of an entity may change for a given service instance but it&#39;s entity_instance_id is stable. @required |
-| entity_instance_id | [string](#string) |  | Entity_instance_id of a discovered entity instance. For example, an AWS &#34;ECS&#34; cluster UUID or GitLab &#34;repository&#34; ID. @required |
+| entity_type | [string](#string) |  | Entity_type is a service configurable object type such as a GitLab &#34;repository&#34; or AWS ECS &#34;cluster&#34;. The entity_instance_name and entity_instance_id must represent an instance of the subtype. For example, &#34;Java 1.5&#34; maybe a valid GitLab repository name or &#34;Elastic front end cluster&#34; maybe a valid AWS ECS cluster name. @required |
+| entity_instance_name | [string](#string) |  | Entity_instance_name of a discovered service entity instance. For example, an AWS ECS cluster name or a GitLab repository name. Entity_instance_name of an entity may change for a given entity instance but it&#39;s entity_instance_id is stable. @required |
+| entity_instance_id | [string](#string) |  | Entity_instance_id of a discovered entity instance. For example, an AWS ECS cluster UUID or GitLab repository ID. @required |
 
 
 
