@@ -35,7 +35,7 @@ type Receptor struct {
 }
 
 func (r *Receptor) GetReceptorType() string {
-	return "example_gitlab"
+	return "gitlab_receptor"
 }
 
 func (r *Receptor) GetKnownServices() []string {
