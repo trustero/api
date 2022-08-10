@@ -13,7 +13,8 @@ const dateTimeLayout = "2006-Jan-02"
 // rows of strings.  Each row's columns are ordered according to its headers in the headers array.
 func (s *Struct) Tabulate() (headers []string, rows [][]string, err error) {
 	headerKeys := s.getHeaderKeys()
-	for _, row := range s.GetRows() {
+
+	for _, row := range s.Rows {
 		cols := make([]string, len(headerKeys))
 		for i, key := range headerKeys {
 			if len(key) == 0 {
@@ -44,10 +45,11 @@ func (s *Struct) getHeaderKeys() (displayHeaders []string) {
 
 	// Build displayHeader array of column key names
 	var allHeaders []string
-	copy(displayHeaders, s.ColDisplayOrder)
 	for k, _ := range s.Rows[0].Cols {
 		allHeaders = append(allHeaders, k)
 	}
+
+	displayHeaders = s.ColDisplayOrder
 	for _, h := range allHeaders {
 		// If displayHeader doesn't contain a known column key, add the column key
 		if !contains(s.ColDisplayOrder, h) {

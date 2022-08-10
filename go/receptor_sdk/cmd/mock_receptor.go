@@ -4,6 +4,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 
 	receptor "github.com/trustero/api/go/receptor_v1"
 	"google.golang.org/grpc"
@@ -56,20 +57,30 @@ func (rc *MockReceptorClient) Discovered(ctx context.Context, in *receptor.Servi
 }
 
 func (rc *MockReceptorClient) Report(ctx context.Context, in *receptor.Finding, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
-	/* REMIND
+	fmt.Println()
 	for _, ev := range in.Evidences {
-		t := ev.GetStruct()
-	}
-	*/
 
-	s = &wrapperspb.StringValue{Value: ""}
-	var yamld string
-	if yamld, err = toYaml(in); err == nil {
-		println("========")
-		println("Report findings...")
-		println(string(yamld))
-		println()
+		t := ev.GetStruct()
+		var headers []string
+		var rows [][]string
+		headers, rows, err = t.Tabulate()
+		for _, header := range headers {
+			fmt.Printf("%12s ", header)
+		}
+		fmt.Println()
+
+		for _, row := range rows {
+			for _, col := range row {
+				fmt.Printf("%12s ", col)
+			}
+			fmt.Println()
+		}
 	}
+
+	if err != nil {
+		fmt.Print(err)
+	}
+
 	return
 }
 
