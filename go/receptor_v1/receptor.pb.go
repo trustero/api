@@ -120,6 +120,7 @@ type Evidence struct {
 	// Evidence_type can be either an unstructured (Document) or structured (Struct) type.
 	//
 	// Types that are assignable to EvidenceType:
+	//
 	//	*Evidence_Doc
 	//	*Evidence_Struct
 	EvidenceType isEvidence_EvidenceType `protobuf_oneof:"evidence_type"`
@@ -496,6 +497,7 @@ type Value struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to ValueType:
+	//
 	//	*Value_DoubleValue
 	//	*Value_FloatValue
 	//	*Value_Int32Value
