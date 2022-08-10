@@ -56,20 +56,20 @@ type Receptor interface {
 // Golang struct.  Fields of this evidence row struct must be public and annotated with Trustero's field annotation
 // where:
 //
-//     Field tag name is 'trustero' with sub-tags separated by ';'
-//     Valid sub-tabs: 'id', 'display', and 'order'
-//        id specifies the field is unique identifier for the struct.
-//        display provides the human-readable name for the field.
-//        order is an integer number starting with 1, denoting the order in which the field should be displayed in a
-//        table.
+//	Field tag name is 'trustero' with sub-tags separated by ';'
+//	Valid sub-tabs: 'id', 'display', and 'order'
+//	   id specifies the field is unique identifier for the struct.
+//	   display provides the human-readable name for the field.
+//	   order is an integer number starting with 1, denoting the order in which the field should be displayed in a
+//	   table.
 //
 // For example:
 //
-// type User struct {
-//     Name     string  `trustero:"display:Name;order:2"`
-//     IsAdmin  bool    `trustero:"display:Admin;order:3"`
-//     Username string  `trustero:"id;display:User Name;order:1"`
-// }
+//	type User struct {
+//	    Name     string  `trustero:"display:Name;order:2"`
+//	    IsAdmin  bool    `trustero:"display:Admin;order:3"`
+//	    Username string  `trustero:"id;display:User Name;order:1"`
+//	}
 type Evidence struct {
 	ServiceName string                // ServiceName where this evidence wa gathered. For example, "S3".
 	EntityType  string                // EntityType of rows of evidence.  For example, "bucket".
