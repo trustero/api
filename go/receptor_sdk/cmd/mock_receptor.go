@@ -60,6 +60,15 @@ func (rc *MockReceptorClient) Discovered(ctx context.Context, in *receptor.Servi
 
 func (rc *MockReceptorClient) Report(ctx context.Context, in *receptor.Finding, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
 	println(header + "Report(...)")
+
+	println("Entities")
+	var yamld string
+	if yamld, err = toYaml(in.Entities); err == nil {
+		println(string(yamld))
+	}
+	println()
+
+	println("Evidences")
 	for _, ev := range in.Evidences {
 
 		t := ev.GetStruct()

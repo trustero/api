@@ -58,8 +58,11 @@ message Finding {
   // REMIND maps to Receptor.TenantID
   string service_provider_account = 2;
 
+  // Entities is a list of service instances configured in the service provider account.
+  repeated ServiceEntity entities = 3;
+
   // One or more evidence collected by a typical receptor scan.
-  repeated Evidence evidences = 3;
+  repeated Evidence evidences = 4;
 }
 
 
@@ -194,7 +197,7 @@ message ServiceEntities {
   // @required
   string service_provider_account = 2;
 
-  // Services is a list of service instances configured in the service provider account.
+  // Entities is a list of service instances configured in the service provider account.
   // @required
   repeated ServiceEntity entities = 3;
 }
