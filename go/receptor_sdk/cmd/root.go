@@ -165,12 +165,9 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 
 	// Get service provider account credentialStr from CLI
 	credentialStr, err = getCredentialStringFromCLI()
-	if err != nil {
-		return
-	}
 
 	// If credentialStr not provided on CLI, get it from Trustero server
-	if len(credentialStr) == 0 {
+	if err != nil || len(credentialStr) == 0 {
 		// Get service provider account credentialStr and config from Trustero.
 		var receptorInfo *receptor.ReceptorConfiguration
 		if receptorInfo, err = getReceptorConfig(rc); err != nil {
