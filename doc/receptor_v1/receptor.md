@@ -77,11 +77,11 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| caption | [string](#string) |  | Caption is a human readable English string that identifies this evidence. It&#39;s important the caption is stable for all scans of the same evidence type. |
-| description | [string](#string) |  | Description is a human readable English string describing the content of this evidence. |
+| caption | [string](#string) |  | Caption is a human readable English string that identifies this evidence. Caption must be stable for all scans of the same evidence type. Trustero uses the caption to associate this evidence with a set of relevant controls. |
+| description | [string](#string) |  | Description is a human readable English string describing the content of this evidence. Description tells Trustero and users contents of the evidence and how |
 | service_name | [string](#string) |  | Service_name is the name of service this evidence was collected from. For example, &#34;S3&#34; or &#34;GitLab&#34; |
 | entity_type | [string](#string) |  | Entity_type specifies the row type and should correspond to a ServiceEntity. An entity_type typically represents a specific configurable entity such as AWS ECS &#34;Cluster&#34;. @required |
-| sources | [Source](#receptor_v1-Source) | repeated | Sources are raw service provider API requests and responses used to generate this evidence. The raw API requests and responses serve as proof the evidence correlates to real service instance configuration. |
+| sources | [Source](#receptor_v1-Source) | repeated | Sources are raw service provider API requests and responses used to generate this evidence. The raw API requests and responses serve as proof the evidence correlates to real service configurations. |
 | doc | [Document](#receptor_v1-Document) |  | Document is an unstructured evidence. |
 | struct | [Struct](#receptor_v1-Struct) |  | Struct is a structured evidence. |
 
@@ -99,8 +99,8 @@ Finding is a set of evidence(s) collected from a service provider account.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | receptor_type | [string](#string) |  | Unique receptor identifier. A receptor is expected to report findings from only one service provider type. A stable identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encoded string that includes an organization name and the service provider name. For example: &#34;trustero_gitlab&#34;. |
-| service_provider_account | [string](#string) |  | The receptor&#39;s evidence source. REMIND maps to Receptor.TenantID |
-| entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Entities is a list of service instances configured in the service provider account. |
+| service_provider_account | [string](#string) |  | The receptor&#39;s evidence source. |
+| entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Entities is a list of service entity configurations in the service provider account. |
 | evidences | [Evidence](#receptor_v1-Evidence) | repeated | One or more evidence collected by a typical receptor scan. |
 
 
@@ -112,15 +112,14 @@ Finding is a set of evidence(s) collected from a service provider account.
 
 ### JobResult
 JobResult reports the result of a receptor request.
-REMIND:  JobResult maps to AsyncTask
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| tracer_id | [string](#string) |  | Tracer_id is used to track the progress of the receptor request. REMIND AyncTask.TracerID for tracking. |
+| tracer_id | [string](#string) |  | Tracer_id is used to track the progress of the receptor request. |
 | command | [string](#string) |  | Command is the receptor request that completed. One of &#34;verify&#34;, &#34;scan&#34;, or &#34;discover&#34; |
 | result | [string](#string) |  | Result is receptor request result. One of &#34;success&#34;, &#34;fail&#34;, or &#34;error&#34;. |
-| receptor_object_id | [string](#string) |  | Receptor_object_id is Trustero&#39;s receptor record identifier. REMIND Receptor.ID |
+| receptor_object_id | [string](#string) |  | Receptor_object_id is Trustero&#39;s receptor record identifier. |
 
 
 
@@ -131,15 +130,14 @@ REMIND:  JobResult maps to AsyncTask
 
 ### ReceptorConfiguration
 ReceptorConfiguration contains a configurations a receptor needs to access a service provider account.
-REMIND: ReceptorConfiguration is a subset of existing ntrced&#39;s Receptor record.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_object_id | [string](#string) |  | Receptor_object_id is Trustero&#39;s receptor record identifier. REMIND Receptor.ID |
-| credential | [string](#string) |  | Credential required to access a service provider for report finding and discover services purposes. REMIND Receptor.Credential required to access the target service. |
-| config | [string](#string) |  | Config holds additional receptor configuration to access a service provider account. REMIND Receptor.config task configuration in json. |
-| service_provider_account | [string](#string) |  | Service_provider_account is the service provider account name. REMIND Receptor.TenantID |
+| receptor_object_id | [string](#string) |  | Receptor_object_id is Trustero&#39;s receptor record identifier. |
+| credential | [string](#string) |  | Credential required to access a service provider for report finding and discover services purposes. |
+| config | [string](#string) |  | Config holds additional receptor configuration to access a service provider account. |
+| service_provider_account | [string](#string) |  | Service_provider_account is the service provider account name. |
 
 
 
@@ -319,21 +317,19 @@ Value is a Struct.Row&#39;s column value.  Value types can be simple protobuf sc
 <a name="receptor_v1-Receptor"></a>
 
 ### Receptor
-Receptor service, or a Trustero client application, collects findings supporting the use of a service from a
-service provider instance.  An example of a service provider is AWS and an example of a service provider account
-is an AWS account.  An example of a service is S3 and an example of a service instance is an S3 bucket.  Trustero
-associates the collected evidence to support the fact an organization is following it&#39;s stated practices.  A
-finding is comprised of a list of evidences.  Each evidence is associated with a service instance and contains
-its configuration information. An example of a finding is an AWS S3 bucket and its configuration.  Service
-configuration can be in opaque document format or structured document format.
+Receptor service, or a Trustero client application, collects findings supporting the use of services from a
+service provider account.  For example, AWS is a service provider, AWS account is a service provider account,
+and S3 is a service.  Trustero associates collected evidence to business controls in support of the business&#39;
+stated procedures.  Evidences are organized into a finding.  Each evidence is associated with a service entity
+and contains the service&#39;s configuration information. For example, an AWS S3 bucket and its configuration.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Verified | [Credential](#receptor_v1-Credential) | [.google.protobuf.Empty](#google-protobuf-Empty) | Report whether the provided credential is a valid service provider credential for purpose of discovering services and reporting findings. This rpc call is typically made as callback by a receptor to trustero from a check credential receptor request. |
-| GetConfiguration | [ReceptorOID](#receptor_v1-ReceptorOID) | [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration) | Get the receptor configuration and service provider credential using the provided receptor record identifier. This rpc call is typically made as a callback by a receptor prior to making a report findings or discover services receptor request. |
-| Discovered | [ServiceEntities](#receptor_v1-ServiceEntities) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report known services. A receptor or a Trustero client application reports its known services on demand. This call returns a string value service listing ID or an error specifying why Trustero failed to process the service listing. |
-| Report | [Finding](#receptor_v1-Finding) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report a finding. A receptor or a Trustero client application reports its findings on a periodic basis. This call returns a string value collection ID or an error specifying why Trustero failed to process the finding. |
-| Notify | [JobResult](#receptor_v1-JobResult) | [.google.protobuf.Empty](#google-protobuf-Empty) | Notify Trustero a long running report finding or discover services receptor request has completed. JobResult contains information about the receptor request and it&#39;s corresponding result. Information such as the JobResult.receptor_object_id are passed to the receptor as part of the request. |
+| Verified | [Credential](#receptor_v1-Credential) | [.google.protobuf.Empty](#google-protobuf-Empty) | Verified reports whether the provided credential is a valid service provider credential for purpose of discovering service entities and reporting findings. This rpc call is typically made as callback by a receptor to Trustero from a check-credential receptor request. |
+| GetConfiguration | [ReceptorOID](#receptor_v1-ReceptorOID) | [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration) | GetConfiguration for the receptor and service provider credential using the provided receptor object identifier. This rpc call is typically made as a callback by a receptor prior to making a report findings or discover service entities receptor request. |
+| Discovered | [ServiceEntities](#receptor_v1-ServiceEntities) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Discovered reports known service entities. A receptor or a Trustero client application reports its known service entities on request. A service entity is a configurable asset of a service such as an S3 bucket. This call returns a string value discovery ID or an error. |
+| Report | [Finding](#receptor_v1-Finding) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report a finding to Trustero. A receptor or a Trustero client application reports its findings to Trustero on a periodic basis. This call returns a string value collection ID or an error. |
+| Notify | [JobResult](#receptor_v1-JobResult) | [.google.protobuf.Empty](#google-protobuf-Empty) | Notify Trustero a long running report finding or discover service entities receptor-request has completed. JobResult contains information about the receptor-request and it&#39;s corresponding result. |
 
  
 
