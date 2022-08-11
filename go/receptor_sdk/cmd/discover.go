@@ -10,7 +10,7 @@ import (
 
 func discover(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
 
-	// Discover services
+	// Discover service entities
 	var discovered []*receptor_v1.ServiceEntity
 	if discovered, err = receptorImpl.Discover(credentials); err != nil {
 		return

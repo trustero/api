@@ -18,20 +18,25 @@ import (
 
 func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
 
-	// Discover evidence
-	var discovered []*receptor_sdk.Evidence
-	if discovered, err = receptorImpl.Report(credentials); err != nil {
+	// Report discovered evidence to Trustero
+	var finding receptor_v1.Finding
+
+	// Discover service entities
+	if finding.Entities, err = receptorImpl.Discover(credentials); err != nil {
 		return
 	}
 
-	// Report discovered evidence to Trustero
-	var finding receptor_v1.Finding
+	// Discover evidence
+	var evidences []*receptor_sdk.Evidence
+	if evidences, err = receptorImpl.Report(credentials); err != nil {
+		return
+	}
 
 	finding.ReceptorType = receptorImpl.GetReceptorType()
 	finding.ServiceProviderAccount = serviceProviderAccount
 
 	// Convert and append discovered evidences to reported evidences
-	for _, evidence := range discovered {
+	for _, evidence := range evidences {
 		reportStruct := receptor_v1.Struct{
 			Rows:            []*receptor_v1.Row{},
 			ColDisplayNames: map[string]string{},

@@ -100,6 +100,7 @@ Finding is a set of evidence(s) collected from a service provider account.
 | ----- | ---- | ----- | ----------- |
 | receptor_type | [string](#string) |  | Unique receptor identifier. A receptor is expected to report findings from only one service provider type. A stable identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encoded string that includes an organization name and the service provider name. For example: &#34;trustero_gitlab&#34;. |
 | service_provider_account | [string](#string) |  | The receptor&#39;s evidence source. REMIND maps to Receptor.TenantID |
+| entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Entities is a list of service instances configured in the service provider account. |
 | evidences | [Evidence](#receptor_v1-Evidence) | repeated | One or more evidence collected by a typical receptor scan. |
 
 
@@ -205,7 +206,7 @@ one Evidence.
 | ----- | ---- | ----- | ----------- |
 | receptor_type | [string](#string) |  | Receptor_type is a unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encode string that includes the organization name and a service provider name. For example &#34;trustero_gitlab&#34;. @required |
 | service_provider_account | [string](#string) |  | Service_provider_account is the service provider account where the services are configured in. @required |
-| entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Services is a list of service instances configured in the service provider account. @required |
+| entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Entities is a list of service instances configured in the service provider account. @required |
 
 
 
