@@ -16,7 +16,7 @@ var servicesCmd = &cobra.Command{
 	RunE:  services,
 }
 
-// Cobra executes this function on verify command.
+// Cobra executes this function on services command.
 func services(_ *cobra.Command, args []string) (err error) {
 	serviceNames := receptorImpl.GetKnownServices()
 	if len(serviceNames) > 0 {
