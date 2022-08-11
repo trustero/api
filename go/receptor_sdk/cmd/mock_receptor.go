@@ -15,15 +15,17 @@ import (
 
 type MockReceptorClient struct{}
 
+const header = "========\nReceptor."
+const footer = "========\n\n"
+
 func (rc *MockReceptorClient) Verified(ctx context.Context, in *receptor.Credential, opts ...grpc.CallOption) (e *emptypb.Empty, err error) {
 	e = &emptypb.Empty{}
+	println(header + "Verified(...)")
 	var yamld string
 	if yamld, err = toYaml(in); err == nil {
-		println("========")
-		println("Verified credentials...")
 		println(string(yamld))
-		println()
 	}
+	println(footer)
 	return
 }
 
@@ -34,30 +36,30 @@ func (rc *MockReceptorClient) GetConfiguration(ctx context.Context, in *receptor
 		Config:                 "",
 		ServiceProviderAccount: "",
 	}
+
+	println(header + "GetConfiguration(...)")
 	var yamld string
 	if yamld, err = toYaml(in); err == nil {
-		println("========")
-		println("GetConfiguration with receptor ID...")
 		println(string(yamld))
-		println()
 	}
+	println(footer)
 	return
 }
 
 func (rc *MockReceptorClient) Discovered(ctx context.Context, in *receptor.ServiceEntities, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
 	s = &wrapperspb.StringValue{Value: ""}
+
+	println(header + "Discovered(...)")
 	var yamld string
 	if yamld, err = toYaml(in); err == nil {
-		println("========")
-		println("Discovered services...")
 		println(string(yamld))
-		println()
 	}
+	println(footer)
 	return
 }
 
 func (rc *MockReceptorClient) Report(ctx context.Context, in *receptor.Finding, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
-	fmt.Println()
+	println(header + "Report(...)")
 	for _, ev := range in.Evidences {
 
 		t := ev.GetStruct()
@@ -67,32 +69,33 @@ func (rc *MockReceptorClient) Report(ctx context.Context, in *receptor.Finding, 
 		for _, header := range headers {
 			fmt.Printf("%12s ", header)
 		}
-		fmt.Println()
+		println()
 
 		for _, row := range rows {
 			for _, col := range row {
 				fmt.Printf("%12s ", col)
 			}
-			fmt.Println()
+			println()
 		}
 	}
 
 	if err != nil {
-		fmt.Print(err)
+		println(err)
 	}
 
+	println(footer)
 	return
 }
 
 func (rc *MockReceptorClient) Notify(ctx context.Context, in *receptor.JobResult, opts ...grpc.CallOption) (e *emptypb.Empty, err error) {
 	e = &emptypb.Empty{}
+
+	println(header + "Notify(...)")
 	var yamld string
 	if yamld, err = toYaml(in); err == nil {
-		println("========")
-		println("Notify job result...")
 		println(string(yamld))
-		println()
 	}
+	println(footer)
 	return
 }
 
