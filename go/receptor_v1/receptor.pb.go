@@ -37,9 +37,8 @@ type Finding struct {
 	// encoded string that includes an organization name and the service provider name.  For example: "trustero_gitlab".
 	ReceptorType string `protobuf:"bytes,1,opt,name=receptor_type,json=receptorType,proto3" json:"receptor_type,omitempty"`
 	// The receptor's evidence source.
-	// REMIND maps to Receptor.TenantID
 	ServiceProviderAccount string `protobuf:"bytes,2,opt,name=service_provider_account,json=serviceProviderAccount,proto3" json:"service_provider_account,omitempty"`
-	// Entities is a list of service instances configured in the service provider account.
+	// Entities is a list of service entity configurations in the service provider account.
 	Entities []*ServiceEntity `protobuf:"bytes,3,rep,name=entities,proto3" json:"entities,omitempty"`
 	// One or more evidence collected by a typical receptor scan.
 	Evidences []*Evidence `protobuf:"bytes,4,rep,name=evidences,proto3" json:"evidences,omitempty"`
@@ -112,10 +111,12 @@ type Evidence struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Caption is a human readable English string that identifies this evidence.  It's important the caption is stable
-	// for all scans of the same evidence type.
+	// Caption is a human readable English string that identifies this evidence.  Caption must be stable for
+	// all scans of the same evidence type.  Trustero uses the caption to associate this evidence with a
+	// set of relevant controls.
 	Caption string `protobuf:"bytes,1,opt,name=caption,proto3" json:"caption,omitempty"`
-	// Description is a human readable English string describing the content of this evidence.
+	// Description is a human readable English string describing the content of this evidence.  Description
+	// tells Trustero and users contents of the evidence and how
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	// Service_name is the name of service this evidence was collected from.  For example, "S3" or "GitLab"
 	ServiceName string `protobuf:"bytes,3,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
@@ -124,7 +125,7 @@ type Evidence struct {
 	// @required
 	EntityType string `protobuf:"bytes,4,opt,name=entity_type,json=entityType,proto3" json:"entity_type,omitempty"`
 	// Sources are raw service provider API requests and responses used to generate this evidence.  The raw API requests
-	// and responses serve as proof the evidence correlates to real service instance configuration.
+	// and responses serve as proof the evidence correlates to real service configurations.
 	Sources []*Source `protobuf:"bytes,5,rep,name=sources,proto3" json:"sources,omitempty"`
 	// Evidence_type can be either an unstructured (Document) or structured (Struct) type.
 	//
@@ -972,23 +973,18 @@ func (x *ReceptorOID) GetReceptorObjectId() string {
 }
 
 // ReceptorConfiguration contains a configurations a receptor needs to access a service provider account.
-// REMIND: ReceptorConfiguration is a subset of existing ntrced's Receptor record.
 type ReceptorConfiguration struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Receptor_object_id is Trustero's receptor record identifier.
-	// REMIND Receptor.ID
 	ReceptorObjectId string `protobuf:"bytes,1,opt,name=receptor_object_id,json=receptorObjectId,proto3" json:"receptor_object_id,omitempty"`
 	// Credential required to access a service provider for report finding and discover services purposes.
-	// REMIND Receptor.Credential required to access the target service.
 	Credential string `protobuf:"bytes,2,opt,name=credential,proto3" json:"credential,omitempty"`
 	// Config holds additional receptor configuration to access a service provider account.
-	// REMIND Receptor.config task configuration in json.
 	Config string `protobuf:"bytes,3,opt,name=config,proto3" json:"config,omitempty"`
 	// Service_provider_account is the service provider account name.
-	// REMIND Receptor.TenantID
 	ServiceProviderAccount string `protobuf:"bytes,4,opt,name=service_provider_account,json=serviceProviderAccount,proto3" json:"service_provider_account,omitempty"`
 }
 
@@ -1053,21 +1049,18 @@ func (x *ReceptorConfiguration) GetServiceProviderAccount() string {
 }
 
 // JobResult reports the result of a receptor request.
-// REMIND:  JobResult maps to AsyncTask
 type JobResult struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Tracer_id is used to track the progress of the receptor request.
-	// REMIND AyncTask.TracerID for tracking.
 	TracerId string `protobuf:"bytes,1,opt,name=tracer_id,json=tracerId,proto3" json:"tracer_id,omitempty"`
 	// Command is the receptor request that completed.  One of "verify", "scan", or "discover"
 	Command string `protobuf:"bytes,2,opt,name=command,proto3" json:"command,omitempty"`
 	// Result is receptor request result.  One of "success", "fail", or "error".
 	Result string `protobuf:"bytes,3,opt,name=result,proto3" json:"result,omitempty"`
 	// Receptor_object_id is Trustero's receptor record identifier.
-	// REMIND Receptor.ID
 	ReceptorObjectId string `protobuf:"bytes,4,opt,name=receptor_object_id,json=receptorObjectId,proto3" json:"receptor_object_id,omitempty"`
 }
 
