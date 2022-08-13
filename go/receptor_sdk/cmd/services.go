@@ -8,12 +8,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Set up the 'services' CLI subcommand.
-var servicesCmd = &cobra.Command{
-	Use:   "services",
-	Short: "Show list of service names this receptor will collect evidence for.",
-	Args:  cobra.MinimumNArgs(0),
-	RunE:  services,
+const (
+	svcsUse   = "services"
+	svcsShort = "Show list of service names this receptor will collect evidence for"
+)
+
+type svcs struct {
+	cmd *cobra.Command
+}
+
+func (s *svcs) getCommand() *cobra.Command {
+	return s.cmd
+}
+
+func (s *svcs) setup() {
+	s.cmd = &cobra.Command{
+		Use:   svcsUse,
+		Short: svcsShort,
+		Args:  cobra.MinimumNArgs(0),
+		RunE:  services,
+	}
 }
 
 // Cobra executes this function on services command.

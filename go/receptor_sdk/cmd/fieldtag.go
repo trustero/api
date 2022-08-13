@@ -8,10 +8,11 @@ import (
 )
 
 const (
-	tagName      = "trustero"
-	idField      = "id"
-	displayField = "display"
-	orderField   = "order"
+	tagName          = "trustero"
+	idField          = "id"
+	displayField     = "display"
+	orderField       = "order"
+	placeholderField = "placeholder"
 )
 
 func expandFieldTag(field reflect.StructField) (tags map[string]string) {
@@ -55,4 +56,11 @@ func getKVPair(str string) (k, v string) {
 		v = ""
 	}
 	return
+}
+
+func getTagField(tags map[string]string, fieldName, fieldDefault string) string {
+	if display, ok := tags[fieldName]; ok {
+		return display
+	}
+	return fieldDefault
 }
