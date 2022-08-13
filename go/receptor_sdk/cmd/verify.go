@@ -10,18 +10,36 @@ import (
 	"github.com/trustero/api/go/receptor_v1"
 )
 
-// Set up the 'verify' CLI subcommand.
-var verifyCmd = &cobra.Command{
-	Use:   "verify <trustero_access_token>|dryrun",
-	Short: "Verify read-only access to a service provider account.",
-	Long: `
+const (
+	verifyUse   = "verify <trustero_access_token>|dryrun"
+	verifyShort = "Verify read-only access to a service provider account"
+	verifyLong  = `
 Verify read-only access to a service provider account.  Verify command
 decodes the base64 URL encoded credentials from the '--credentials' command
 line flag and check it's validity.  If 'dryrun' is specified instead of a
 Trustero access token, the verify command will not report the results to
-Trustero and instead print the results to console.`,
-	Args: cobra.MinimumNArgs(1),
-	RunE: verify,
+Trustero and instead print the results to console.`
+)
+
+type verifi struct {
+	cmd *cobra.Command
+}
+
+func (v *verifi) getCommand() *cobra.Command {
+	return v.cmd
+}
+
+func (v *verifi) setup() {
+	v.cmd = &cobra.Command{
+		Use:     verifyUse,
+		Short:   verifyShort,
+		Long:    verifyLong,
+		Args:    cobra.MinimumNArgs(1),
+		PreRun:  grpcPreRun,
+		RunE:    verify,
+		PostRun: grpcPostRun,
+	}
+	addGrpcFlags(v.cmd)
 }
 
 // Cobra executes this function on verify command.

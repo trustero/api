@@ -3,7 +3,6 @@
 package main
 
 import (
-	"encoding/json"
 	"strconv"
 	"time"
 
@@ -29,9 +28,10 @@ const (
 	memberEntity = "Member"
 )
 
+// Credential object
 type Receptor struct {
-	Token   string
-	GroupID string
+	Token   string `trustero:"display:GitLab Access Token;placeholder:token"`
+	GroupID string `trustero:"display:GitLab Group ID;placeholder:group id"`
 }
 
 func (r *Receptor) GetReceptorType() string {
@@ -42,9 +42,8 @@ func (r *Receptor) GetKnownServices() []string {
 	return []string{serviceName}
 }
 
-func (r *Receptor) UnmarshalCredentials(credentials string) (obj interface{}, err error) {
-	obj, err = receptor_sdk.UnmarshalCredentials(credentials, r)
-	return
+func (r *Receptor) GetCredentialObj() (credentialObj interface{}) {
+	return r
 }
 
 func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
@@ -123,22 +122,5 @@ func newGitLabUser(user *gitlab.User, group *gitlab.Group) *GitLabUser {
 }
 
 func main() {
-	receptor := &Receptor{}
-
-	// Add convenience token
-	cmd.RootCmd.PersistentFlags().StringVarP(&receptor.Token, "token", "t", "", "GitLab user access token")
-	cmd.RootCmd.PersistentFlags().StringVarP(&receptor.GroupID, "gid", "g", "", "GitLab group id")
-
-	// Get credentials from flags
-	receptor_sdk.CredentialsFromFlags = func() string {
-		if len(receptor.Token) > 0 {
-			b, err := json.Marshal(receptor)
-			if err == nil {
-				return string(b)
-			}
-		}
-		return ""
-	}
-
 	cmd.Execute(&Receptor{})
 }

@@ -3,8 +3,6 @@
 package receptor_sdk
 
 import (
-	"encoding/json"
-
 	"github.com/trustero/api/go/receptor_v1"
 )
 
@@ -35,9 +33,21 @@ type Receptor interface {
 	// GetKnownServices returns a list of service names this receptor will be providing evidence for.
 	GetKnownServices() (serviceNames []string)
 
-	// UnmarshalCredentials converts the service provider account credential json string into a Go object used by
-	// the receptor's Verify, Discover, and Report methods.
-	UnmarshalCredentials(credentials string) (obj interface{}, err error)
+	// GetCredentialObj returns an instance of a credential struct used for service provider authentication.  The
+	// credential struct contains only public string fields with Go struct field tags:
+	//
+	//  Field tag name is 'trustero' with sub-tags separated by ';'
+	//  Valid sub-tags: display, placeholder
+	//    display provides the human-readable name of the field
+	//    placeholder provides a default field value suggestion for the field
+	//
+	// For example:
+	//
+	//  type Credentials {
+	//      GroupId string `trustero:"display:Group Identifier;placeholder:abcdefg123"`
+	//      Token   string `trustero:"display:Access Token;placeholder:1234wxyz"`
+	//  }
+	GetCredentialObj() (credentialObj interface{})
 
 	// Verify read-only access to a service provider account.  This method is invoked from the following ClI:
 	// <receptor> verify
@@ -57,7 +67,7 @@ type Receptor interface {
 // where:
 //
 //	Field tag name is 'trustero' with sub-tags separated by ';'
-//	Valid sub-tabs: 'id', 'display', and 'order'
+//	Valid sub-tags: 'id', 'display', and 'order'
 //	   id specifies the field is unique identifier for the struct.
 //	   display provides the human-readable name for the field.
 //	   order is an integer number starting with 1, denoting the order in which the field should be displayed in a
@@ -77,23 +87,4 @@ type Evidence struct {
 	Description string                // Description provides additional information on origins of the evidence.
 	Sources     []*receptor_v1.Source // Sources of raw API request and response used to gather the evidence.
 	Rows        []interface{}         // Rows of formatted evidence represented by a Golang struct.
-}
-
-// CredentialsFromFlagsFunc
-// A utility function to convert receptor specific CLI arguments to a credentials string.  A credentials string
-// is a json object as a string.  See CredentialsFromFlags variable for more background.
-type CredentialsFromFlagsFunc func() string
-
-// CredentialsFromFlags
-// A receptor CLI can add custom CLI flags as credentials instead of using the base64 URL encoded --credentials
-// flag or getting the credentials stored in Trustero.  When a CLI chooses to add custom credential flags, it must
-// implement the CredentialsFromFlagsFunc to return credentials as a json object as a string.
-var CredentialsFromFlags CredentialsFromFlagsFunc = func() string { return "" }
-
-// UnmarshalCredentials
-// A utilities function to unmarshal a json string into the provided object type.
-func UnmarshalCredentials(credentials string, credentialsObj interface{}) (obj interface{}, err error) {
-	err = json.Unmarshal([]byte(credentials), credentialsObj)
-	obj = credentialsObj
-	return
 }

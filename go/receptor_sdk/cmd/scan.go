@@ -11,22 +11,37 @@ import (
 	"github.com/trustero/api/go/receptor_v1"
 )
 
-// Set up the 'scan' CLI subcommand.
-var scanCmd = &cobra.Command{
-	Use:   "scan <trustero_access_token>|dryrun",
-	Short: "Scan for services or evidence in a service provider account.",
-	Long: `
+const (
+	scanUse   = "scan <trustero_access_token>|dryrun"
+	scanShort = "Scan for services or evidence in a service provider account"
+	scanLong  = `
 Scan for services and evidences in-use in a service provider account.  Scan
 command decodes the base64 URL encoded credentials from the '--credentials'
 command line flag and check it's validity.  If 'dryrun' is specified instead
 of a Trustero access token, the scan command will not report the results to
-Trustero and instead print the results to console.`,
-	Args: cobra.MinimumNArgs(1),
-	RunE: scan,
+Trustero and instead print the results to console.`
+)
+
+type scann struct {
+	cmd *cobra.Command
 }
 
-func init() {
-	scanCmd.PersistentFlags().BoolVarP(&receptor_sdk.FindEvidence, "find-evidence", "", false,
+func (s *scann) getCommand() *cobra.Command {
+	return s.cmd
+}
+
+func (s *scann) setup() {
+	s.cmd = &cobra.Command{
+		Use:     scanUse,
+		Short:   scanShort,
+		Long:    scanLong,
+		Args:    cobra.MinimumNArgs(1),
+		PreRun:  grpcPreRun,
+		RunE:    scan,
+		PostRun: grpcPostRun,
+	}
+	addGrpcFlags(s.cmd)
+	addBoolFlag(s.cmd, &receptor_sdk.FindEvidence, "find-evidence", "", false,
 		"Scan for evidences in a service provider account")
 }
 
