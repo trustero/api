@@ -60,8 +60,8 @@ Document is an unstructured evidence provided as a MIME document.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| mime | [string](#string) |  | Mime is the document type defined using MIME. (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) @required |
-| body | [bytes](#bytes) |  | Body is the opaque document body. The document body must match the type defined by the mime attribute. @required |
+| mime | [string](#string) |  | Mime is the document type defined using [MIME]. [MIME]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types |
+| body | [bytes](#bytes) |  | Body is the opaque document body. The document body must match the type defined by the mime attribute. |
 
 
 
@@ -80,7 +80,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | caption | [string](#string) |  | Caption is a human readable English string that identifies this evidence. Caption must be stable for all scans of the same evidence type. Trustero uses the caption to associate this evidence with a set of relevant controls. |
 | description | [string](#string) |  | Description is a human readable English string describing the content of this evidence. Description tells Trustero and users contents of the evidence and how |
 | service_name | [string](#string) |  | Service_name is the name of service this evidence was collected from. For example, &#34;S3&#34; or &#34;GitLab&#34; |
-| entity_type | [string](#string) |  | Entity_type specifies the row type and should correspond to a ServiceEntity. An entity_type typically represents a specific configurable entity such as AWS ECS &#34;Cluster&#34;. @required |
+| entity_type | [string](#string) |  | Entity_type specifies the row type and should correspond to a ServiceEntity. An entity_type typically represents a specific configurable entity such as AWS ECS &#34;Cluster&#34;. |
 | sources | [Source](#receptor_v1-Source) | repeated | Sources are raw service provider API requests and responses used to generate this evidence. The raw API requests and responses serve as proof the evidence correlates to real service configurations. |
 | doc | [Document](#receptor_v1-Document) |  | Document is an unstructured evidence. |
 | struct | [Struct](#receptor_v1-Struct) |  | Struct is a structured evidence. |
@@ -168,7 +168,7 @@ Row is a row of structured data.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | entity_instance_id | [string](#string) |  | Entity_instance_id of a discovered entity instance. For example, an AWS &#34;ECS&#34; cluster UUID or GitLab &#34;repository&#34; ID. |
-| cols | [Row.ColsEntry](#receptor_v1-Row-ColsEntry) | repeated | Cols are columns of the row in column name to value pairs. All rows in a struct must have the same column names and corresponding value types. In addition, one of the key-value pair in the cols map must be the entity_instance_id, a unique instance of this row&#39;s Struct.entity_type. @required |
+| cols | [Row.ColsEntry](#receptor_v1-Row-ColsEntry) | repeated | Cols are columns of the row in column name to value pairs. All rows in a struct must have the same column names and corresponding value types. In addition, one of the key-value pair in the cols map must be the entity_instance_id, a unique instance of this row&#39;s Struct.entity_type. |
 
 
 
@@ -202,9 +202,9 @@ one Evidence.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_type | [string](#string) |  | Receptor_type is a unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encode string that includes the organization name and a service provider name. For example &#34;trustero_gitlab&#34;. @required |
-| service_provider_account | [string](#string) |  | Service_provider_account is the service provider account where the services are configured in. @required |
-| entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Entities is a list of service instances configured in the service provider account. @required |
+| receptor_type | [string](#string) |  | Receptor_type is a unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encode string that includes the organization name and a service provider name. For example &#34;trustero_gitlab&#34;. |
+| service_provider_account | [string](#string) |  | Service_provider_account is the service provider account where the services are configured in. |
+| entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Entities is a list of service instances configured in the service provider account. |
 
 
 
@@ -222,10 +222,10 @@ collected evidence that aren&#39;t relevant to specific audit contexts.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| service_name | [string](#string) |  | Service_name of the entity source. This is a Trustero assigned identifier for a known service such as &#34;GitLab&#34; or AWS &#34;ECS&#34;. @required |
-| entity_type | [string](#string) |  | Entity_type is a service configurable object type such as a GitLab &#34;repository&#34; or AWS ECS &#34;cluster&#34;. The entity_instance_name and entity_instance_id must represent an instance of the subtype. For example, &#34;Java 1.5&#34; maybe a valid GitLab repository name or &#34;Elastic front end cluster&#34; maybe a valid AWS ECS cluster name. @required |
-| entity_instance_name | [string](#string) |  | Entity_instance_name of a discovered service entity instance. For example, an AWS ECS cluster name or a GitLab repository name. Entity_instance_name of an entity may change for a given entity instance but it&#39;s entity_instance_id is stable. @required |
-| entity_instance_id | [string](#string) |  | Entity_instance_id of a discovered entity instance. For example, an AWS ECS cluster UUID or GitLab repository ID. @required |
+| service_name | [string](#string) |  | Service_name of the entity source. This is a Trustero assigned identifier for a known service such as &#34;GitLab&#34; or AWS &#34;ECS&#34;. |
+| entity_type | [string](#string) |  | Entity_type is a service configurable object type such as a GitLab &#34;repository&#34; or AWS ECS &#34;cluster&#34;. The entity_instance_name and entity_instance_id must represent an instance of the subtype. For example, &#34;Java 1.5&#34; maybe a valid GitLab repository name or &#34;Elastic front end cluster&#34; maybe a valid AWS ECS cluster name. |
+| entity_instance_name | [string](#string) |  | Entity_instance_name of a discovered service entity instance. For example, an AWS ECS cluster name or a GitLab repository name. Entity_instance_name of an entity may change for a given entity instance but it&#39;s entity_instance_id is stable. |
+| entity_instance_id | [string](#string) |  | Entity_instance_id of a discovered entity instance. For example, an AWS ECS cluster UUID or GitLab repository ID. |
 
 
 
@@ -259,9 +259,9 @@ must have the same column name-value pairs.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| rows | [Row](#receptor_v1-Row) | repeated | Rows of key-value pairs. Each row typically represents the configuration of a service instance or an data type such as a member of GitLab group. @required |
-| col_display_names | [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry) | repeated | Col_display_names is a map of row column name to it&#39;s corresponding display name. Display names are used by the user interface to render a field in a struct&#39;s rows. @required |
-| col_display_order | [string](#string) | repeated | Col_display_order is an ordered list of row column names. The order of the column names are used by the user interface to render the column order of a struct&#39;s rows. @required |
+| rows | [Row](#receptor_v1-Row) | repeated | Rows of key-value pairs. Each row typically represents the configuration of a service instance or an data type such as a member of GitLab group. |
+| col_display_names | [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry) | repeated | Col_display_names is a map of row column name to it&#39;s corresponding display name. Display names are used by the user interface to render a field in a struct&#39;s rows. |
+| col_display_order | [string](#string) | repeated | Col_display_order is an ordered list of row column names. The order of the column names are used by the user interface to render the column order of a struct&#39;s rows. |
 
 
 
@@ -287,8 +287,7 @@ must have the same column name-value pairs.
 <a name="receptor_v1-Value"></a>
 
 ### Value
-Value is a Struct.Row&#39;s column value.  Value types can be simple protobuf scalar or google.proto.Timestamp.
-@required
+Value is a [Struct.row.col] column value.  Value types can be simple protobuf scalar or [google.proto.Timestamp].
 
 
 | Field | Type | Label | Description |
