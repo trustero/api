@@ -122,7 +122,6 @@ type Evidence struct {
 	ServiceName string `protobuf:"bytes,3,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
 	// Entity_type specifies the row type and should correspond to a ServiceEntity.  An entity_type typically
 	// represents a specific configurable entity such as AWS ECS "Cluster".
-	// @required
 	EntityType string `protobuf:"bytes,4,opt,name=entity_type,json=entityType,proto3" json:"entity_type,omitempty"`
 	// Sources are raw service provider API requests and responses used to generate this evidence.  The raw API requests
 	// and responses serve as proof the evidence correlates to real service configurations.
@@ -306,12 +305,10 @@ type Document struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Mime is the document type defined using MIME.
-	// (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)
-	// @required
+	// Mime is the document type defined using [MIME].
+	// [MIME]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
 	Mime string `protobuf:"bytes,2,opt,name=mime,proto3" json:"mime,omitempty"`
 	// Body is the opaque document body.  The document body must match the type defined by the mime attribute.
-	// @required
 	Body []byte `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
 }
 
@@ -372,15 +369,12 @@ type Struct struct {
 
 	// Rows of key-value pairs.  Each row typically represents the configuration of a service instance or an data
 	// type such as a member of GitLab group.
-	// @required
 	Rows []*Row `protobuf:"bytes,2,rep,name=rows,proto3" json:"rows,omitempty"`
 	// Col_display_names is a map of row column name to it's corresponding display name.  Display names are used
 	// by the user interface to render a field in a struct's rows.
-	// @required
 	ColDisplayNames map[string]string `protobuf:"bytes,3,rep,name=col_display_names,json=colDisplayNames,proto3" json:"col_display_names,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Col_display_order is an ordered list of row column names.  The order of the column names are used by the user
 	// interface to render the column order of a struct's rows.
-	// @required
 	ColDisplayOrder []string `protobuf:"bytes,4,rep,name=col_display_order,json=colDisplayOrder,proto3" json:"col_display_order,omitempty"`
 }
 
@@ -449,7 +443,6 @@ type Row struct {
 	// Cols are columns of the row in column name to value pairs.  All rows in a struct must have the same column
 	// names and corresponding value types.  In addition, one of the key-value pair in the cols map must be the
 	// entity_instance_id, a unique instance of this row's Struct.entity_type.
-	// @required
 	Cols map[string]*Value `protobuf:"bytes,2,rep,name=cols,proto3" json:"cols,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -499,8 +492,7 @@ func (x *Row) GetCols() map[string]*Value {
 	return nil
 }
 
-// Value is a Struct.Row's column value.  Value types can be simple protobuf scalar or google.proto.Timestamp.
-// @required
+// Value is a [Struct.row.col] column value.  Value types can be simple protobuf scalar or [google.proto.Timestamp].
 type Value struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -692,13 +684,10 @@ type ServiceEntities struct {
 	// Receptor_type is a unique receptor type.  A stable string identifier that represent the type of receptor
 	// reporting this finding.  The identifier is a simple URL encode string that includes the organization name
 	// and a service provider name.  For example "trustero_gitlab".
-	// @required
 	ReceptorType string `protobuf:"bytes,1,opt,name=receptor_type,json=receptorType,proto3" json:"receptor_type,omitempty"`
 	// Service_provider_account is the service provider account where the services are configured in.
-	// @required
 	ServiceProviderAccount string `protobuf:"bytes,2,opt,name=service_provider_account,json=serviceProviderAccount,proto3" json:"service_provider_account,omitempty"`
 	// Entities is a list of service instances configured in the service provider account.
-	// @required
 	Entities []*ServiceEntity `protobuf:"bytes,3,rep,name=entities,proto3" json:"entities,omitempty"`
 }
 
@@ -766,22 +755,18 @@ type ServiceEntity struct {
 
 	// Service_name of the entity source.  This is a Trustero assigned identifier for a known service such as
 	// "GitLab" or AWS "ECS".
-	// @required
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
 	// Entity_type is a service configurable object type such as a GitLab "repository" or AWS ECS "cluster".  The
 	// entity_instance_name and entity_instance_id must represent an instance of the subtype.  For example,
 	// "Java 1.5" maybe a valid GitLab repository name or "Elastic front end cluster" maybe a valid AWS ECS
 	// cluster name.
-	// @required
 	EntityType string `protobuf:"bytes,2,opt,name=entity_type,json=entityType,proto3" json:"entity_type,omitempty"`
 	// Entity_instance_name of a discovered service entity instance.  For example, an AWS ECS cluster name or a
 	// GitLab repository name.  Entity_instance_name of an entity may change for a given entity instance but
 	// it's entity_instance_id is stable.
-	// @required
 	EntityInstanceName string `protobuf:"bytes,3,opt,name=entity_instance_name,json=entityInstanceName,proto3" json:"entity_instance_name,omitempty"`
 	// Entity_instance_id of a discovered entity instance.  For example, an AWS ECS cluster UUID or GitLab
 	// repository ID.
-	// @required
 	EntityInstanceId string `protobuf:"bytes,4,opt,name=entity_instance_id,json=entityInstanceId,proto3" json:"entity_instance_id,omitempty"`
 }
 

@@ -1,5 +1,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+
+// Package main is an example of how to use the Receptor SDK to build a Receptor CLI
 package main
 
 import (
@@ -12,6 +14,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
+// GitLabUser represents a type of evidence to emit to Trustero as part of a finding.
 type GitLabUser struct {
 	Username         string     `trustero:"id:;display:Username;order:1"`
 	Name             string     `trustero:"display:Name;order:2"`
@@ -22,30 +25,35 @@ type GitLabUser struct {
 	LastActivityOn   *time.Time `trustero:"display:Last Activity On;order:7"`
 }
 
+// Receptor defines the GitLab service credentials required for connecting to the GitLab
+// service and gathering necessary evidence to support its use.
+type Receptor struct {
+	Token   string `trustero:"display:GitLab Access Token;placeholder:token"`
+	GroupID string `trustero:"display:GitLab Group ID;placeholder:group id"`
+}
+
 const (
 	serviceName  = "GitLab"
 	groupEntity  = "Group"
 	memberEntity = "Member"
 )
 
-// Credential object
-type Receptor struct {
-	Token   string `trustero:"display:GitLab Access Token;placeholder:token"`
-	GroupID string `trustero:"display:GitLab Group ID;placeholder:group id"`
-}
-
+// GetReceptorType implements the [receptor_sdk.Receptor] interface.
 func (r *Receptor) GetReceptorType() string {
 	return "gitlab_receptor"
 }
 
+// GetKnownServices implements the [receptor_sdk.Receptor] interface.
 func (r *Receptor) GetKnownServices() []string {
 	return []string{serviceName}
 }
 
+// GetCredentialObj implements the [receptor_sdk.Receptor] interface.
 func (r *Receptor) GetCredentialObj() (credentialObj interface{}) {
 	return r
 }
 
+// Verify implements the [receptor_sdk.Receptor] interface.
 func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
 	c := credentials.(*Receptor)
 	ok = true
@@ -59,6 +67,7 @@ func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
 	return
 }
 
+// Discover implements the [receptor_sdk.Receptor] interface.
 func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.ServiceEntity, err error) {
 	c := credentials.(*Receptor)
 	var git *gitlab.Client
@@ -73,6 +82,7 @@ func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.Servic
 	return services.Entities, err
 }
 
+// Report implements the [receptor_sdk.Receptor] interface.
 func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {
 	c := credentials.(*Receptor)
 	report := receptor_sdk.NewReport()

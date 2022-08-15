@@ -1,8 +1,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
-package client
 
-// Create common setup and teardown for dependent services
+// Package client provides GRPC utilities to simplify connecting to Trustero GRPC service.
+package client
 
 import (
 	"context"
@@ -28,17 +28,18 @@ type ServerConnection struct {
 	TlsDialOption grpc.DialOption
 }
 
+// InitGRPCClient sets up the SSL certificate for subsequent Trustero GRPC connections.
 func InitGRPCClient(cert, override string) {
 	ServerConn = &ServerConnection{}
 
 	rootCAs, err := x509.SystemCertPool()
 	if err != nil {
-		log.Err(err).Msg("error loading system cert pool")
+		log.Err(err).Msg("error loading system certificate pool")
 		rootCAs = x509.NewCertPool()
 	}
 
 	if cert == "dev" {
-		log.Info().Msgf("using dev cert with server name override %s", override)
+		log.Info().Msgf("using a development SSL certificate with server name override %s", override)
 		if !rootCAs.AppendCertsFromPEM([]byte(config.DevCertCa)) {
 			panic("Error parsing X.509 certificate CA.")
 		}
@@ -51,6 +52,7 @@ func InitGRPCClient(cert, override string) {
 		}))
 }
 
+// Dial makes a GRPC connection to Trustero GRPC service.  A Trustero JWT bearer token must be provided.
 func (sc *ServerConnection) Dial(token, host string, port int) (err error) {
 	// Dial options
 	grpcCred := oauth.NewOauthAccess(&oauth2.Token{AccessToken: token})
@@ -67,6 +69,7 @@ func (sc *ServerConnection) Dial(token, host string, port int) (err error) {
 	return
 }
 
+// CloseClient closes a previously dialed Trustero GRPC connection.
 func (sc *ServerConnection) CloseClient() error {
 	if sc.Connection != nil {
 		return sc.Connection.Close()
@@ -74,6 +77,7 @@ func (sc *ServerConnection) CloseClient() error {
 	return nil
 }
 
+// GetReceptorClient returns a Go client instance that implements the [receptor_v1.Receptor] Protobuf interface.
 func (sc *ServerConnection) GetReceptorClient() (rc receptor_v1.ReceptorClient) {
 	rc = receptor_v1.NewReceptorClient(sc.Connection)
 	return

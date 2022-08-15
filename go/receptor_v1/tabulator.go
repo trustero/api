@@ -1,5 +1,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+
+// Package receptor_v1 provides the Go GRPC client bindings to communicate with the Trustero service.
 package receptor_v1
 
 import (

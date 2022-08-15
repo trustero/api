@@ -1,5 +1,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+
+// Package receptor_sdk is simple platform that simplifies the development of a Trustero Receptor
+// CLI that emit evidence finding to Trustero.  A Receptor CLI has a standard set of command
+// line arguments and flags to support interacting with the Trustero server.
 package receptor_sdk
 
 import (
@@ -36,10 +40,9 @@ type Receptor interface {
 	// GetCredentialObj returns an instance of a credential struct used for service provider authentication.  The
 	// credential struct contains only public string fields with Go struct field tags:
 	//
-	//  Field tag name is 'trustero' with sub-tags separated by ';'
-	//  Valid sub-tags: display, placeholder
-	//    display provides the human-readable name of the field
-	//    placeholder provides a default field value suggestion for the field
+	// Field tag name is 'trustero' with sub-tags separated by ';' and valid sub-tags are 'display', and 'placeholder'
+	//  - display provides the human-readable name of the field
+	//  - placeholder provides a default field value suggestion for the field
 	//
 	// For example:
 	//
@@ -66,12 +69,11 @@ type Receptor interface {
 // Golang struct.  Fields of this evidence row struct must be public and annotated with Trustero's field annotation
 // where:
 //
-//	Field tag name is 'trustero' with sub-tags separated by ';'
-//	Valid sub-tags: 'id', 'display', and 'order'
-//	   id specifies the field is unique identifier for the struct.
-//	   display provides the human-readable name for the field.
-//	   order is an integer number starting with 1, denoting the order in which the field should be displayed in a
-//	   table.
+// Field tag name is 'trustero' with sub-tags separated by ';' and valid sub-tags are 'id', 'display', and 'order'
+//   - id specifies the field is unique identifier for the struct.
+//   - display provides the human-readable name for the field.
+//   - order is an integer number starting with 1, denoting the order in which the field should be displayed in a
+//     table.
 //
 // For example:
 //

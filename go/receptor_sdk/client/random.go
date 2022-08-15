@@ -1,5 +1,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+
 package client
 
 import (
@@ -17,6 +18,7 @@ const (
 
 var src = rand.NewSource(time.Now().UnixNano())
 
+// RandString returns a random string of length n.
 func RandString(n int) string {
 	b := make([]byte, n)
 	// A src.Int63() generates 63 random bits, enough for letterIdxMax characters!

@@ -1,8 +1,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+
 package config
 
-// Certificate CA for dev
+// Certificate CA for Trustero developer GRPC server instance.
 var DevCertCa = `-----BEGIN CERTIFICATE-----
 MIIDdDCCAlwCCQC25Z0Mbc8rDTANBgkqhkiG9w0BAQsFADB8MQswCQYDVQQGEwJV
 UzELMAkGA1UECAwCQ0ExEjAQBgNVBAcMCVBhbG8gQWx0bzEYMBYGA1UECgwPSW50
