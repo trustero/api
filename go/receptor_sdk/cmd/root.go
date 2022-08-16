@@ -1,6 +1,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+// Package cmd provides a CLI framework that implements the contract between Trustero service
+// and a [receptor_v1.Receptor].  The framework allows the Receptor developer to focus on collecting
+// evidences and avoid having to deal with RPC and CLI plumbing.
 package cmd
 
 import (
@@ -42,7 +45,8 @@ var cmds = map[string]command{
 	"descriptor": &desc{},
 }
 
-// Execute the command
+// Execute is the entry point into the CLI framework.  Receptor author implements the [receptor_sdk.Receptor]
+// interface and the CLI framework takes care of the rest.
 func Execute(r receptor_sdk.Receptor) {
 	cobra.OnInitialize(initConfig)
 
@@ -225,7 +229,7 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 func getReceptorClient(token string) (rc receptor.ReceptorClient, err error) {
 	if receptor_sdk.NoSave {
 		// Mock client
-		rc = &MockReceptorClient{}
+		rc = &mockReceptorClient{}
 	} else {
 		// Connect to Trustero grpc server
 		if err = client.ServerConn.Dial(token, receptor_sdk.Host, receptor_sdk.Port); err != nil {

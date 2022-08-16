@@ -14,12 +14,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type MockReceptorClient struct{}
+type mockReceptorClient struct{}
 
 const header = "========\nReceptor."
 const footer = "========\n\n"
 
-func (rc *MockReceptorClient) Verified(ctx context.Context, in *receptor.Credential, opts ...grpc.CallOption) (e *emptypb.Empty, err error) {
+// Verified implements a mock [receptor_v1.Receptor.Verified] method for testing.
+func (rc *mockReceptorClient) Verified(ctx context.Context, in *receptor.Credential, opts ...grpc.CallOption) (e *emptypb.Empty, err error) {
 	e = &emptypb.Empty{}
 	println(header + "Verified(...)")
 	var yamld string
@@ -30,7 +31,8 @@ func (rc *MockReceptorClient) Verified(ctx context.Context, in *receptor.Credent
 	return
 }
 
-func (rc *MockReceptorClient) GetConfiguration(ctx context.Context, in *receptor.ReceptorOID, opts ...grpc.CallOption) (c *receptor.ReceptorConfiguration, err error) {
+// Verified implements a mock [receptor_v1.Receptor.GetConfiguration] method for testing.
+func (rc *mockReceptorClient) GetConfiguration(ctx context.Context, in *receptor.ReceptorOID, opts ...grpc.CallOption) (c *receptor.ReceptorConfiguration, err error) {
 	c = &receptor.ReceptorConfiguration{
 		ReceptorObjectId:       "",
 		Credential:             "",
@@ -47,7 +49,8 @@ func (rc *MockReceptorClient) GetConfiguration(ctx context.Context, in *receptor
 	return
 }
 
-func (rc *MockReceptorClient) Discovered(ctx context.Context, in *receptor.ServiceEntities, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
+// Verified implements a mock [receptor_v1.Receptor.Discovered] method for testing.
+func (rc *mockReceptorClient) Discovered(ctx context.Context, in *receptor.ServiceEntities, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
 	s = &wrapperspb.StringValue{Value: ""}
 
 	println(header + "Discovered(...)")
@@ -59,7 +62,8 @@ func (rc *MockReceptorClient) Discovered(ctx context.Context, in *receptor.Servi
 	return
 }
 
-func (rc *MockReceptorClient) Report(ctx context.Context, in *receptor.Finding, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
+// Verified implements a mock [receptor_v1.Receptor.Report] method for testing.
+func (rc *mockReceptorClient) Report(ctx context.Context, in *receptor.Finding, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
 	println(header + "Report(...)")
 
 	println("Entities")
@@ -97,7 +101,8 @@ func (rc *MockReceptorClient) Report(ctx context.Context, in *receptor.Finding, 
 	return
 }
 
-func (rc *MockReceptorClient) Notify(ctx context.Context, in *receptor.JobResult, opts ...grpc.CallOption) (e *emptypb.Empty, err error) {
+// Verified implements a mock [receptor_v1.Receptor.Notify] method for testing.
+func (rc *mockReceptorClient) Notify(ctx context.Context, in *receptor.JobResult, opts ...grpc.CallOption) (e *emptypb.Empty, err error) {
 	e = &emptypb.Empty{}
 
 	println(header + "Notify(...)")

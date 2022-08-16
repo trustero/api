@@ -1,9 +1,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-// Package receptor_sdk is simple platform that simplifies the development of a Trustero Receptor
-// CLI that emit evidence finding to Trustero.  A Receptor CLI has a standard set of command
-// line arguments and flags to support interacting with the Trustero server.
+// Package receptor_sdk provides a CLI platform simplifying the development of Trustero Receptor(s).  A Receptor
+// is a CLI that implements a contract of CLI arguments and flags the Trustero services invokes to collect
+// evidence of how a business uses a service provider's services.
 package receptor_sdk
 
 import (
