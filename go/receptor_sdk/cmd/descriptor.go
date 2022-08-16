@@ -83,8 +83,8 @@ func addCredentialFlags(credentialObj interface{}) (err error) {
 		fname := vt.Field(i).Name
 		display := getTagField(tags, displayField, fname)
 		sptr := (*string)(reflect.Indirect(v.Field(i)).Addr().UnsafePointer())
-		AddStrFlag("verify", sptr, strings.ToLower(fname), "", "", display)
-		AddStrFlag("scan", sptr, strings.ToLower(fname), "", "", display)
+		addStrFlagP("verify", sptr, strings.ToLower(fname), "", "", display)
+		addStrFlagP("scan", sptr, strings.ToLower(fname), "", "", display)
 	}
 	return
 }

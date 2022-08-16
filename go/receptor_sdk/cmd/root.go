@@ -99,7 +99,7 @@ func addGrpcFlags(cmd *cobra.Command) {
 	addStrFlag(cmd, &receptor_sdk.CredentialsBase64URL, "credentials", "", "", "Base64 URL encoded service provider credential")
 }
 
-func AddStrFlag(cmd string, p *string, name, shorthand, value, usage string) {
+func addStrFlagP(cmd string, p *string, name, shorthand, value, usage string) {
 	if c, ok := cmds[cmd]; ok && c != nil {
 		addStrFlag(c.getCommand(), p, name, shorthand, value, usage)
 	}
@@ -172,7 +172,7 @@ func initConfig() {
 	}
 
 	// Initialize zerolog
-	InitLog(receptor_sdk.LogLevel, receptor_sdk.LogFile)
+	initLog(receptor_sdk.LogLevel, receptor_sdk.LogFile)
 
 	// Set GRPC host related flags if we see Host set to api.infra.trustero.com
 	if strings.HasSuffix(receptor_sdk.Host, ".api.infra.trustero.com") {

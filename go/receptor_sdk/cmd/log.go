@@ -30,7 +30,7 @@ var tz *time.Location
 var noColor bool
 
 // Setup server logging using zerolog
-func InitLog(levelStr string, logFile string) {
+func initLog(levelStr string, logFile string) {
 
 	// Use current timezone when printing console log messages
 	tz = time.Now().Location()
