@@ -223,6 +223,11 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 	if err == nil {
 		err = run(rc, credentialObj)
 	}
+
+	// Log error
+	if err != nil {
+		log.Error().Err(err)
+	}
 	return
 }
 
