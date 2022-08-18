@@ -138,6 +138,7 @@ ReceptorConfiguration contains a configurations a receptor needs to access a ser
 | credential | [string](#string) |  | Credential required to access a service provider for report finding and discover services purposes. |
 | config | [string](#string) |  | Config holds additional receptor configuration to access a service provider account. |
 | service_provider_account | [string](#string) |  | Service_provider_account is the service provider account name. |
+| receptor_type | [string](#string) |  | Receptor_type is the name of the receptor. ex: trr-aws |
 
 
 
