@@ -258,6 +258,9 @@ message ReceptorConfiguration {
 
   // Service_provider_account is the service provider account name.
   string service_provider_account = 4;
+
+  // Receptor_type is the name of the receptor. ex: trr-aws
+  string receptor_type = 5;
 }
 
 
