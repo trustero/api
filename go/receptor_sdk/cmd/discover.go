@@ -19,7 +19,7 @@ func discover(rc receptor_v1.ReceptorClient, credentials interface{}) (err error
 
 	// Report discovered services to Trustero
 	var services receptor_v1.ServiceEntities
-	services.ReceptorType = receptorImpl.GetReceptorType()
+	services.ReceptorType = GetParsedReceptorType()
 	services.ServiceProviderAccount = serviceProviderAccount
 	services.Entities = discovered
 

@@ -59,7 +59,7 @@ func Execute(r receptor_sdk.Receptor) {
 	}
 
 	receptorImpl = r
-	receptor_sdk.ModelID = receptorImpl.GetReceptorType()
+	receptor_sdk.ModelID = GetParsedReceptorType()
 	rootCmd.getCommand().Use = receptor_sdk.ModelID
 	_ = addCredentialFlags(r.GetCredentialObj())
 	cobra.CheckErr(rootCmd.getCommand().Execute())
