@@ -93,6 +93,9 @@ func addCredentialFlags(credentialObj interface{}) (err error) {
 	return
 }
 
+// This func cleans up the the receptor type,
+// a receptor type can only include letters, numbers, "-", and "_"
+// all other characters will be converted to "_"
 func GetParsedReceptorType() (parsedName string) {
 	receptorName := receptorImpl.GetReceptorType()
 	regex, _ := regexp.Compile(`[^-a-z0-9A-Z_]`)
