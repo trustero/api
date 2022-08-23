@@ -33,7 +33,7 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 		return
 	}
 
-	finding.ReceptorType = receptorImpl.GetReceptorType()
+	finding.ReceptorType = GetParsedReceptorType()
 	finding.ServiceProviderAccount = serviceProviderAccount
 
 	// Convert and append discovered evidences to reported evidences

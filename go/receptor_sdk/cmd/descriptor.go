@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -50,7 +51,8 @@ type credential struct {
 }
 
 type credentials struct {
-	Credentials []*credential `json:"credentials"`
+	Credentials  []*credential `json:"credentials"`
+	ReceptorType string        `json:"receptorType"`
 }
 
 func toDescriptor(credentialObj interface{}) (descriptor string, err error) {
@@ -67,6 +69,8 @@ func toDescriptor(credentialObj interface{}) (descriptor string, err error) {
 			Placeholder: getTagField(tags, placeholderField, strings.ToLower(fname)),
 		})
 	}
+
+	creds.ReceptorType = GetParsedReceptorType()
 
 	var bytes []byte
 	if bytes, err = json.MarshalIndent(creds, "", "  "); err == nil {
@@ -87,4 +91,11 @@ func addCredentialFlags(credentialObj interface{}) (err error) {
 		addStrFlagP("scan", sptr, strings.ToLower(fname), "", "", display)
 	}
 	return
+}
+
+func GetParsedReceptorType() (parsedName string) {
+	receptorName := receptorImpl.GetReceptorType()
+	regex, _ := regexp.Compile(`[^-a-z0-9A-Z_]`)
+	res := regex.ReplaceAll([]byte(receptorName), []byte("_"))
+	return string(res)
 }
