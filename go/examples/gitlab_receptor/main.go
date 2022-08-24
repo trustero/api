@@ -8,22 +8,18 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/trustero/api/go/receptor_sdk/cmd"
 	"github.com/trustero/api/go/receptor_v1"
 	"github.com/xanzy/go-gitlab"
 )
 
-// GitLabUser represents a type of evidence to emit to Trustero as part of a finding.
-type GitLabUser struct {
-	Username         string     `trustero:"id:;display:Username;order:1"`
-	Name             string     `trustero:"display:Name;order:2"`
-	Group            string     `trustero:"display:Group;order:3"`
-	IsAdmin          bool       `trustero:"display:Admin;order:4"`
-	CreatedAt        *time.Time `trustero:"display:Created On;order:5"`
-	TwoFactorEnabled bool       `trustero:"display:MFA Enabled;order:6"`
-	LastActivityOn   *time.Time `trustero:"display:Last Activity On;order:7"`
-}
+// resources used to write this receptor:
+// GitLab Golang SDK:
+// https://pkg.go.dev/github.com/xanzy/go-gitlab
+// GitLab API documentation:
+// https://docs.gitlab.com/ee/api/api_resources.html
 
 // This struct holds the credentials the receptor needs to authenticate with the
 // service provider. A display name and placeholder tag should be provided
@@ -76,6 +72,7 @@ func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
 	var git *gitlab.Client
 	if git, err = gitlab.NewClient(c.Token); err == nil {
 		if _, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{}); err != nil {
+			log.Err(err).Msgf("could not verify, error in GetLab GetGroup for Group %s", c.GroupID)
 			ok = false
 			return
 		}
@@ -100,8 +97,11 @@ func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.Servic
 	if git, err = gitlab.NewClient(c.Token); err == nil {
 		// Get Group's name
 		var group *gitlab.Group
-		group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{})
-		services.AddService(serviceName, groupEntity, group.Name, strconv.Itoa(group.ID))
+		if group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{}); err != nil {
+			services.AddService(serviceName, groupEntity, group.Name, strconv.Itoa(group.ID))
+		} else {
+			log.Err(err).Msgf("could not discover, error in GetLab GetGroup for Group %s", c.GroupID)
+		}
 	}
 	return services.Entities, err
 }
@@ -109,14 +109,6 @@ func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.Servic
 // Report implements the [receptor_sdk.Receptor] interface.
 // Report will often make the same API calls made in the Discover call, but it
 // will additionally create evidences with the data returned from the API calls
-
-// In this example, Report makes a query to GET all group members in the account
-// Each member in the list of members is converted into a GitLabUser which is
-// defined above. Each converted member is then added as a Row into an evidence
-// The Evidence also has a caption and a description that will be used in the
-// Trustero UI.
-// NOTE: The caption is prepended with the service name, so in the UI, it will
-// read: "GitLab Group Members"
 func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {
 	c := credentials.(*Receptor)
 	report := receptor_sdk.NewReport()
@@ -127,11 +119,22 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 		var ev *receptor_sdk.Evidence
 		if ev, err = r.getMemberEvidence(c, git); err == nil {
 			report.AddEvidence(ev)
+		} else {
+			log.Err(err).Msgf("could not generate evidence, error in getMemberEvidence")
 		}
 	}
 	return report.Evidences, err
 }
 
+// In this example, Report makes a call to a helper function, getMemberEvidence.
+// getMemberEvidence then makes a query to GET all group members in the account.
+// With the use of another helper function, newGitLabUser, each member in the
+// list of members is converted into a GitLabUser which is defined below.
+// Each converted member is then added as a Row into an evidence, with the use of evidence.AddRow
+// The Evidence also has a caption and a description that will be used in the
+// Trustero UI.
+// NOTE: The caption will automatically be prepended with the service name,
+// so in the UI, it will read: "GitLab Group Members"
 func (r *Receptor) getMemberEvidence(credentials interface{}, git *gitlab.Client) (evidence *receptor_sdk.Evidence, err error) {
 	c := credentials.(*Receptor)
 	evidence = receptor_sdk.NewEvidence(serviceName, memberEntity, serviceName+" Group Members",
@@ -145,16 +148,42 @@ func (r *Receptor) getMemberEvidence(credentials interface{}, git *gitlab.Client
 		if members, _, err = git.Groups.ListAllGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{}); err == nil {
 			for _, member := range members {
 				user, _, err = git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})
-				evidence.AddSource("git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})", user)
-				evidence.AddRow(*newGitLabUser(user, group))
+				if err != nil {
+					log.Err(err).Msgf("error calling GetUser in GitLab for user %s", member.ID)
+				} else {
+					evidence.AddSource("git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})", user)
+					evidence.AddRow(*newTrusteroGitLabUser(user, group))
+				}
 			}
+		} else {
+			log.Err(err).Msgf("error calling ListAllGroupMembers in GitLab for Group %s", c.GroupID)
 		}
+	} else {
+		log.Err(err).Msgf("error calling GetGroup in GitLab for Group %s", c.GroupID)
 	}
 	return
 }
 
-func newGitLabUser(user *gitlab.User, group *gitlab.Group) *GitLabUser {
-	return &GitLabUser{
+// TrusteroGitLabUser represents a type of evidence to emit to Trustero as part of a finding.
+// A list of users returned from the GitLab API will be converted to this type
+// and added to an evidence object. Trustero will use the "display" and "order"
+// tags to generate a table to display all users in the UI.
+// The "display" tag will the the column heading, and "order" tag determines
+// the order the columns show up in the table
+type TrusteroGitLabUser struct {
+	Username         string     `trustero:"id:;display:Username;order:1"`
+	Name             string     `trustero:"display:Name;order:2"`
+	Group            string     `trustero:"display:Group;order:3"`
+	IsAdmin          bool       `trustero:"display:Admin;order:4"`
+	CreatedAt        *time.Time `trustero:"display:Created On;order:5"`
+	TwoFactorEnabled bool       `trustero:"display:MFA Enabled;order:6"`
+	LastActivityOn   *time.Time `trustero:"display:Last Activity On;order:7"`
+}
+
+// This is a helper function that converts a user returned by the GitLab API
+// into a TrusteroGitLabUser
+func newTrusteroGitLabUser(user *gitlab.User, group *gitlab.Group) *TrusteroGitLabUser {
+	return &TrusteroGitLabUser{
 		Username:         user.Username,
 		Name:             user.Name,
 		Group:            group.Name,
