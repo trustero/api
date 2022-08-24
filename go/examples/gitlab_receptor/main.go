@@ -66,9 +66,9 @@ func (r *Receptor) GetCredentialObj() (credentialObj interface{}) {
 }
 
 // Verify implements the [receptor_sdk.Receptor] interface.
-// This function will call into the service provider API with the provided 
+// This function will call into the service provider API with the provided
 // credentials and confirm that the credentials are valid. Usually a simple
-// API call like GET org name. If the credentials are not valid, 
+// API call like GET org name. If the credentials are not valid,
 // return a relevant error message
 func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
 	c := credentials.(*Receptor)
@@ -84,12 +84,12 @@ func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
 }
 
 // Discover implements the [receptor_sdk.Receptor] interface.
-// The Discover function returns a list of Service Entities. This function 
+// The Discover function returns a list of Service Entities. This function
 // makes any relevant API calls to the Service Provider to gather information
-// about how many Service Entity Instances are in use. If at any point this 
+// about how many Service Entity Instances are in use. If at any point this
 // function runs into an error, log that error and continue
 
-// In this example, Discover is making a query to GET the group name. 
+// In this example, Discover is making a query to GET the group name.
 // The group name is then added to a list of Service Entities that will be
 // returned to the Trustero platform to display in the UI.
 func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.ServiceEntity, err error) {
@@ -111,10 +111,10 @@ func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.Servic
 // will additionally create evidences with the data returned from the API calls
 
 // In this example, Report makes a query to GET all group members in the account
-// Each member in the list of members is converted into a GitLabUser which is 
+// Each member in the list of members is converted into a GitLabUser which is
 // defined above. Each converted member is then added as a Row into an evidence
 // The Evidence also has a caption and a description that will be used in the
-// Trustero UI. 
+// Trustero UI.
 // NOTE: The caption is prepended with the service name, so in the UI, it will
 // read: "GitLab Group Members"
 func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {
