@@ -135,6 +135,8 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 // Trustero UI.
 // NOTE: The caption will automatically be prepended with the service name,
 // so in the UI, it will read: "GitLab Group Members"
+// NOTE: Any time any queries that need to be made for an evidence object should
+// be recorded in the evidence object via the "AddSource" command
 func (r *Receptor) getMemberEvidence(credentials interface{}, git *gitlab.Client) (evidence *receptor_sdk.Evidence, err error) {
 	c := credentials.(*Receptor)
 	evidence = receptor_sdk.NewEvidence(serviceName, memberEntity, serviceName+" Group Members",
@@ -145,7 +147,9 @@ func (r *Receptor) getMemberEvidence(credentials interface{}, git *gitlab.Client
 		members []*gitlab.GroupMember
 	)
 	if group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{}); err == nil {
+		evidence.AddSource("git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{})", group)
 		if members, _, err = git.Groups.ListAllGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{}); err == nil {
+			evidence.AddSource("git.Groups.ListAllGroupMembers(c.GroupID, &gitlab.ListGroupMembersOptions{})", members)
 			for _, member := range members {
 				user, _, err = git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})
 				if err != nil {
