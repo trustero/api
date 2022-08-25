@@ -28,11 +28,13 @@ func (d *desc) getCommand() *cobra.Command {
 
 func (d *desc) setup() {
 	d.cmd = &cobra.Command{
-		Use:   descUse,
-		Short: descShort,
-		Args:  cobra.MinimumNArgs(0),
-		RunE:  descriptor,
+		Use:          descUse,
+		Short:        descShort,
+		Args:         cobra.MinimumNArgs(0),
+		RunE:         descriptor,
+		SilenceUsage: true,
 	}
+	d.cmd.FParseErrWhitelist.UnknownFlags = true
 }
 
 // Cobra executes this function on descriptor command.
@@ -93,9 +95,8 @@ func addCredentialFlags(credentialObj interface{}) (err error) {
 	return
 }
 
-// This func cleans up the the receptor type,
-// a receptor type can only include letters, numbers, "-", and "_"
-// all other characters will be converted to "_"
+// GetParsedReceptorType returns a normalized receptor type string.  A receptor type string only includes letters,
+// numbers, "-", and "_".  All other characters will be converted to "_".
 func GetParsedReceptorType() (parsedName string) {
 	receptorName := receptorImpl.GetReceptorType()
 	regex, _ := regexp.Compile(`[^-a-z0-9A-Z_]`)

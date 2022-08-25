@@ -80,9 +80,12 @@ func (r *root) getCommand() *cobra.Command {
 
 func (r *root) setup() {
 	r.cmd = &cobra.Command{
-		Short: rootShortDesc,
-		Long:  rootLongDesc,
+		Short:        rootShortDesc,
+		Long:         rootLongDesc,
+		SilenceUsage: true,
 	}
+	r.cmd.FParseErrWhitelist.UnknownFlags = true
+
 	addStrFlag(r.cmd, &cfgFile, "config", "", "", "Config file, defaults to $HOME/.receptor.yaml")
 	addStrFlag(r.cmd, &receptor_sdk.LogLevel, "level", "l", "error", "trace, debug, info, warn, error, fatal, or panic")
 	addStrFlag(r.cmd, &receptor_sdk.LogFile, "log-file", "", "", "Log file path")
@@ -228,6 +231,7 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 	if err != nil {
 		log.Error().Err(err)
 	}
+
 	return
 }
 

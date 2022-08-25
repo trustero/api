@@ -24,11 +24,13 @@ func (s *svcs) getCommand() *cobra.Command {
 
 func (s *svcs) setup() {
 	s.cmd = &cobra.Command{
-		Use:   svcsUse,
-		Short: svcsShort,
-		Args:  cobra.MinimumNArgs(0),
-		RunE:  services,
+		Use:          svcsUse,
+		Short:        svcsShort,
+		Args:         cobra.MinimumNArgs(0),
+		RunE:         services,
+		SilenceUsage: true,
 	}
+	s.cmd.FParseErrWhitelist.UnknownFlags = true
 }
 
 // Cobra executes this function on services command.
