@@ -33,14 +33,16 @@ func (s *scann) getCommand() *cobra.Command {
 
 func (s *scann) setup() {
 	s.cmd = &cobra.Command{
-		Use:     scanUse,
-		Short:   scanShort,
-		Long:    scanLong,
-		Args:    cobra.MinimumNArgs(1),
-		PreRun:  grpcPreRun,
-		RunE:    scan,
-		PostRun: grpcPostRun,
+		Use:          scanUse,
+		Short:        scanShort,
+		Long:         scanLong,
+		Args:         cobra.MinimumNArgs(1),
+		PreRun:       grpcPreRun,
+		RunE:         scan,
+		PostRun:      grpcPostRun,
+		SilenceUsage: true,
 	}
+	s.cmd.FParseErrWhitelist.UnknownFlags = true
 	addGrpcFlags(s.cmd)
 	addBoolFlag(s.cmd, &receptor_sdk.FindEvidence, "find-evidence", "", false,
 		"Scan for evidences in a service provider account")

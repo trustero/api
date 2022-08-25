@@ -32,14 +32,17 @@ func (v *verifi) getCommand() *cobra.Command {
 
 func (v *verifi) setup() {
 	v.cmd = &cobra.Command{
-		Use:     verifyUse,
-		Short:   verifyShort,
-		Long:    verifyLong,
-		Args:    cobra.MinimumNArgs(1),
-		PreRun:  grpcPreRun,
-		RunE:    verify,
-		PostRun: grpcPostRun,
+		Use:          verifyUse,
+		Short:        verifyShort,
+		Long:         verifyLong,
+		Args:         cobra.MinimumNArgs(1),
+		PreRun:       grpcPreRun,
+		RunE:         verify,
+		PostRun:      grpcPostRun,
+		SilenceUsage: true,
 	}
+	v.cmd.FParseErrWhitelist.UnknownFlags = true
+
 	addGrpcFlags(v.cmd)
 }
 
