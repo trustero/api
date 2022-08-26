@@ -58,11 +58,11 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 		var rowFieldNames []string
 		for idx, row := range evidence.Rows {
 			if idx == 0 {
-				if entityIdFieldName, rowFieldNames, err = extractMetaData(row, &reportStruct); err != nil {
+				if entityIdFieldName, rowFieldNames, err = ExtractMetaData(row, &reportStruct); err != nil {
 					return // fail to extract metadata, likely an invalid row type
 				}
 			}
-			reportStruct.Rows = append(reportStruct.Rows, rowToStructRow(row, entityIdFieldName, rowFieldNames))
+			reportStruct.Rows = append(reportStruct.Rows, RowToStructRow(row, entityIdFieldName, rowFieldNames))
 		}
 
 		// Append to Finding
@@ -75,7 +75,8 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 	return
 }
 
-func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (entityIdFieldName string, rowFieldNames []string, err error) {
+// ExtractMetaData Extracts tag information from struct
+func ExtractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (entityIdFieldName string, rowFieldNames []string, err error) {
 	rowFieldNames = []string{}
 	rowType := reflect.TypeOf(row)
 	if err = assertStruct(rowType); err != nil {
@@ -118,7 +119,8 @@ func extractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (entityI
 	return
 }
 
-func rowToStructRow(row interface{}, entityIdFieldName string, rowFieldNames []string) (reportRow *receptor_v1.Row) {
+// RowToStructRow Builds structured row of evidence
+func RowToStructRow(row interface{}, entityIdFieldName string, rowFieldNames []string) (reportRow *receptor_v1.Row) {
 	reportRow = &receptor_v1.Row{
 		EntityInstanceId: getField(row, entityIdFieldName),
 		Cols:             map[string]*receptor_v1.Value{},
