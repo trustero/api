@@ -97,7 +97,7 @@ func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.Servic
 	if git, err = gitlab.NewClient(c.Token); err == nil {
 		// Get Group's name
 		var group *gitlab.Group
-		if group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{}); err != nil {
+		if group, _, err = git.Groups.GetGroup(c.GroupID, &gitlab.GetGroupOptions{}); err == nil {
 			services.AddService(serviceName, groupEntity, group.Name, strconv.Itoa(group.ID))
 		} else {
 			log.Err(err).Msgf("could not discover, error in GetLab GetGroup for Group %s", c.GroupID)
