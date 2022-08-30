@@ -6,11 +6,13 @@ abcdefg
 abcdefghijklmnopqrstuvwxyz
 abspath
 arduino
+autobuild
 Bignum
 CAs
 certoverride
 Certs
 cmds
+codeql
 coverprofile
 cred
 creds
@@ -27,6 +29,7 @@ endef
 extendee
 FIXME
 Fixnum
+FParse
 gitlab
 gofmt
 google
