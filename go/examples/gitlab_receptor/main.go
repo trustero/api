@@ -34,6 +34,7 @@ type Receptor struct {
 }
 
 const (
+	receptorName = "gitlab_receptor"
 	serviceName  = "GitLab"
 	groupEntity  = "Group"
 	memberEntity = "Member"
@@ -43,7 +44,7 @@ const (
 // Set the name of the receptor in the const declaration above
 // This will let the receptor inform Trustero about itself
 func (r *Receptor) GetReceptorType() string {
-	return "gitlab_receptor"
+	return receptorName
 }
 
 // GetKnownServices implements the [receptor_sdk.Receptor] interface.
