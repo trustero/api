@@ -153,7 +153,7 @@ func (r *Receptor) getMemberEvidence(credentials interface{}, git *gitlab.Client
 			for _, member := range members {
 				user, _, err = git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})
 				if err != nil {
-					log.Err(err).Msgf("error calling GetUser in GitLab for user %s", member.ID)
+					log.Err(err).Msgf("error calling GetUser in GitLab for user %v", member.ID)
 				} else {
 					evidence.AddSource("git.Users.GetUser(member.ID, gitlab.GetUsersOptions{})", user)
 					evidence.AddRow(*newTrusteroGitLabUser(user, group))

@@ -81,15 +81,15 @@ func (rc *mockReceptorClient) Report(ctx context.Context, in *receptor.Finding, 
 		var rows [][]string
 		headers, rows, err = t.Tabulate()
 		for _, header := range headers {
-			fmt.Printf("%12s ", header)
+			fmt.Printf("| %-12s ", header)
 		}
-		println()
+		fmt.Println()
 
 		for _, row := range rows {
 			for _, col := range row {
-				fmt.Printf("%12s ", col)
+				fmt.Printf("| %-12s ", col)
 			}
-			println()
+			fmt.Println()
 		}
 	}
 
