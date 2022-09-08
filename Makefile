@@ -1,4 +1,4 @@
-SUB_DIRS := go doc
+SUB_DIRS := go docs
 MODULE := api
 include ./make/globals.mk
 
