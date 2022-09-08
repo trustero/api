@@ -139,11 +139,13 @@ func RowToStructRow(row interface{}, entityIdFieldName string, rowFieldNames []s
 			continue
 		}
 
-		if dateTime, ok := v.Interface().(*time.Time); ok && dateTime != nil {
-			reportRow.Cols[fieldName] = &receptor_v1.Value{
-				ValueType: &receptor_v1.Value_TimestampValue{
+		dateTime, ok := v.Interface().(*time.Time)
+		if ok {
+			reportRow.Cols[fieldName] = &receptor_v1.Value{}
+			if dateTime != nil {
+				reportRow.Cols[fieldName].ValueType = &receptor_v1.Value_TimestampValue{
 					TimestampValue: timestamppb.New(*dateTime),
-				},
+				}
 			}
 			continue
 		}
