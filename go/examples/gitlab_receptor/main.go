@@ -34,7 +34,7 @@ type Receptor struct {
 }
 
 const (
-	receptorName = "gitlab_receptor"
+	receptorName = "trr-custom"
 	serviceName  = "GitLab"
 	groupEntity  = "Group"
 	memberEntity = "Member"
