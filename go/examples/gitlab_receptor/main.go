@@ -188,15 +188,23 @@ type TrusteroGitLabUser struct {
 // This is a helper function that converts a user returned by the GitLab API
 // into a TrusteroGitLabUser
 func newTrusteroGitLabUser(user *gitlab.User, group *gitlab.Group) *TrusteroGitLabUser {
-	return &TrusteroGitLabUser{
+
+	TGLuser := &TrusteroGitLabUser{
 		Username:         user.Username,
 		Name:             user.Name,
 		Group:            group.Name,
 		IsAdmin:          user.IsAdmin,
-		CreatedAt:        user.CreatedAt,
 		TwoFactorEnabled: user.TwoFactorEnabled,
-		LastActivityOn:   (*time.Time)(user.LastActivityOn),
 	}
+
+	if user.LastActivityOn != nil {
+		TGLuser.LastActivityOn = (*time.Time)(user.LastActivityOn)
+	}
+	if user.CreatedAt != nil {
+		TGLuser.CreatedAt = (*time.Time)(user.CreatedAt)
+	}
+
+	return TGLuser
 }
 
 func main() {
