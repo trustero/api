@@ -173,7 +173,7 @@ func (r *Receptor) getMemberEvidence(credentials interface{}, git *gitlab.Client
 // A list of users returned from the GitLab API will be converted to this type
 // and added to an evidence object. Trustero will use the "display" and "order"
 // tags to generate a table to display all users in the UI.
-// The "display" tag will the the column heading, and "order" tag determines
+// The "display" tag will the column heading, and "order" tag determines
 // the order the columns show up in the table
 type TrusteroGitLabUser struct {
 	Username         string     `trustero:"id:;display:Username;order:1"`
