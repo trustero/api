@@ -1,6 +1,6 @@
-// These are instructions on how to generate the needed credentials for this
-// receptor. 
-// GitLab receptor needs a GroupID and a Token to access an account.
+These are instructions on how to generate the needed credentials for this receptor. 
+
+GitLab receptor needs a GroupID and a Token to access an account.
 
 
 First, get the group ID
