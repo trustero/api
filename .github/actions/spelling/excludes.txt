@@ -39,3 +39,4 @@ ignore$
 \.zip$
 ^\.github/actions/spelling/
 ^\Q.github/workflows/spelling.yml\E$
+^\Qgo/receptor_sdk/config/cert.go\E$
