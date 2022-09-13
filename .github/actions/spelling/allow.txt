@@ -33,6 +33,7 @@ FParse
 gitlab
 gofmt
 google
+goreportcard
 grep
 grpc
 grpclog
@@ -91,4 +92,3 @@ xdb
 xfa
 yamld
 zerolog
-goreportcard
