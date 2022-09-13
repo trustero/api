@@ -91,3 +91,4 @@ xdb
 xfa
 yamld
 zerolog
+goreportcard
