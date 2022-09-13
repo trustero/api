@@ -2,7 +2,6 @@ These are instructions on how to generate the needed credentials for this recept
 
 GitLab receptor needs a GroupID and a Token to access an account.
 
-
 First, get the group ID
 1. In the top-left corner, select **Menu**.
 2. Select **Groups**.
