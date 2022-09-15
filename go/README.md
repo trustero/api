@@ -1,12 +1,10 @@
-# Trustero Receptor SDK
+# Trustero Receptor SDK for Golang
 
 ![Build CI](https://github.com/trustero/api/actions/workflows/ci.yml/badge.svg)
 [![CodeQL](https://github.com/trustero/api/actions/workflows/codeql.yml/badge.svg)](https://github.com/trustero/api/actions/workflows/codeql.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/trustero/api/go)](https://goreportcard.com/report/github.com/trustero/api/go)
 [![Go Reference](https://pkg.go.dev/badge/github.com/trustero/api.svg)](https://pkg.go.dev/github.com/trustero/api/go/receptor_sdk)
 
-This repository contains the SDK for creating a Receptor that integrates with
-the Trustero Service.
 
 ReceptorSDK documentation is available on [pkg.go.dev](https://pkg.go.dev/github.com/trustero/api/go/receptor_sdk). Users are advised to consult this ReceptorSDK documentation together with the comprehensive `Receptor Developer Guide` and [protobuf definitions](docs/receptor_v1/receptor.md). To obtain a copy of the guide, please reach out to Trustero Support. The easiest way to learn about the SDK is to consult the set of [examples](go/examples/) built on top of the SDK. What follows is a subset of these examples that can be found useful as stand-alone programs.
 
@@ -18,10 +16,30 @@ ReceptorSDK is an open source Trustero project and contributions are welcome.
 
 ReceptorSDK is periodically refreshed to reflect the newest additions to the Trustero API. Users of the SDK are advised to track the latest releases rather closely to ensure proper function in the unlikely event of an incompatible change to a Trustero API.
 
+## Installation
+
+```
+go get github.com/trustero/api/go@latest
+```
+
+
 
 ## Usage
 
 The developer needs to implement the [Receptor interface](https://pkg.go.dev/github.com/trustero/api/go/receptor_sdk#Receptor) in their project to create a Receptor.
+
+### Required Functions
+
+As a developer, you will need to implement the following functions to have a working receptor:
+1. func (r *Receptor) GetReceptorType() string {}
+    - This function will return a string, signifying the receptor type (e.g. “trr-gitlab”)
+2. func (r *Receptor) GetKnownServices() []string {}
+    - This function will return an array of string, signifying a list of service types the receptor collects
+3. func (r *Receptor) GetCredentialObj() (credentialObj interface{}) {}
+4. func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {}
+5. func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.ServiceEntity, err error) {}
+6. func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {}
+
 
 ```go
 package main
@@ -74,26 +92,6 @@ func main() {
 ```
 
 A real-life example can be found in the [examples](go/examples/) directory.
-
-## Client Usage
-
-A developer does not need to initialize a client to interact with the Trustero service.
-
-All communication to the Trustero service is handled by the ReceptorSDK internally.
-
-If a client needs to be generated for debugging or other use cases, it may be done like this:
-
-```
-
-rc = client.ServerConn.GetReceptorClient()
-
-if receptorInfo, err = getReceptorConfig(rc); err != nil {
-	log.Error().Err(err)
-}
-
-credentialString = receptorInfo.GetCredential()
-fmt.Print(credentialString)
-```
 
 ## Testing A Receptor
 
