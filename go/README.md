@@ -91,7 +91,7 @@ func main() {
 }
 ```
 
-A real-life example can be found in the [examples](go/examples/) directory.
+A real-life example can be found in the [examples](examples/) directory.
 
 ## Testing A Receptor
 
