@@ -6,7 +6,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/trustero/api.svg)](https://pkg.go.dev/github.com/trustero/api/go/receptor_sdk)
 
 
-ReceptorSDK documentation is available on [pkg.go.dev](https://pkg.go.dev/github.com/trustero/api/go/receptor_sdk). Users are advised to consult this ReceptorSDK documentation together with the comprehensive `Receptor Developer Guide` and [protobuf definitions](docs/receptor_v1/receptor.md). To obtain a copy of the guide, please reach out to Trustero Support. The easiest way to learn about the SDK is to consult the set of [examples](go/examples/) built on top of the SDK. What follows is a subset of these examples that can be found useful as stand-alone programs.
+ReceptorSDK documentation is available on [pkg.go.dev](https://pkg.go.dev/github.com/trustero/api/go/receptor_sdk). Users are advised to consult this ReceptorSDK documentation together with the comprehensive `Receptor Developer Guide` and [protobuf definitions](../docs/receptor_v1/receptor.md). To obtain a copy of the guide, please reach out to Trustero Support. The easiest way to learn about the SDK is to consult the set of [examples](examples/) built on top of the SDK. What follows is a subset of these examples that can be found useful as stand-alone programs.
 
 | Example                                         | Description                                    |
 | :---------------------------------------------- | :--------------------------------------------- |
