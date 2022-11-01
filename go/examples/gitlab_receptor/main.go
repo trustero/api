@@ -3,7 +3,7 @@
 package main
 
 import (
-	"github.com/trustero/api/go/examples/bitbucket_receptor/receptorPackage"
+	"github.com/trustero/api/go/examples/gitlab_receptor/receptorPackage"
 
 	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/trustero/api/go/receptor_sdk/cmd"

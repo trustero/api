@@ -1,7 +1,7 @@
 package receptorPackage
 
 import (
-	"github.com/trustero/api/go/examples/bitbucket_receptor/logging"
+	"github.com/trustero/api/go/examples/gitlab_receptor/logging"
 	"github.com/xanzy/go-gitlab"
 	"strconv"
 

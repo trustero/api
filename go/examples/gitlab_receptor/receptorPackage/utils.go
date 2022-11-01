@@ -1,7 +1,7 @@
 package receptorPackage
 
 import (
-	receptorLog "github.com/trustero/api/go/examples/bitbucket_receptor/logging"
+	receptorLog "github.com/trustero/api/go/examples/gitlab_receptor/logging"
 	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/xanzy/go-gitlab"
 	"time"
