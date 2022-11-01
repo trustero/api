@@ -10,7 +10,7 @@ ReceptorSDK documentation is available on [pkg.go.dev](https://pkg.go.dev/github
 
 | Example                                         | Description                                    |
 | :---------------------------------------------- | :--------------------------------------------- |
-| [GitLab Receptor](examples/gitlab_receptor/) | A Receptor that posts GitLab users as evidence |
+| [GitLab Receptor](examples/gitlab_receptor_old/) | A Receptor that posts GitLab users as evidence |
 
 ReceptorSDK is an open source Trustero project and contributions are welcome.
 
