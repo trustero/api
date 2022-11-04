@@ -3,6 +3,7 @@ These are instructions on how to generate the needed credentials for this recept
 GitLab receptor needs a GroupID and a Token to access an account.
 
 First, get the group ID
+
 1. In the top-left corner, select **Menu**.
 2. Select **Groups**.
 3. Select **Your groups**.
@@ -11,6 +12,7 @@ First, get the group ID
 6. Paste the `group ID` into the **Group ID** field.
 
 Next, create a read-only personal access token
+
 1. In the top-right corner, select your avatar.
 2. Select **Edit** profile.
 3. On the left sidebar, select **Access Tokens**.
