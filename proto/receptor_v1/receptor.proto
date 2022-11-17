@@ -140,7 +140,7 @@ message Struct {
   repeated string col_display_order = 4;
 
   // Col_tags is a map of column tag to row column name. These tags are used by Trustero's evidence testing interface
-  // to identify relavent evidence.
+  // to identify relevant evidence.
   map<string, string> col_tags = 5;
 }
 
