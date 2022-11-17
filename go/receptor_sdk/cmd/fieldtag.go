@@ -14,6 +14,7 @@ const (
 	displayField     = "display"
 	orderField       = "order"
 	placeholderField = "placeholder"
+	controlTestField = "check"
 )
 
 func expandFieldTag(field reflect.StructField) (tags map[string]string) {
