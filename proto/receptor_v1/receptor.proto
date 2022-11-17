@@ -138,6 +138,10 @@ message Struct {
   // Col_display_order is an ordered list of row column names.  The order of the column names are used by the user
   // interface to render the column order of a struct's rows.
   repeated string col_display_order = 4;
+
+  // Col_tags is a map of column tag to row column name. These tags are used by Trustero's evidence testing interface
+  // to identify relavent evidence.
+  map<string, string> col_tags = 5;
 }
 
 

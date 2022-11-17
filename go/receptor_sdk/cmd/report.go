@@ -42,6 +42,7 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 			Rows:            []*receptor_v1.Row{},
 			ColDisplayNames: map[string]string{},
 			ColDisplayOrder: []string{},
+			ColTags:         map[string]string{},
 		}
 
 		reportEvidence := receptor_v1.Evidence{
@@ -108,6 +109,11 @@ func ExtractMetaData(row interface{}, reportStruct *receptor_v1.Struct) (entityI
 			reportStruct.ColDisplayNames[field.Name] = val
 		} else {
 			reportStruct.ColDisplayNames[field.Name] = field.Name
+		}
+
+		// Get the check
+		if val, ok := tags[controlTestField]; ok {
+			reportStruct.ColTags[val] = field.Name
 		}
 	}
 

@@ -18,6 +18,7 @@
     - [Source](#receptor_v1-Source)
     - [Struct](#receptor_v1-Struct)
     - [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry)
+    - [Struct.ColTagsEntry](#receptor_v1-Struct-ColTagsEntry)
     - [Value](#receptor_v1-Value)
   
     - [Receptor](#receptor_v1-Receptor)
@@ -262,6 +263,7 @@ must have the same column name-value pairs.
 | rows | [Row](#receptor_v1-Row) | repeated | Rows of key-value pairs. Each row typically represents the configuration of a service instance or an data type such as a member of GitLab group. |
 | col_display_names | [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry) | repeated | Col_display_names is a map of row column name to it&#39;s corresponding display name. Display names are used by the user interface to render a field in a struct&#39;s rows. |
 | col_display_order | [string](#string) | repeated | Col_display_order is an ordered list of row column names. The order of the column names are used by the user interface to render the column order of a struct&#39;s rows. |
+| col_tags | [Struct.ColTagsEntry](#receptor_v1-Struct-ColTagsEntry) | repeated | Col_tags is a map of column tag to row column name. These tags are used by Trustero&#39;s evidence testing interface to identify relavent evidence. |
 
 
 
@@ -271,6 +273,22 @@ must have the same column name-value pairs.
 <a name="receptor_v1-Struct-ColDisplayNamesEntry"></a>
 
 ### Struct.ColDisplayNamesEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="receptor_v1-Struct-ColTagsEntry"></a>
+
+### Struct.ColTagsEntry
 
 
 
