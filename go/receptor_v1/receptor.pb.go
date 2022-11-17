@@ -377,7 +377,7 @@ type Struct struct {
 	// interface to render the column order of a struct's rows.
 	ColDisplayOrder []string `protobuf:"bytes,4,rep,name=col_display_order,json=colDisplayOrder,proto3" json:"col_display_order,omitempty"`
 	// Col_tags is a map of column tag to row column name. These tags are used by Trustero's evidence testing interface
-	// to identify relavent evidence.
+	// to identify relevant evidence.
 	ColTags map[string]string `protobuf:"bytes,5,rep,name=col_tags,json=colTags,proto3" json:"col_tags,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
