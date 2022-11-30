@@ -89,9 +89,7 @@ func NewServiceEntities() *ServiceEntities {
 
 // AddService adds a services to discovered services
 func (s *ServiceEntities) AddService(typeName, typeId, instanceName, instanceId string) *ServiceEntities {
-	if len(typeName) > 0 && len(typeId) > 0 && len(instanceName) > 0 && len(instanceId) > 0 {
-		s.Entities = append(s.Entities, newService(typeName, typeId, instanceName, instanceId))
-	}
+	s.Entities = append(s.Entities, newService(typeName, typeId, instanceName, instanceId))
 	return s
 }
 
