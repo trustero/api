@@ -60,7 +60,6 @@ jobs:
             cspell:django/django.txt
             cspell:scala/scala.txt
             cspell:filetypes/filetypes.txt
-            cspell:python/python.txt
             cspell:java/java.txt
             cspell:html/html.txt
             cspell:fullstack/fullstack.txt
