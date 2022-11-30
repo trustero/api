@@ -52,12 +52,6 @@ func (s *Struct) getHeaderKeys() (displayHeaders []string) {
 	}
 
 	displayHeaders = s.ColDisplayOrder
-	for _, h := range allHeaders {
-		// If displayHeader doesn't contain a known column key, add the column key
-		if !contains(s.ColDisplayOrder, h) {
-			displayHeaders = append(displayHeaders, h)
-		}
-	}
 
 	return
 }
