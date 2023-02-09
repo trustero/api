@@ -89,7 +89,7 @@ func toStringValue(value *Value) (str string) {
 
 	} else if t, ok := v.(*Value_TimestampValue); ok {
 		dt := t.TimestampValue
-		if dt == nil || dt.Seconds < 1 {
+		if dt == nil || (dt.Nanos == 0 && dt.Seconds <= 0) {
 			str = "-"
 		} else {
 			str = dt.AsTime().Format(dateTimeLayout)
