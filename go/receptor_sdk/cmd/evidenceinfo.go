@@ -42,7 +42,7 @@ func printEvidenceInfo(_ *cobra.Command, args []string) (err error) {
 			Description: e.Description,
 		}
 		evS, _ := json.MarshalIndent(evidenceInfo, "", "    ")
-		println(evS)
+		println(string(evS))
 	}
 	return
 }
