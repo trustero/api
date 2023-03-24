@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"github.com/spf13/cobra"
 )
 
@@ -28,11 +29,20 @@ func (e *evi) setup() {
 	e.cmd.FParseErrWhitelist.UnknownFlags = true
 }
 
-// Cobra executes this function on descriptor command.
+type EvidenceInfo struct {
+	Caption     string `json:"caption"`
+	Description string `json:"description"`
+}
+
+// Cobra executes this function on evidenceinfo command.
 func printEvidenceInfo(_ *cobra.Command, args []string) (err error) {
 	for _, e := range receptorImpl.GetEvidenceInfo() {
-		println(e.Caption)
-		println(e.Description)
+		evidenceInfo := EvidenceInfo{
+			Caption:     e.Caption,
+			Description: e.Description,
+		}
+		evS, _ := json.MarshalIndent(evidenceInfo, "", "    ")
+		println(evS)
 	}
 	return
 }
