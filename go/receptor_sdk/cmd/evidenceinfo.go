@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/spf13/cobra"
 )
 
@@ -36,13 +37,20 @@ type EvidenceInfo struct {
 
 // Cobra executes this function on evidenceinfo command.
 func printEvidenceInfo(_ *cobra.Command, args []string) (err error) {
+	var allEvs []EvidenceInfo
 	for _, e := range receptorImpl.GetEvidenceInfo() {
 		evidenceInfo := EvidenceInfo{
 			Caption:     e.Caption,
 			Description: e.Description,
 		}
-		evS, _ := json.MarshalIndent(evidenceInfo, "", "    ")
-		println(string(evS))
+		allEvs = append(allEvs, evidenceInfo)
+	}
+	evS, _ := json.MarshalIndent(allEvs, "", "    ")
+
+	if string(evS) == "null" {
+		println("{}")
+	} else {
+		println(fmt.Sprintf("%s", evS))
 	}
 	return
 }
