@@ -66,7 +66,8 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 	return receptorPackage.ReportImpl(c.Token, c.GroupID)
 }
 
-// Required to exist but unless you want it implemented
+// GetEvidenceInfo returns a list of all the possible evidence created. The return value should not have any actual
+// rows or source data, just the Caption and Description
 func (r *Receptor) GetEvidenceInfo() (evidences []*receptor_sdk.Evidence) {
 	return
 }
