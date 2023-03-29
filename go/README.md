@@ -86,6 +86,11 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 	return
 }
 
+func (r *Receptor) GetEvidenceInfo() (evidences []*receptor_sdk.Evidence) {
+	//YOUR CODE HERE
+   return
+}
+
 func main() {
 	cmd.Execute(&Receptor{})
 }
