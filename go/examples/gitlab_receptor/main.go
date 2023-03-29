@@ -66,6 +66,11 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 	return receptorPackage.ReportImpl(c.Token, c.GroupID)
 }
 
+// Required to exist but unless you want it implemented
+func (r *Receptor) GetEvidenceInfo() (evidences []*receptor_sdk.Evidence) {
+	return
+}
+
 func main() {
 	cmd.Execute(&Receptor{})
 }
