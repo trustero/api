@@ -82,6 +82,11 @@ func scan(_ *cobra.Command, args []string) (err error) {
 			// Report evidence discovered in the service provider account
 			if receptor_sdk.FindEvidence {
 				err = report(rc, credentials)
+			} else {
+				// Discover services in-use in the service provider account only run if --find-evidence is not run since discover runs in report
+				if err = discover(rc, credentials); err != nil {
+					return
+				}
 			}
 
 			return
