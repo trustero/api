@@ -6,4 +6,4 @@ import api.receptor_v1.receptor_pb2 as receptor
 
 class TestProtoc:
     def test_import_ok(self):
-        assert True
+        assert receptor is not None
