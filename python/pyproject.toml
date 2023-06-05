@@ -71,13 +71,14 @@ exclude = '''
   | dist
   | docs
   | notes
+  | src/api/receptor_v1
 )/
 '''
 
 [tool.isort]
 profile = "black"
 line_length = 132
-skip_glob = [ "docs", "notes" ]
+skip_glob = [ "docs", "notes", "src/api/receptor_v1"]
 
 [build-system]
 requires = ["poetry>=1.0.0", "poetry-dynamic-versioning"]
