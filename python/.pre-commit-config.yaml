@@ -1,0 +1,9 @@
+fail_fast: true
+repos:
+  - repo: local
+    hooks:
+      - id: system
+        name: Code Style Checks
+        entry: cd python && ./run checks
+        pass_filenames: false
+        language: system

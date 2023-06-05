@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# vim: set ft=bash ts=3 sw=3 expandtab:
+# Shortcuts for common developer tasks
+
+# NOTE: Shared run functionality is maintained at: https://github.com/pronovic/run-script-framework
+
+unset CDPATH
+
+REPO_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd) # see: https://stackoverflow.com/a/246128/2907667
+source "$REPO_DIR/.run/util.sh"
+setup_environment
+
+if task_exists "$1"; then
+   run_task $*
+else
+   echo ""
+   echo "------------------------------------"
+   echo "Shortcuts for common developer tasks"
+   echo "------------------------------------"
+   echo ""
+
+   echo "Basic tasks:"
+   echo ""
+   for task in $(basic_tasks); do
+      task_help "$task"
+   done
+   echo ""
+
+   if [ ! -z "$(additional_tasks)" ]; then
+      echo "Additional tasks:"
+      echo ""
+      for task in $(additional_tasks); do
+         task_help "$task"
+      done
+      echo ""
+   fi
+
+   add_addendum
+
+   exit 2
+fi
