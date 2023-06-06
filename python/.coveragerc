@@ -3,7 +3,7 @@ source = src
 
 [run]
 branch = true
-source = src/api
+source = src/trustero_api
 
 [report]
 show_missing = false

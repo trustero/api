@@ -13,7 +13,7 @@ PROTOS_SRC_DIR="../proto/"
 export GO111MODULE=on
 export PATH=$PATH:$GO_PATH_BIN
 
-outDir="src/api"
+outDir="src/trustero_api"
 
 for module in $PROTO_MODULES; do
   proto_files=$(find ../proto/"${module}" -name "*.proto")
