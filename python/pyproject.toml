@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "trustero_api"
-version = "0.0.3"
+version = "0.0.4"
 description = "Trustero Receptor API Python Proto File Bindings"
 authors = ["Alex Gonopolskiy <alex@trustero.com>"]
 license = "Apache-2.0"
@@ -17,7 +17,7 @@ include = [
    { path = 'proto-gen', format = 'sdist' },
 ]
 packages = [ 
-   { include = "api", from = "src" },
+   { include = "trustero_api", from = "src" },
 ]
 classifiers=[
    "Programming Language :: Python :: 3",
@@ -64,14 +64,14 @@ exclude = '''
   | dist
   | docs
   | notes
-  | src/api/receptor_v1
+  | src/trustero_api/receptor_v1
 )/
 '''
 
 [tool.isort]
 profile = "black"
 line_length = 132
-skip_glob = [ "docs", "notes", "src/api/receptor_v1"]
+skip_glob = [ "docs", "notes", "src/trustero_api/receptor_v1"]
 
 [build-system]
 requires = ["poetry>=1.0.0", "poetry-dynamic-versioning"]
