@@ -507,4 +507,4 @@ min-public-methods=2
 overgeneral-exceptions=BaseException,
                        Exception
 
-ignore=src/api/receptor_v1
+ignore=src/trustero_api/receptor_v1
