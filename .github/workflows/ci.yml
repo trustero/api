@@ -13,7 +13,7 @@ concurrency:
 
 
 jobs:
-  Build:
+  make-all:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -22,7 +22,7 @@ jobs:
         run: |
           make all
 
-  Test:
+  make-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,7 +31,7 @@ jobs:
         run: |
           make deps test
 
-  Lint:
+  go-lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -42,8 +42,7 @@ jobs:
         working-directory: go
 
   python-build-and-test:
-    name: "Python Build and Test"
-    secrets: inherit
+    runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v3
