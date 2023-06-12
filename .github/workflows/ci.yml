@@ -43,23 +43,32 @@ jobs:
 
   python-build-and-test:
     name: "Python Build and Test"
-    uses: pronovic/gha-shared-workflows/.github/workflows/poetry-build-and-test.yml@v3
-    working-directory: python
     secrets: inherit
-    with:
-      matrix-os-version: "[ 'ubuntu-latest' ]"
-      matrix-python-version: "[ '3.9', '3.10', '3.11' ]"  # run Linux tests on all supported Python versions
-      poetry-version: "1.3.1"
-      enable-coveralls: true  # only report to coveralls.io for tests that run on Linux
-
-  python-release:
-    name: "Python Release"
-    if: github.ref_type == 'tag'
-    uses: pronovic/gha-shared-workflows/.github/workflows/poetry-release.yml@v3
-    needs: [ linux-build-and-test, macos-build-and-test, windows-build-and-test ]
-    working-directory: python
-    secrets: inherit
-    with:
-      python-version: "3.9"
-      poetry-version: "1.3.1"
-      publish-pypi: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # we need this so that tags are pulled; unfortunately it also pulls all history
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "${{ matrix.python }}"
+      - name: Setup Poetry
+        uses: pronovic/setup-poetry@v1
+        with:
+          version: "${{ inputs.poetry-version }}"
+          plugins: "poetry-dynamic-versioning[plugin]:0.22.0,${{ inputs.poetry-plugins }}"
+          cache-venv: "${{ inputs.poetry-cache-venv }}"
+          cache-poetry: "${{ inputs.poetry-cache-install }}"
+          cache-suffix: "001"  # safest to bump this when upgrading plugin above
+      - name: Install dependencies
+        working-directory: python
+        run: |
+          # Install dependencies
+          poetry install --sync --no-interaction
+      - name: Run test suite
+        working-directory: python
+        run: |
+          ./run suite
+      
+    
