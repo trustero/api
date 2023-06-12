@@ -60,6 +60,8 @@ jobs:
           cache-venv: "${{ inputs.poetry-cache-venv }}"
           cache-poetry: "${{ inputs.poetry-cache-install }}"
           cache-suffix: "001"  # safest to bump this when upgrading plugin above
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
       - name: Install dependencies
         working-directory: python
         run: |
