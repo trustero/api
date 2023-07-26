@@ -17,3 +17,7 @@
 .vscode
 build/
 **/coverage.txt
+
+# Output of the proto-gen.sh script
+lib
+index.js
