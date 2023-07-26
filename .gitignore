@@ -19,5 +19,5 @@ build/
 **/coverage.txt
 
 # Output of the proto-gen.sh script
-lib
-index.js
+web/lib
+web/index.js
