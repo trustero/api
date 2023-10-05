@@ -73,7 +73,7 @@ func main() {
 }
 ```
 
-A real-life example can be found in the [examples](go/examples/) directory.
+See examples [here](go/examples/) directory.
 
 ## Client Usage
 
