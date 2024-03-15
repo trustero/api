@@ -95,6 +95,10 @@ message Evidence {
     // Struct is a structured evidence.
     Struct struct = 7;
   }
+
+  // Service_account_id is the member account of the organization. For example, an AWS account number in an organization
+  // that has more than one account.
+    string service_account_id = 8;
 }
 
 
@@ -191,6 +195,11 @@ message ServiceEntities {
 
   // Entities is a list of service instances configured in the service provider account.
   repeated ServiceEntity entities = 3;
+  
+  // Service_account_id is the member account of the organization. For example, an AWS account number in a an organization
+  // that has more than one account.
+  string service_account_id=4;
+  
 }
 
 
@@ -218,6 +227,8 @@ message ServiceEntity {
   // Entity_instance_id of a discovered entity instance.  For example, an AWS ECS cluster UUID or GitLab
   // repository ID.
   string entity_instance_id = 4;
+
+ 
 }
 
 

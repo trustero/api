@@ -91,10 +91,11 @@ type Receptor interface {
 //	    Username string  `trustero:"id;display:User Name;order:1"`
 //	}
 type Evidence struct {
-	ServiceName string                // ServiceName where this evidence wa gathered. For example, "S3".
-	EntityType  string                // EntityType of rows of evidence.  For example, "bucket".
-	Caption     string                // Caption identifies the evidence.
-	Description string                // Description provides additional information on origins of the evidence.
-	Sources     []*receptor_v1.Source // Sources of raw API request and response used to gather the evidence.
-	Rows        []interface{}         // Rows of formatted evidence represented by a Golang struct.
+	ServiceName      string                // ServiceName where this evidence was gathered. For example, "S3".
+	EntityType       string                // EntityType of rows of evidence.  For example, "bucket".
+	Caption          string                // Caption identifies the evidence.
+	Description      string                // Description provides additional information on origins of the evidence.
+	Sources          []*receptor_v1.Source // Sources of raw API request and response used to gather the evidence.
+	Rows             []interface{}         // Rows of formatted evidence represented by a Golang struct.
+	ServiceAccountId string                // AccountId of multi-account organization
 }

@@ -68,12 +68,17 @@ func scan(_ *cobra.Command, args []string) (err error) {
 			var ok bool
 			if ok, err = receptorImpl.Verify(credentials); err != nil {
 				log.Err(err).Msg("error verifying credentials")
+				if !ok {
+					_, err = rc.Verified(context.Background(), toVerifyResult(ok, err))
+				}
 				return
 			}
 
 			// Let Trustero know the credentials have been verified.
 			_, err = rc.Verified(context.Background(), toVerifyResult(ok, err))
-
+			if !ok {
+				return
+			}
 			// Report evidence discovered in the service provider account
 			if receptor_sdk.FindEvidence {
 				err = report(rc, credentials)
