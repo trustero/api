@@ -46,12 +46,13 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) 
 		}
 
 		reportEvidence := receptor_v1.Evidence{
-			Caption:      evidence.Caption,
-			Description:  evidence.Description,
-			ServiceName:  evidence.ServiceName,
-			EntityType:   evidence.EntityType,
-			Sources:      evidence.Sources,
-			EvidenceType: &receptor_v1.Evidence_Struct{Struct: &reportStruct},
+			Caption:          evidence.Caption,
+			Description:      evidence.Description,
+			ServiceName:      evidence.ServiceName,
+			EntityType:       evidence.EntityType,
+			Sources:          evidence.Sources,
+			ServiceAccountId: evidence.ServiceAccountId,
+			EvidenceType:     &receptor_v1.Evidence_Struct{Struct: &reportStruct},
 		}
 
 		// Convert rows

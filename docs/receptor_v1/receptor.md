@@ -85,6 +85,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | sources | [Source](#receptor_v1-Source) | repeated | Sources are raw service provider API requests and responses used to generate this evidence. The raw API requests and responses serve as proof the evidence correlates to real service configurations. |
 | doc | [Document](#receptor_v1-Document) |  | Document is an unstructured evidence. |
 | struct | [Struct](#receptor_v1-Struct) |  | Struct is a structured evidence. |
+| service_account_id | [string](#string) |  | Service_account_id is the member account of the organization. For example, an AWS account number in an organization that has more than one account. |
 
 
 
@@ -206,6 +207,7 @@ one Evidence.
 | receptor_type | [string](#string) |  | Receptor_type is a unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encode string that includes the organization name and a service provider name. For example &#34;trustero_gitlab&#34;. |
 | service_provider_account | [string](#string) |  | Service_provider_account is the service provider account where the services are configured in. |
 | entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Entities is a list of service instances configured in the service provider account. |
+| service_account_id | [string](#string) |  | Service_account_id is the member account of the organization. For example, an AWS account number in a an organization that has more than one account. |
 
 
 

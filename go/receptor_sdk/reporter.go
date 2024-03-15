@@ -80,6 +80,12 @@ func (ev *Evidence) AddRow(row interface{}) *Evidence {
 	return ev
 }
 
+// AddServiceAccountId adds a service account id to an evidence
+func (ev *Evidence) AddServiceAccountId(serviceAccountId string) *Evidence {
+	ev.ServiceAccountId = serviceAccountId
+	return ev
+}
+
 type ServiceEntities receptor_v1.ServiceEntities
 
 // NewServiceEntities instantiate a new service
@@ -92,6 +98,12 @@ func (s *ServiceEntities) AddService(typeName, typeId, instanceName, instanceId 
 	if len(typeName) > 0 {
 		s.Entities = append(s.Entities, newService(typeName, typeId, instanceName, instanceId))
 	}
+	return s
+}
+
+// AddServiceAccountId adds a ServiceAccountId to ServiceEntities
+func (s *ServiceEntities) AddServiceAccountId(serviceAccountId string) *ServiceEntities {
+	s.ServiceAccountId = serviceAccountId
 	return s
 }
 
