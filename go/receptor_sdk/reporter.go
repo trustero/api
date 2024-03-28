@@ -87,6 +87,7 @@ func (ev *Evidence) AddServiceAccountId(serviceAccountId string) *Evidence {
 }
 
 type ServiceEntities receptor_v1.ServiceEntities
+type ServiceEntity receptor_v1.ServiceEntity
 
 // NewServiceEntities instantiate a new service
 func NewServiceEntities() *ServiceEntities {
@@ -101,12 +102,6 @@ func (s *ServiceEntities) AddService(typeName, typeId, instanceName, instanceId 
 	return s
 }
 
-// AddServiceAccountId adds a ServiceAccountId to ServiceEntities
-func (s *ServiceEntities) AddServiceAccountId(serviceAccountId string) *ServiceEntities {
-	s.ServiceAccountId = serviceAccountId
-	return s
-}
-
 // NewService is a helper to instantiate a new Source struct
 func newService(serviceName, entityType, entityInstanceName, entityInstanceId string) *receptor_v1.ServiceEntity {
 	return &receptor_v1.ServiceEntity{
@@ -115,4 +110,9 @@ func newService(serviceName, entityType, entityInstanceName, entityInstanceId st
 		EntityInstanceName: entityInstanceName,
 		EntityInstanceId:   entityInstanceId,
 	}
+}
+
+func (s *ServiceEntity) AddServiceAccountId(serviceAccountId string) *ServiceEntity {
+	s.ServiceAccountId = serviceAccountId
+	return s
 }

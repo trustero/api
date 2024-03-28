@@ -207,7 +207,6 @@ one Evidence.
 | receptor_type | [string](#string) |  | Receptor_type is a unique receptor type. A stable string identifier that represent the type of receptor reporting this finding. The identifier is a simple URL encode string that includes the organization name and a service provider name. For example &#34;trustero_gitlab&#34;. |
 | service_provider_account | [string](#string) |  | Service_provider_account is the service provider account where the services are configured in. |
 | entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Entities is a list of service instances configured in the service provider account. |
-| service_account_id | [string](#string) |  | Service_account_id is the member account of the organization. For example, an AWS account number in a an organization that has more than one account. |
 
 
 
@@ -229,6 +228,7 @@ collected evidence that aren&#39;t relevant to specific audit contexts.
 | entity_type | [string](#string) |  | Entity_type is a service configurable object type such as a GitLab &#34;repository&#34; or AWS ECS &#34;cluster&#34;. The entity_instance_name and entity_instance_id must represent an instance of the subtype. For example, &#34;Java 1.5&#34; maybe a valid GitLab repository name or &#34;Elastic front end cluster&#34; maybe a valid AWS ECS cluster name. |
 | entity_instance_name | [string](#string) |  | Entity_instance_name of a discovered service entity instance. For example, an AWS ECS cluster name or a GitLab repository name. Entity_instance_name of an entity may change for a given entity instance but it&#39;s entity_instance_id is stable. |
 | entity_instance_id | [string](#string) |  | Entity_instance_id of a discovered entity instance. For example, an AWS ECS cluster UUID or GitLab repository ID. |
+| service_account_id | [string](#string) |  | Service_account_id is the member account of the organization. For example, an AWS account number in a an organization that has more than one account. |
 
 
 

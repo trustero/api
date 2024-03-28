@@ -59,6 +59,7 @@ message Finding {
 
   // One or more evidence collected by a typical receptor scan.
   repeated Evidence evidences = 4;
+
 }
 
 
@@ -195,11 +196,6 @@ message ServiceEntities {
 
   // Entities is a list of service instances configured in the service provider account.
   repeated ServiceEntity entities = 3;
-  
-  // Service_account_id is the member account of the organization. For example, an AWS account number in a an organization
-  // that has more than one account.
-  string service_account_id=4;
-  
 }
 
 
@@ -228,7 +224,9 @@ message ServiceEntity {
   // repository ID.
   string entity_instance_id = 4;
 
- 
+  // Service_account_id is the member account of the organization. For example, an AWS account number in a an organization
+  // that has more than one account.
+  string service_account_id=5;
 }
 
 
