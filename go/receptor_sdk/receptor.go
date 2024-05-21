@@ -24,6 +24,7 @@ var (
 	FindEvidence         bool   // If true as part of a scan command, scan for evidence in a service provider account.
 	CredentialsBase64URL string // Service provider credentials as a base64 URL encoded json string.
 	ReceptorId           string // Trustero's persistent record ID of a record holding a receptor's service provider credentials.
+	ConfigBase64URL      string // Receptor configuration as a base64 URL encoded json string.
 )
 
 // Receptor is the main interface for the Receptor implementor-facing  API.
@@ -52,6 +53,8 @@ type Receptor interface {
 	//  }
 	GetCredentialObj() (credentialObj interface{})
 
+	GetConfigObj() map[string]interface{}
+
 	//GetEvidenceInfo returns a list of Evidences that a receptor has implemented
 	//The metadata is extracted and then printed out
 	//<receptor_type> evidenceinfo
@@ -71,6 +74,8 @@ type Receptor interface {
 	// if any error is encountered in contacting the service provider.  This method is invoked from the following
 	// CLI: <receptor_type> scan --find-evidence
 	Report(credentials interface{}) (evidences []*Evidence, err error)
+
+	Configure(credentials interface{}) (config string, err error)
 }
 
 // Evidence is a discovered evidence from an in-use service.  All rows in the evidence are instances of the same

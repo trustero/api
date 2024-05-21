@@ -50,7 +50,7 @@ func (v *verifi) setup() {
 func verify(_ *cobra.Command, args []string) (err error) {
 	// Run receptor's Verify function and report results to Trustero
 	err = invokeWithContext(args[0],
-		func(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
+		func(rc receptor_v1.ReceptorClient, credentials interface{}, config interface{}) (err error) {
 
 			// Call receptor's Verify method
 			verifyResult := toVerifyResult(receptorImpl.Verify(credentials))
