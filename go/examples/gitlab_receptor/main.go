@@ -72,6 +72,17 @@ func (r *Receptor) GetEvidenceInfo() (evidences []*receptor_sdk.Evidence) {
 	return
 }
 
+func (r *Receptor) Configure(credentials interface{}) (config string, err error) {
+	c := credentials.(*Receptor)
+	return receptorPackage.ConfigureImpl(c.Token, c.GroupID)
+}
+
+// This will return Receptor struct defined above when the receptor is asked for
+// config
+func (r *Receptor) GetConfigObj() (config map[string]interface{}) {
+	return nil
+}
+
 func main() {
 	cmd.Execute(&Receptor{})
 }

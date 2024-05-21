@@ -349,6 +349,7 @@ and contains the service&#39;s configuration information. For example, an AWS S3
 | Discovered | [ServiceEntities](#receptor_v1-ServiceEntities) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Discovered reports known service entities. A receptor or a Trustero client application reports its known service entities on request. A service entity is a configurable asset of a service such as an S3 bucket. This call returns a string value discovery ID or an error. |
 | Report | [Finding](#receptor_v1-Finding) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report a finding to Trustero. A receptor or a Trustero client application reports its findings to Trustero on a periodic basis. This call returns a string value collection ID or an error. |
 | Notify | [JobResult](#receptor_v1-JobResult) | [.google.protobuf.Empty](#google-protobuf-Empty) | Notify Trustero a long running report finding or discover service entities receptor-request has completed. JobResult contains information about the receptor-request and it&#39;s corresponding result. |
+| SetConfiguration | [ReceptorOID](#receptor_v1-ReceptorOID) | [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration) | SetConfiguration reports the configuration for receptors that need extra configuration to access a service This call is typically made as a callback by a receptor after credential verification. |
 
  
 

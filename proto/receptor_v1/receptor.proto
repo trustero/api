@@ -40,6 +40,10 @@ service Receptor {
   // Notify Trustero a long running report finding or discover service entities receptor-request has completed.
   // JobResult contains information about the receptor-request and it's corresponding result.
   rpc Notify(JobResult) returns (google.protobuf.Empty);
+
+  // SetConfiguration reports the configuration for receptors that need extra configuration to access a service
+  // This call is typically made as a callback by a receptor after credential verification.
+  rpc SetConfiguration(ReceptorOID) returns (ReceptorConfiguration);
 }
 
 
