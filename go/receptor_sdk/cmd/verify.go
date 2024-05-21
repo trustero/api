@@ -66,6 +66,8 @@ func verify(_ *cobra.Command, args []string) (err error) {
 
 			// Let Trustero know if the service provider account credentials are valid.
 			_, err = rc.Verified(context.Background(), verifyResult)
+
+			//
 			return
 		})
 	return

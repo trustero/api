@@ -77,3 +77,7 @@ func ReportImpl(token string, groupId string) (evidences []*receptor_sdk.Evidenc
 	receptorLog.Info("Leaving ReportImpl")
 	return report.Evidences, err
 }
+
+func ConfigureImpl(token string, groupId string) (config string, err error) {
+	return "", nil
+}

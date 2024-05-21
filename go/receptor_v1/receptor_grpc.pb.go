@@ -29,6 +29,7 @@ const (
 	Receptor_Discovered_FullMethodName       = "/receptor_v1.Receptor/Discovered"
 	Receptor_Report_FullMethodName           = "/receptor_v1.Receptor/Report"
 	Receptor_Notify_FullMethodName           = "/receptor_v1.Receptor/Notify"
+	Receptor_SetConfiguration_FullMethodName = "/receptor_v1.Receptor/SetConfiguration"
 )
 
 // ReceptorClient is the client API for Receptor service.
@@ -53,6 +54,9 @@ type ReceptorClient interface {
 	// Notify Trustero a long running report finding or discover service entities receptor-request has completed.
 	// JobResult contains information about the receptor-request and it's corresponding result.
 	Notify(ctx context.Context, in *JobResult, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// SetConfiguration reports the configuration for receptors that need extra configuration to access a service
+	// This call is typically made as a callback by a receptor after credential verification.
+	SetConfiguration(ctx context.Context, in *ReceptorOID, opts ...grpc.CallOption) (*ReceptorConfiguration, error)
 }
 
 type receptorClient struct {
@@ -108,6 +112,15 @@ func (c *receptorClient) Notify(ctx context.Context, in *JobResult, opts ...grpc
 	return out, nil
 }
 
+func (c *receptorClient) SetConfiguration(ctx context.Context, in *ReceptorOID, opts ...grpc.CallOption) (*ReceptorConfiguration, error) {
+	out := new(ReceptorConfiguration)
+	err := c.cc.Invoke(ctx, Receptor_SetConfiguration_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReceptorServer is the server API for Receptor service.
 // All implementations should embed UnimplementedReceptorServer
 // for forward compatibility
@@ -130,6 +143,9 @@ type ReceptorServer interface {
 	// Notify Trustero a long running report finding or discover service entities receptor-request has completed.
 	// JobResult contains information about the receptor-request and it's corresponding result.
 	Notify(context.Context, *JobResult) (*emptypb.Empty, error)
+	// SetConfiguration reports the configuration for receptors that need extra configuration to access a service
+	// This call is typically made as a callback by a receptor after credential verification.
+	SetConfiguration(context.Context, *ReceptorOID) (*ReceptorConfiguration, error)
 }
 
 // UnimplementedReceptorServer should be embedded to have forward compatible implementations.
@@ -150,6 +166,9 @@ func (UnimplementedReceptorServer) Report(context.Context, *Finding) (*wrappersp
 }
 func (UnimplementedReceptorServer) Notify(context.Context, *JobResult) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Notify not implemented")
+}
+func (UnimplementedReceptorServer) SetConfiguration(context.Context, *ReceptorOID) (*ReceptorConfiguration, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetConfiguration not implemented")
 }
 
 // UnsafeReceptorServer may be embedded to opt out of forward compatibility for this service.
@@ -253,6 +272,24 @@ func _Receptor_Notify_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Receptor_SetConfiguration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReceptorOID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReceptorServer).SetConfiguration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Receptor_SetConfiguration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReceptorServer).SetConfiguration(ctx, req.(*ReceptorOID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Receptor_ServiceDesc is the grpc.ServiceDesc for Receptor service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -279,6 +316,10 @@ var Receptor_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Notify",
 			Handler:    _Receptor_Notify_Handler,
+		},
+		{
+			MethodName: "SetConfiguration",
+			Handler:    _Receptor_SetConfiguration_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
