@@ -63,6 +63,7 @@ func Execute(r receptor_sdk.Receptor) {
 	receptor_sdk.ModelID = GetParsedReceptorType()
 	rootCmd.getCommand().Use = receptor_sdk.ModelID
 	_ = addCredentialFlags(r.GetCredentialObj())
+
 	cobra.CheckErr(rootCmd.getCommand().Execute())
 }
 
@@ -87,7 +88,7 @@ func (r *root) setup() {
 	}
 	r.cmd.FParseErrWhitelist.UnknownFlags = true
 
-	addStrFlag(r.cmd, &cfgFile, "config", "", "", "Config file, defaults to $HOME/.receptor.yaml")
+	addStrFlag(r.cmd, &cfgFile, "config-file", "", "", "Config file, defaults to $HOME/.receptor.yaml")
 	addStrFlag(r.cmd, &receptor_sdk.LogLevel, "level", "l", "error", "trace, debug, info, warn, error, fatal, or panic")
 	addStrFlag(r.cmd, &receptor_sdk.LogFile, "log-file", "", "", "Log file path")
 }
@@ -101,6 +102,8 @@ func addGrpcFlags(cmd *cobra.Command) {
 	addBoolFlag(cmd, &receptor_sdk.NoSave, "nosave", "n", false, "Send results to console instead of Trustero")
 	addStrFlag(cmd, &receptor_sdk.Notify, "notify", "", "", "Notify Trustero with Tracer ID on command completion")
 	addStrFlag(cmd, &receptor_sdk.CredentialsBase64URL, "credentials", "", "", "Base64 URL encoded service provider credential")
+	addStrFlag(cmd, &receptor_sdk.ConfigBase64URL, "config", "", "", "Base64 URL encoded receptor configuration")
+
 }
 
 func addStrFlagP(cmd string, p *string, name, shorthand, value, usage string) {
@@ -186,13 +189,15 @@ func initConfig() {
 	}
 }
 
-type commandInContext func(rc receptor.ReceptorClient, credentials interface{}) error
+type commandInContext func(rc receptor.ReceptorClient, credentials interface{}, config interface{}) error
 
 func invokeWithContext(token string, run commandInContext) (err error) {
 	var (
 		rc            receptor.ReceptorClient
 		credentialStr string
 		credentialObj interface{}
+		configStr     string
+		configObj     interface{}
 	)
 
 	// Get Trustero GRPC client
@@ -202,7 +207,8 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 
 	// Get service provider account credentialStr from --credentials CLI flag
 	credentialStr, err = getCredentialStringFromCLI()
-
+	// Get receptor configuration from --config CLI flag
+	configStr, err = getConfigStringFromCLI()
 	// If credentialStr not provided on CLI, get it from Trustero server
 	if !receptor_sdk.NoSave {
 		// Get service provider account credentialStr and config from Trustero.
@@ -214,6 +220,10 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 			credentialStr = receptorInfo.GetCredential()
 		}
 		serviceProviderAccount = receptorInfo.ServiceProviderAccount
+
+		if len(configStr) == 0 {
+			configStr = receptorInfo.GetConfig()
+		}
 	}
 
 	// Unmarshal json string credential
@@ -225,9 +235,16 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 		credentialObj = receptorImpl.GetCredentialObj()
 	}
 
+	// Unmarshal json string config
+	if len(configStr) > 0 {
+		configObj, err = unmarshalConfig(configStr, receptorImpl.GetConfigObj())
+	} else {
+		configObj = receptorImpl.GetConfigObj()
+	}
+
 	// Invoke receptor's method
 	if err == nil {
-		err = run(rc, credentialObj)
+		err = run(rc, credentialObj, configObj)
 	}
 
 	// Log error
@@ -288,8 +305,27 @@ func getCredentialStringFromCLI() (credentials string, err error) {
 	return
 }
 
+func getConfigStringFromCLI() (config string, err error) {
+	// Extract receptor configuration from --config CLI flag
+	if len(receptor_sdk.ConfigBase64URL) > 0 {
+		// Get receptor configuration from the --config flag
+		var receptor_config []byte
+		if receptor_config, err = base64.URLEncoding.DecodeString(receptor_sdk.ConfigBase64URL); err != nil {
+			return
+		}
+		config = string(receptor_config)
+	}
+	return
+}
+
 func unmarshalCredentials(credentials string, credentialsObj interface{}) (obj interface{}, err error) {
 	err = json.Unmarshal([]byte(credentials), credentialsObj)
 	obj = credentialsObj
+	return
+}
+
+func unmarshalConfig(config string, configObj map[string]interface{}) (obj interface{}, err error) {
+	err = json.Unmarshal([]byte(config), &configObj)
+	obj = configObj
 	return
 }

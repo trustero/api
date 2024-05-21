@@ -52,7 +52,7 @@ func (s *scann) setup() {
 func scan(_ *cobra.Command, args []string) (err error) {
 	// Run receptor's Verify function and report results to Trustero
 	err = invokeWithContext(args[0],
-		func(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
+		func(rc receptor_v1.ReceptorClient, credentials interface{}, config interface{}) (err error) {
 			defer func() {
 				if len(receptor_sdk.Notify) == 0 {
 					return
