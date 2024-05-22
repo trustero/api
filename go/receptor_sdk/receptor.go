@@ -53,7 +53,7 @@ type Receptor interface {
 	//  }
 	GetCredentialObj() (credentialObj interface{})
 
-	GetConfigObj() map[string]interface{}
+	GetConfigObj() (configObj map[string]interface{})
 
 	//GetEvidenceInfo returns a list of Evidences that a receptor has implemented
 	//The metadata is extracted and then printed out
