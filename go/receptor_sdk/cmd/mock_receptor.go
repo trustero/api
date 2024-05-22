@@ -124,17 +124,10 @@ func toYaml(v interface{}) (yamld string, err error) {
 }
 
 // Verified implements a mock [receptor_v1.Receptor.GetConfiguration] method for testing.
-func (rc *mockReceptorClient) SetConfiguration(ctx context.Context, in *receptor.ReceptorOID, opts ...grpc.CallOption) (c *receptor.ReceptorConfiguration, err error) {
-	c = &receptor.ReceptorConfiguration{
-		ReceptorObjectId:       "",
-		Credential:             "",
-		Config:                 "",
-		ServiceProviderAccount: "",
-	}
-
+func (rc *mockReceptorClient) SetConfiguration(ctx context.Context, c *receptor.ReceptorConfiguration, opts ...grpc.CallOption) (e *emptypb.Empty, err error) {
 	println(header + "SetConfiguration(...)")
 	var yamld string
-	if yamld, err = toYaml(in); err == nil {
+	if yamld, err = toYaml(c.ReceptorObjectId); err == nil {
 		println(string(yamld))
 	}
 	println(footer)

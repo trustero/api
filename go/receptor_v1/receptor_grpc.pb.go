@@ -54,9 +54,9 @@ type ReceptorClient interface {
 	// Notify Trustero a long running report finding or discover service entities receptor-request has completed.
 	// JobResult contains information about the receptor-request and it's corresponding result.
 	Notify(ctx context.Context, in *JobResult, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// SetConfiguration reports the configuration for receptors that need extra configuration to access a service
+	// SetConfiguration reports the configuration for receptors that need extra configuration to access a service.
 	// This call is typically made as a callback by a receptor after credential verification.
-	SetConfiguration(ctx context.Context, in *ReceptorOID, opts ...grpc.CallOption) (*ReceptorConfiguration, error)
+	SetConfiguration(ctx context.Context, in *ReceptorConfiguration, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type receptorClient struct {
@@ -112,8 +112,8 @@ func (c *receptorClient) Notify(ctx context.Context, in *JobResult, opts ...grpc
 	return out, nil
 }
 
-func (c *receptorClient) SetConfiguration(ctx context.Context, in *ReceptorOID, opts ...grpc.CallOption) (*ReceptorConfiguration, error) {
-	out := new(ReceptorConfiguration)
+func (c *receptorClient) SetConfiguration(ctx context.Context, in *ReceptorConfiguration, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Receptor_SetConfiguration_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -143,9 +143,9 @@ type ReceptorServer interface {
 	// Notify Trustero a long running report finding or discover service entities receptor-request has completed.
 	// JobResult contains information about the receptor-request and it's corresponding result.
 	Notify(context.Context, *JobResult) (*emptypb.Empty, error)
-	// SetConfiguration reports the configuration for receptors that need extra configuration to access a service
+	// SetConfiguration reports the configuration for receptors that need extra configuration to access a service.
 	// This call is typically made as a callback by a receptor after credential verification.
-	SetConfiguration(context.Context, *ReceptorOID) (*ReceptorConfiguration, error)
+	SetConfiguration(context.Context, *ReceptorConfiguration) (*emptypb.Empty, error)
 }
 
 // UnimplementedReceptorServer should be embedded to have forward compatible implementations.
@@ -167,7 +167,7 @@ func (UnimplementedReceptorServer) Report(context.Context, *Finding) (*wrappersp
 func (UnimplementedReceptorServer) Notify(context.Context, *JobResult) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Notify not implemented")
 }
-func (UnimplementedReceptorServer) SetConfiguration(context.Context, *ReceptorOID) (*ReceptorConfiguration, error) {
+func (UnimplementedReceptorServer) SetConfiguration(context.Context, *ReceptorConfiguration) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetConfiguration not implemented")
 }
 
@@ -273,7 +273,7 @@ func _Receptor_Notify_Handler(srv interface{}, ctx context.Context, dec func(int
 }
 
 func _Receptor_SetConfiguration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReceptorOID)
+	in := new(ReceptorConfiguration)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -285,7 +285,7 @@ func _Receptor_SetConfiguration_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: Receptor_SetConfiguration_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReceptorServer).SetConfiguration(ctx, req.(*ReceptorOID))
+		return srv.(ReceptorServer).SetConfiguration(ctx, req.(*ReceptorConfiguration))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -41,9 +41,9 @@ service Receptor {
   // JobResult contains information about the receptor-request and it's corresponding result.
   rpc Notify(JobResult) returns (google.protobuf.Empty);
 
-  // SetConfiguration reports the configuration for receptors that need extra configuration to access a service
+  // SetConfiguration reports the configuration for receptors that need extra configuration to access a service.
   // This call is typically made as a callback by a receptor after credential verification.
-  rpc SetConfiguration(ReceptorOID) returns (ReceptorConfiguration);
+  rpc SetConfiguration(ReceptorConfiguration) returns (google.protobuf.Empty);
 }
 
 
@@ -275,6 +275,9 @@ message ReceptorConfiguration {
 
   // Service_provider_account is the service provider account name.
   string service_provider_account = 4;
+
+  // Model_id is the receptor model id
+  string model_id = 5;
 }
 
 
