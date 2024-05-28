@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/spf13/cobra"
 	"github.com/trustero/api/go/receptor_sdk"
@@ -67,7 +68,19 @@ func verify(_ *cobra.Command, args []string) (err error) {
 			// Let Trustero know if the service provider account credentials are valid.
 			_, err = rc.Verified(context.Background(), verifyResult)
 
-			//
+			// Send the config back to Trustero if there is additional config
+			if config != nil {
+				jsonBytes, err := json.Marshal(receptorImpl.GetConfigObj())
+				if err != nil {
+					return err
+				}
+
+				_, err = rc.SetConfiguration(context.Background(), &receptor_v1.ReceptorConfiguration{
+					ReceptorObjectId: receptor_sdk.ReceptorId,
+					Config:           string(jsonBytes),
+					ModelId:          receptorImpl.GetReceptorType(),
+				})
+			}
 			return
 		})
 	return

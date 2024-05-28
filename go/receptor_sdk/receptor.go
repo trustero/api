@@ -75,7 +75,7 @@ type Receptor interface {
 	// CLI: <receptor_type> scan --find-evidence
 	Report(credentials interface{}) (evidences []*Evidence, err error)
 
-	Configure(credentials interface{}) (config string, err error)
+	Configure(credentials interface{}) (config *receptor_v1.ReceptorConfiguration, err error)
 }
 
 // Evidence is a discovered evidence from an in-use service.  All rows in the evidence are instances of the same
