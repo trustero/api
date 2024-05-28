@@ -72,7 +72,7 @@ func (r *Receptor) GetEvidenceInfo() (evidences []*receptor_sdk.Evidence) {
 	return
 }
 
-func (r *Receptor) Configure(credentials interface{}) (config string, err error) {
+func (r *Receptor) Configure(credentials interface{}) (config *receptor_v1.ReceptorConfiguration, err error) {
 	c := credentials.(*Receptor)
 	return receptorPackage.ConfigureImpl(c.Token, c.GroupID)
 }

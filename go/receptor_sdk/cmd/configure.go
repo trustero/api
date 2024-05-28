@@ -4,26 +4,20 @@
 package cmd
 
 import (
-	// "context"
+	"context"
 
 	"github.com/trustero/api/go/receptor_v1"
 )
 
 func configure(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
 
-	// configure receptor
-	// var discovered []*receptor_v1.ServiceEntity
-	// if discovered, err = receptorImpl.Discover(credentials); err != nil {
-	// 	return
-	// }
+	// Receptor configuration setup
+	var config *receptor_v1.ReceptorConfiguration
+	if config, err = receptorImpl.Configure(credentials); err != nil || config == nil {
+		return
+	}
 
-	// // Report discovered services to Trustero
-	// var services receptor_v1.ServiceEntities
-	// services.ReceptorType = GetParsedReceptorType()
-	// services.ServiceProviderAccount = serviceProviderAccount
-	// services.Entities = discovered
-
-	// // Report discovered services to Trustero
-	// _, err = rc.Discovered(context.Background(), &services)
+	// Send receptor configuration to Trustero
+	_, err = rc.SetConfiguration(context.Background(), config)
 	return
 }
