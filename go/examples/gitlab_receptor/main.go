@@ -77,7 +77,7 @@ func (r *Receptor) Configure(credentials interface{}) (config *receptor_v1.Recep
 	return receptorPackage.ConfigureImpl(c.Token, c.GroupID)
 }
 
-// This will return Receptor struct defined above when the receptor is asked for
+// This will return Config json when the receptor is asked for
 // config
 func (r *Receptor) GetConfigObj() (config map[string]interface{}) {
 	return nil
