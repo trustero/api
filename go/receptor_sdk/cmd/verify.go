@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/trustero/api/go/receptor_v1"
@@ -52,7 +53,6 @@ func verify(_ *cobra.Command, args []string) (err error) {
 	// Run receptor's Verify function and report results to Trustero
 	err = invokeWithContext(args[0],
 		func(rc receptor_v1.ReceptorClient, credentials interface{}, config interface{}) (err error) {
-
 			// Call receptor's Verify method
 			verifyResult := toVerifyResult(receptorImpl.Verify(credentials))
 
@@ -62,19 +62,18 @@ func verify(_ *cobra.Command, args []string) (err error) {
 			// in the receptor record.
 			if len(receptor_sdk.Notify) > 0 {
 				_ = notify(rc, "verify", verifyResult.Message, err)
-				return
+			} else {
+				// Let Trustero know if the service provider account credentials are valid.
+				_, err = rc.Verified(context.Background(), verifyResult)
 			}
-
-			// Let Trustero know if the service provider account credentials are valid.
-			_, err = rc.Verified(context.Background(), verifyResult)
 
 			// Send the config back to Trustero if there is additional config
 			if config != nil {
 				jsonBytes, err := json.Marshal(receptorImpl.GetConfigObj())
+				log.Debug().Msgf("Config: %s", string(jsonBytes))
 				if err != nil {
 					return err
 				}
-
 				_, err = rc.SetConfiguration(context.Background(), &receptor_v1.ReceptorConfiguration{
 					ReceptorObjectId: receptor_sdk.ReceptorId,
 					Config:           string(jsonBytes),
