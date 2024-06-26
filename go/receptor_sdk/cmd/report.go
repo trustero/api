@@ -17,19 +17,19 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func report(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
+func report(rc receptor_v1.ReceptorClient, credentials interface{}, config interface{}) (err error) {
 
 	// Report discovered evidence to Trustero
 	var finding receptor_v1.Finding
 
 	// Discover service entities
-	if finding.Entities, err = receptorImpl.Discover(credentials); err != nil {
+	if finding.Entities, err = receptorImpl.Discover(credentials, config); err != nil {
 		return
 	}
 
 	// Discover evidence
 	var evidences []*receptor_sdk.Evidence
-	if evidences, err = receptorImpl.Report(credentials); err != nil {
+	if evidences, err = receptorImpl.Report(credentials, config); err != nil {
 		return
 	}
 
