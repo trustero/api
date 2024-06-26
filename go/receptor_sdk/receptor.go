@@ -63,17 +63,17 @@ type Receptor interface {
 	// Verify read-only access to a service provider account.  Return ok if the credentials are valid and err
 	// if any error is encountered in contacting the service provider.  This method is invoked from the following
 	// ClI:  <receptor_type> verify
-	Verify(credentials interface{}) (ok bool, err error)
+	Verify(credentials interface{}, config interface{}) (ok bool, err error)
 
 	// Discover in-use service entities in a service provider.  Return an array of [receptor_v1.ServiceEntity]
 	// discovered and err if any error is encountered.  This method is invoked from the following CLI:
 	// <receptor_type> scan
-	Discover(credentials interface{}) (services []*receptor_v1.ServiceEntity, err error)
+	Discover(credentials interface{}, config interface{}) (services []*receptor_v1.ServiceEntity, err error)
 
 	// Report in-use service entity's configurations as evidence.  Return an array of [Evidence] found and an error
 	// if any error is encountered in contacting the service provider.  This method is invoked from the following
 	// CLI: <receptor_type> scan --find-evidence
-	Report(credentials interface{}) (evidences []*Evidence, err error)
+	Report(credentials interface{}, config interface{}) (evidences []*Evidence, err error)
 
 	Configure(credentials interface{}) (config *receptor_v1.ReceptorConfiguration, err error)
 }

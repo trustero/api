@@ -9,11 +9,11 @@ import (
 	"github.com/trustero/api/go/receptor_v1"
 )
 
-func discover(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
+func discover(rc receptor_v1.ReceptorClient, credentials interface{}, config interface{}) (err error) {
 
 	// Discover service entities
 	var discovered []*receptor_v1.ServiceEntity
-	if discovered, err = receptorImpl.Discover(credentials); err != nil {
+	if discovered, err = receptorImpl.Discover(credentials, config); err != nil {
 		return
 	}
 

@@ -53,7 +53,7 @@ func verify(_ *cobra.Command, args []string) (err error) {
 	err = invokeWithContext(args[0],
 		func(rc receptor_v1.ReceptorClient, credentials interface{}, config interface{}) (err error) {
 			// Call receptor's Verify method
-			verifyResult := toVerifyResult(receptorImpl.Verify(credentials))
+			verifyResult := toVerifyResult(receptorImpl.Verify(credentials, config))
 
 			// Notify behavior is different for the verify command.  When the '--notify' command line
 			// flag is provided on a verify command, verify only notify Trustero of the command

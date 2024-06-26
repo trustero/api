@@ -66,7 +66,7 @@ func scan(_ *cobra.Command, args []string) (err error) {
 
 			// Verify credentials.
 			var ok bool
-			if ok, err = receptorImpl.Verify(credentials); err != nil {
+			if ok, err = receptorImpl.Verify(credentials, config); err != nil {
 				log.Err(err).Msg("error verifying credentials")
 				if !ok {
 					_, err = rc.Verified(context.Background(), toVerifyResult(ok, err))
@@ -81,10 +81,10 @@ func scan(_ *cobra.Command, args []string) (err error) {
 			}
 			// Report evidence discovered in the service provider account
 			if receptor_sdk.FindEvidence {
-				err = report(rc, credentials)
+				err = report(rc, credentials, config)
 			} else {
 				// Discover services in-use in the service provider account only run if --find-evidence is not run since discover runs in report
-				if err = discover(rc, credentials); err != nil {
+				if err = discover(rc, credentials, config); err != nil {
 					return
 				}
 			}

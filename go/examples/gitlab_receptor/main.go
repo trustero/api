@@ -45,7 +45,7 @@ func (r *Receptor) GetCredentialObj() (credentialObj interface{}) {
 // credentials and confirm that the credentials are valid. Usually a simple
 // API call like GET org name. If the credentials are not valid,
 // return a relevant error message
-func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
+func (r *Receptor) Verify(credentials interface{}, config interface{}) (ok bool, err error) {
 	c := credentials.(*Receptor)
 	return receptorPackage.VerifyImpl(c.Token, c.GroupID)
 }
@@ -54,14 +54,14 @@ func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
 // makes any relevant API calls to the Service Provider to gather information
 // about how many Service Entity Instances are in use. If at any point this
 // function runs into an error, log that error and continue
-func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.ServiceEntity, err error) {
+func (r *Receptor) Discover(credentials interface{}, config interface{}) (svcs []*receptor_v1.ServiceEntity, err error) {
 	c := credentials.(*Receptor)
 	return receptorPackage.DiscoverImpl(c.Token, c.GroupID)
 }
 
 // Report will often make the same API calls made in the Discover call, but it
 // will additionally create evidences with the data returned from the API calls
-func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {
+func (r *Receptor) Report(credentials interface{}, config interface{}) (evidences []*receptor_sdk.Evidence, err error) {
 	c := credentials.(*Receptor)
 	return receptorPackage.ReportImpl(c.Token, c.GroupID)
 }
