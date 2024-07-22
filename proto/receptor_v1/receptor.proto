@@ -250,6 +250,9 @@ message Credential {
 
   // Message contains the reason for why the service provider credential in this message is invalid.
   string message = 4;
+
+  // Exceptions contains information about the permissions that are missing for the credentials provided.
+  string exceptions = 5;
 }
 
 
