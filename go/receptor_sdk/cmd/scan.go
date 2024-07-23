@@ -58,9 +58,9 @@ func scan(_ *cobra.Command, args []string) (err error) {
 					return
 				}
 				if receptor_sdk.FindEvidence {
-					notify(rc, "scan", "successful", err)
+					notify(rc, "scan", "successful", "", err)
 				} else {
-					notify(rc, "discover", "successful", err)
+					notify(rc, "discover", "successful", "", err)
 				}
 			}()
 
