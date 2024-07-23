@@ -275,7 +275,7 @@ func getReceptorConfig(rc receptor.ReceptorClient) (config *receptor.ReceptorCon
 	return
 }
 
-func notify(rc receptor.ReceptorClient, command, result string, execeptions string, e error) (err error) {
+func notify(rc receptor.ReceptorClient, command, result string, exceptions string, e error) (err error) {
 	if e != nil {
 		result = "error"
 	}
@@ -285,7 +285,7 @@ func notify(rc receptor.ReceptorClient, command, result string, execeptions stri
 		ReceptorObjectId: receptor_sdk.ReceptorId,
 		Command:          command,
 		Result:           result,
-		Exceptions:       execeptions,
+		Exceptions:       exceptions,
 	}
 
 	_, err = rc.Notify(context.Background(), &res)
