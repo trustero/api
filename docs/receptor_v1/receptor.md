@@ -47,6 +47,7 @@ Credential is returned by a Verified request noting if a given service provider 
 | credential | [string](#string) |  | Credential is the service provider credential being verified. |
 | is_credential_valid | [bool](#bool) |  | Is_credential_valid report whether the service provider credential provided to the receptor verify request is valid. |
 | message | [string](#string) |  | Message contains the reason for why the service provider credential in this message is invalid. |
+| exceptions | [string](#string) |  | Exceptions contains information about the permissions that are missing for the credentials provided. |
 
 
 
@@ -122,6 +123,7 @@ JobResult reports the result of a receptor request.
 | command | [string](#string) |  | Command is the receptor request that completed. One of &#34;verify&#34;, &#34;scan&#34;, or &#34;discover&#34; |
 | result | [string](#string) |  | Result is receptor request result. One of &#34;success&#34;, &#34;fail&#34;, or &#34;error&#34;. |
 | receptor_object_id | [string](#string) |  | Receptor_object_id is Trustero&#39;s receptor record identifier. |
+| exceptions | [string](#string) |  | Exceptions contain information about the error like permission missing for the credentials provided. |
 
 
 

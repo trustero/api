@@ -298,4 +298,8 @@ message JobResult {
 
   // Receptor_object_id is Trustero's receptor record identifier.
   string receptor_object_id = 4;
+
+  // Exceptions contain information about the error like permission missing for the credentials provided.
+  string exceptions = 5;
+
 }

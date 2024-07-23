@@ -60,7 +60,7 @@ func verify(_ *cobra.Command, args []string) (err error) {
 			// status and does NOT invoke the Verified Trustero RPC method to save the credential
 			// in the receptor record.
 			if len(receptor_sdk.Notify) > 0 {
-				_ = notify(rc, "verify", verifyResult.Message, err)
+				_ = notify(rc, "verify", verifyResult.Message, verifyResult.Exceptions, err)
 			} else {
 				// Let Trustero know if the service provider account credentials are valid.
 				_, err = rc.Verified(context.Background(), verifyResult)
@@ -85,13 +85,15 @@ func verify(_ *cobra.Command, args []string) (err error) {
 
 func toVerifyResult(ok bool, err error) *receptor_v1.Credential {
 	var message string
+	var exceptions string
 	if err != nil {
 		message = "error"
+		exceptions = err.Error()
 	} else if ok {
 		message = "successful"
 	} else {
 		message = "failed"
 	}
 
-	return &receptor_v1.Credential{ReceptorObjectId: receptor_sdk.ReceptorId, Message: message, IsCredentialValid: ok}
+	return &receptor_v1.Credential{ReceptorObjectId: receptor_sdk.ReceptorId, Message: message, IsCredentialValid: ok, Exceptions: exceptions}
 }
