@@ -79,7 +79,7 @@ func (r *Receptor) Configure(credentials interface{}) (config *receptor_v1.Recep
 
 // This will return Config json when the receptor is asked for
 // config
-func (r *Receptor) GetConfigObj() (config map[string]interface{}) {
+func (r *Receptor) GetConfigObj() (config interface{}) {
 	return nil
 }
 

@@ -326,8 +326,8 @@ func unmarshalCredentials(credentials string, credentialsObj interface{}) (obj i
 	return
 }
 
-func unmarshalConfig(config string, configObj map[string]interface{}) (obj interface{}, err error) {
-	err = json.Unmarshal([]byte(config), &configObj)
+func unmarshalConfig(config string, configObj interface{}) (obj interface{}, err error) {
+	err = json.Unmarshal([]byte(config), configObj)
 	obj = configObj
 	return
 }
