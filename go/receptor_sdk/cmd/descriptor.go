@@ -52,28 +52,37 @@ type credential struct {
 	Field       string `json:"field"`
 }
 
-type credentials struct {
+type descriptors struct {
 	Credentials  []*credential `json:"credentials"`
+	Config       interface{}   `json:"config"`
 	ReceptorType string        `json:"receptorType"`
 }
 
 func toDescriptor(credentialObj interface{}) (descriptor string, err error) {
 	vt := reflect.Indirect(reflect.ValueOf(credentialObj)).Type()
 
-	creds := &credentials{}
+	creds := &descriptors{}
 	for i := 0; i < vt.NumField(); i++ {
 		tags := expandFieldTag(vt.Field(i))
 		fname := vt.Field(i).Name
 		display := getTagField(tags, displayField, fname)
-		creds.Credentials = append(creds.Credentials, &credential{
-			Display:     display,
-			Field:       fname,
-			Placeholder: getTagField(tags, placeholderField, strings.ToLower(fname)),
-		})
+		if strings.ToLower(fname) == "oauth" {
+			fname = "oauth"
+			display = ""
+		}
+
+		placeholder := getTagField(tags, placeholderField, strings.ToLower(fname))
+		if display != "" || fname == "oauth" {
+			creds.Credentials = append(creds.Credentials, &credential{
+				Display:     display,
+				Field:       fname,
+				Placeholder: placeholder,
+			})
+		}
 	}
 
 	creds.ReceptorType = GetParsedReceptorType()
-
+	creds.Config = GetReceptorConfig()
 	var bytes []byte
 	if bytes, err = json.MarshalIndent(creds, "", "  "); err == nil {
 		descriptor = string(bytes)
@@ -102,4 +111,8 @@ func GetParsedReceptorType() (parsedName string) {
 	regex, _ := regexp.Compile(`[^-a-z0-9A-Z_]`)
 	res := regex.ReplaceAll([]byte(receptorName), []byte("_"))
 	return string(res)
+}
+
+func GetReceptorConfig() interface{} {
+	return receptorImpl.GetConfigObj()
 }

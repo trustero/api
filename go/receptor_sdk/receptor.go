@@ -53,7 +53,7 @@ type Receptor interface {
 	//  }
 	GetCredentialObj() (credentialObj interface{})
 
-	GetConfigObj() (configObj map[string]interface{})
+	GetConfigObj() (configObj interface{})
 
 	//GetEvidenceInfo returns a list of Evidences that a receptor has implemented
 	//The metadata is extracted and then printed out
@@ -103,4 +103,23 @@ type Evidence struct {
 	Sources          []*receptor_v1.Source // Sources of raw API request and response used to gather the evidence.
 	Rows             []interface{}         // Rows of formatted evidence represented by a Golang struct.
 	ServiceAccountId string                // AccountId of multi-account organization
+}
+
+// Config with Field struct defines the json shape of the custom configurations for receptors that the app can use
+// for special condition receptors that might collect and post to an arbitrary number of controls
+// that an user can map
+type Config struct {
+	Title       string  `json:"title"`       // Title of the modal for the config
+	Description string  `json:"description"` // Description of the config
+	Fields      []Field `json:"fields"`      // Fields in the config
+}
+
+type Field struct {
+	Display         string                 `json:"display"`          // Label for the field
+	Placeholder     string                 `json:"placeholder"`      // Placeholder for the field
+	InputType       string                 `json:"input_type"`       // Input Html Element type. For example, "Text", "Select"
+	Field           string                 `json:"field"`            // name of the field
+	Options         map[string]interface{} `json:"options"`          // name-value pairs when InputType is a select from list
+	EvidenceCaption string                 `json:"evidence_caption"` // caption of the evidence
+	ServiceModelID  string                 `json:"service_model_id"` // trustero model id for the service
 }
