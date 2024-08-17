@@ -236,7 +236,7 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 	}
 
 	// Unmarshal json string config
-	if len(configStr) > 0 {
+	if len(configStr) > 0 && configStr != "{}" {
 		configObj, err = unmarshalConfig(configStr, receptorImpl.GetConfigObj())
 	} else {
 		configObj = receptorImpl.GetConfigObj()
@@ -327,7 +327,7 @@ func unmarshalCredentials(credentials string, credentialsObj interface{}) (obj i
 }
 
 func unmarshalConfig(config string, configObj interface{}) (obj interface{}, err error) {
-	err = json.Unmarshal([]byte(config), configObj)
+	err = json.Unmarshal([]byte(config), &configObj)
 	obj = configObj
 	return
 }
