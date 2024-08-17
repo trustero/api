@@ -55,6 +55,8 @@ type Receptor interface {
 
 	GetConfigObj() (configObj interface{})
 
+	GetConfigObjDesc() (configObjDesc interface{})
+
 	//GetEvidenceInfo returns a list of Evidences that a receptor has implemented
 	//The metadata is extracted and then printed out
 	//<receptor_type> evidenceinfo

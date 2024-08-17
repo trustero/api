@@ -82,7 +82,7 @@ func toDescriptor(credentialObj interface{}) (descriptor string, err error) {
 	}
 
 	creds.ReceptorType = GetParsedReceptorType()
-	creds.Config = GetReceptorConfig()
+	creds.Config = GetReceptorConfigDesc()
 	var bytes []byte
 	if bytes, err = json.MarshalIndent(creds, "", "  "); err == nil {
 		descriptor = string(bytes)
@@ -113,6 +113,6 @@ func GetParsedReceptorType() (parsedName string) {
 	return string(res)
 }
 
-func GetReceptorConfig() interface{} {
-	return receptorImpl.GetConfigObj()
+func GetReceptorConfigDesc() interface{} {
+	return receptorImpl.GetConfigObjDesc()
 }
