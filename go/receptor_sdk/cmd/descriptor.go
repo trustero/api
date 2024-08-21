@@ -67,7 +67,7 @@ func toDescriptor(credentialObj interface{}) (descriptor string, err error) {
 	creds := &descriptors{}
 	for i := 0; i < vt.NumField(); i++ {
 		tags := expandFieldTag(vt.Field(i))
-		fname := vt.Field(i).Name // strings.ToLower(vt.Field(i).Name)
+		fname := vt.Field(i).Name
 		display := getTagField(tags, displayField, "")
 		if strings.ToLower(fname) == "oauth" {
 			fname = "oauth"
