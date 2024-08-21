@@ -50,12 +50,15 @@ type credential struct {
 	Display     string `json:"display"`
 	Placeholder string `json:"placeholder"`
 	Field       string `json:"field"`
+	Method      string `json:"method,omitempty"`
+	InputType   string `json:"input_type,omitempty"`
 }
 
 type descriptors struct {
 	Credentials  []*credential `json:"credentials"`
-	Config       interface{}   `json:"config"`
+	Config       interface{}   `json:"config,omitempty"`
 	ReceptorType string        `json:"receptorType"`
+	Methods      interface{}   `json:"methods,omitempty"`
 }
 
 func toDescriptor(credentialObj interface{}) (descriptor string, err error) {
@@ -64,25 +67,30 @@ func toDescriptor(credentialObj interface{}) (descriptor string, err error) {
 	creds := &descriptors{}
 	for i := 0; i < vt.NumField(); i++ {
 		tags := expandFieldTag(vt.Field(i))
-		fname := vt.Field(i).Name
-		display := getTagField(tags, displayField, fname)
+		fname := vt.Field(i).Name // strings.ToLower(vt.Field(i).Name)
+		display := getTagField(tags, displayField, "")
 		if strings.ToLower(fname) == "oauth" {
 			fname = "oauth"
 			display = ""
 		}
 
 		placeholder := getTagField(tags, placeholderField, strings.ToLower(fname))
-		if display != "" || fname == "oauth" {
+		authmethod := getTagField(tags, methodField, "")
+		inputType := getTagField(tags, inputTypeField, "")
+		if display != "" || strings.ToLower(fname) == "oauth" {
 			creds.Credentials = append(creds.Credentials, &credential{
 				Display:     display,
 				Field:       fname,
 				Placeholder: placeholder,
+				Method:      authmethod,
+				InputType:   inputType,
 			})
 		}
 	}
 
 	creds.ReceptorType = GetParsedReceptorType()
-	creds.Config = GetReceptorConfigDesc()
+	creds.Config = receptorImpl.GetConfigObjDesc()
+	creds.Methods = receptorImpl.GetAuthMethods()
 	var bytes []byte
 	if bytes, err = json.MarshalIndent(creds, "", "  "); err == nil {
 		descriptor = string(bytes)
@@ -111,8 +119,4 @@ func GetParsedReceptorType() (parsedName string) {
 	regex, _ := regexp.Compile(`[^-a-z0-9A-Z_]`)
 	res := regex.ReplaceAll([]byte(receptorName), []byte("_"))
 	return string(res)
-}
-
-func GetReceptorConfigDesc() interface{} {
-	return receptorImpl.GetConfigObjDesc()
 }
