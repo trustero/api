@@ -44,6 +44,8 @@ type Receptor interface {
 	// Field tag name is 'trustero' with sub-tags separated by ';' and valid sub-tags are 'display', and 'placeholder'
 	//  - display provides the human-readable name of the field
 	//  - placeholder provides a default field value suggestion for the field
+	//  - method to which this field belongs when receptors support multiple auth methods
+	//  - input_type is the html element input type. ex. text, password
 	//
 	// For example:
 	//
@@ -53,9 +55,16 @@ type Receptor interface {
 	//  }
 	GetCredentialObj() (credentialObj interface{})
 
+	// GetConfigObj returns an instance of a Config object
 	GetConfigObj() (configObj interface{})
 
+	// GetConfigObjDesc returns an instance of struct that represents a json for the config object to be rendered
+	// in the receptor config modal
 	GetConfigObjDesc() (configObjDesc interface{})
+
+	// GetAuthMethods returns an instance of struct representing the authentication methods supported by the
+	// receptor
+	GetAuthMethods() (authMethods interface{})
 
 	//GetEvidenceInfo returns a list of Evidences that a receptor has implemented
 	//The metadata is extracted and then printed out
@@ -117,11 +126,19 @@ type Config struct {
 }
 
 type Field struct {
-	Display         string                 `json:"display"`          // Label for the field
-	Placeholder     string                 `json:"placeholder"`      // Placeholder for the field
-	InputType       string                 `json:"input_type"`       // Input Html Element type. For example, "Text", "Select"
-	Field           string                 `json:"field"`            // name of the field
-	Options         map[string]interface{} `json:"options"`          // name-value pairs when InputType is a select from list
-	EvidenceCaption string                 `json:"evidence_caption"` // caption of the evidence
-	ServiceModelID  string                 `json:"service_model_id"` // trustero model id for the service
+	Display         string      `json:"display"`           // Label for the field
+	Placeholder     string      `json:"placeholder"`       // Placeholder for the field
+	InputType       string      `json:"input_type"`        // Input Html Element type. For example, "Text", "Select"
+	Field           string      `json:"field"`             // name of the field
+	Options         interface{} `json:"options,omitempty"` // name-value pairs when InputType is a select from list
+	EvidenceCaption string      `json:"evidence_caption"`  // caption of the evidence
+	ServiceModelID  string      `json:"service_model_id"`  // trustero model id for the service
+}
+
+// AuthodMethod struct to list the authentication methods supported
+// by the receptor
+
+type AuthMethod struct {
+	Display string `json:"display"` // Label for the authentication method
+	Value   string `json:"value"`   // Id/Name for the authentication method
 }
