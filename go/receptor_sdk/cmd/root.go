@@ -44,6 +44,7 @@ var cmds = map[string]command{
 	"services":   &svcs{},
 	"descriptor": &desc{},
 	"evidences":  &evi{},
+	"logo":       &getlogo{},
 }
 
 // Execute is the entry point into the CLI framework.  Receptor author implements the [receptor_sdk.Receptor]

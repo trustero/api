@@ -81,3 +81,11 @@ func ReportImpl(token string, groupId string) (evidences []*receptor_sdk.Evidenc
 func ConfigureImpl(token string, groupId string) (config *receptor_v1.ReceptorConfiguration, err error) {
 	return nil, nil
 }
+
+func GetAuthMethodImpl() interface{} {
+	return nil
+}
+
+func GetConfigObjDescImpl() interface{} {
+	return nil
+}

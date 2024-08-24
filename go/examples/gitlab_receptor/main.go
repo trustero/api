@@ -83,6 +83,14 @@ func (r *Receptor) GetConfigObj() (config interface{}) {
 	return nil
 }
 
+func (r *Receptor) GetAuthMethods() interface{} {
+	return receptorPackage.GetAuthMethodImpl()
+}
+
+func (r *Receptor) GetConfigObjDesc() interface{} {
+	return receptorPackage.GetConfigObjDescImpl()
+}
+
 func main() {
 	cmd.Execute(&Receptor{})
 }
