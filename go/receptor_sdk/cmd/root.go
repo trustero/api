@@ -39,12 +39,13 @@ with the --find-evidence flag.`
 
 // Setup sub commands
 var cmds = map[string]command{
-	"verify":     &verifi{},
-	"scan":       &scann{},
-	"services":   &svcs{},
-	"descriptor": &desc{},
-	"evidences":  &evi{},
-	"logo":       &getlogo{},
+	"verify":       &verifi{},
+	"scan":         &scann{},
+	"services":     &svcs{},
+	"descriptor":   &desc{},
+	"evidences":    &evi{},
+	"logo":         &logor{},
+	"instructions": &instruct{},
 }
 
 // Execute is the entry point into the CLI framework.  Receptor author implements the [receptor_sdk.Receptor]

@@ -8,33 +8,33 @@ import (
 )
 
 const (
-	logoUse   = "logo"
-	logoShort = "Dump logo Trustero internal use"
+	instructionsUse   = "instructions"
+	instructionsShort = "Dump instructions Trustero internal use"
 )
 
-type logor struct {
+type instruct struct {
 	cmd *cobra.Command
 }
 
-func (l *logor) getCommand() *cobra.Command {
+func (l *instruct) getCommand() *cobra.Command {
 	return l.cmd
 }
 
-func (l *logor) setup() {
+func (l *instruct) setup() {
 	l.cmd = &cobra.Command{
 		Use:          logoUse,
 		Short:        logoShort,
 		Args:         cobra.MinimumNArgs(0),
-		RunE:         logo,
+		RunE:         instructions,
 		SilenceUsage: true,
 	}
 	l.cmd.FParseErrWhitelist.UnknownFlags = true
 }
 
 // Cobra executes this function on logo command.
-func logo(_ *cobra.Command, args []string) (err error) {
-	if logo, err := receptorImpl.GetLogo(); err == nil {
-		println(logo)
+func instructions(_ *cobra.Command, args []string) (err error) {
+	if instructions, err := receptorImpl.GetInstructions(); err == nil {
+		println(instructions)
 	}
 	return
 }

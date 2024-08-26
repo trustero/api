@@ -91,6 +91,15 @@ func (r *Receptor) GetConfigObjDesc() interface{} {
 	return receptorPackage.GetConfigObjDescImpl()
 }
 
+func (r *Receptor) GetLogo() (string, error) {
+	logo, _ := receptorPackage.GetLogoImpl()
+	return logo, nil
+}
+func (r *Receptor) GetInstructions() (string, error) {
+	logo, _ := receptorPackage.GetInstructionsImpl()
+	return logo, nil
+}
+
 func main() {
 	cmd.Execute(&Receptor{})
 }

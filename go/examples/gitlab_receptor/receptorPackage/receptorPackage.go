@@ -89,3 +89,11 @@ func GetAuthMethodImpl() interface{} {
 func GetConfigObjDescImpl() interface{} {
 	return nil
 }
+
+func GetLogoImpl() (string, error) {
+	return "", nil
+}
+
+func GetInstructionsImpl() (string, error) {
+	return "", nil
+}

@@ -86,7 +86,18 @@ type Receptor interface {
 	// CLI: <receptor_type> scan --find-evidence
 	Report(credentials interface{}, config interface{}) (evidences []*Evidence, err error)
 
+	// Configure returns a ReceptorConfiguration object that represents the configuration of the receptor
+	// Configure is used when there special configurations required for the receptor that the user can set
+	// This method is invoked from the following CLI: <receptor_type> configure
 	Configure(credentials interface{}) (config *receptor_v1.ReceptorConfiguration, err error)
+
+	// GetLogo returns the content of the logo in svg format for the receptor
+	// This method is invoked from the following CLI: <receptor_type> logo
+	GetLogo() (logo string, err error)
+
+	// GetInstructions returns the instructions in markdown format for settings up the providers during receptor activation
+	// This method is invoked from the following CLI: <receptor_type> instructions
+	GetInstructions() (instructions string, err error)
 }
 
 // Evidence is a discovered evidence from an in-use service.  All rows in the evidence are instances of the same
