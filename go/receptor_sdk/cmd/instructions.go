@@ -22,8 +22,8 @@ func (l *instruct) getCommand() *cobra.Command {
 
 func (l *instruct) setup() {
 	l.cmd = &cobra.Command{
-		Use:          logoUse,
-		Short:        logoShort,
+		Use:          instructionsUse,
+		Short:        instructionsShort,
 		Args:         cobra.MinimumNArgs(0),
 		RunE:         instructions,
 		SilenceUsage: true,
