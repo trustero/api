@@ -31,7 +31,7 @@ func (l *instruct) setup() {
 	l.cmd.FParseErrWhitelist.UnknownFlags = true
 }
 
-// Cobra executes this function on logo command.
+// Cobra executes this function on instructions command.
 func instructions(_ *cobra.Command, args []string) (err error) {
 	if instructions, err := receptorImpl.GetInstructions(); err == nil {
 		println(instructions)
