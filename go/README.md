@@ -36,10 +36,13 @@ As a developer, you will need to implement the following functions to have a wor
 2. func (r *Receptor) GetKnownServices() []string {}
     - This function will return an array of string, signifying a list of service types the receptor collects
 3. func (r *Receptor) GetCredentialObj() (credentialObj interface{}) {}
-4. func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {}
-5. func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.ServiceEntity, err error) {}
-6. func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {}
-
+4. func (r *Receptor) GetConfigObj() (configObj interface{}) {}
+5. func (r *Receptor) GetConfigObjDesc() (configObjDesc interface{}) {}
+6. func (r *Receptor) GetAuthMethods() (authMethods interface{}) {}
+7. func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {}
+8. func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.ServiceEntity, err error) {}
+9. func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {}
+10. func (r *Receptor) GetEvidenceInfo() (evidences []*receptor_sdk.Evidence) {}
 
 ```go
 package main
@@ -71,6 +74,21 @@ func (r *Receptor) GetCredentialObj() (credentialObj interface{}) {
 	return r
 }
 
+func (r *Receptor) GetConfigObj() (configObj interface{}){
+	return
+}
+
+func (r *Receptor) GetConfigObjDesc() (configObjDesc interface{}) {
+	return
+}
+
+func (r *Receptor)	GetConfigObjDesc() (configObjDesc interface{}) {
+	return
+}
+
+func (r *Receptor) GetAuthMethods() (authMethods interface{}) {
+	return
+}
 func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
   // YOUR CODE HERE
 	return

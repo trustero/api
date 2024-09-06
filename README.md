@@ -53,6 +53,15 @@ func (r *Receptor) GetCredentialObj() (credentialObj interface{}) {
 	return r
 }
 
+func GetInstructionsImpl() (string, error) {
+	return
+}
+
+func GetLogoImpl() (string, error) {
+	return
+}
+
+
 func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
   // YOUR CODE HERE
 	return
@@ -67,6 +76,7 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
   // YOUR CODE HERE
 	return
 }
+
 
 func main() {
 	cmd.Execute(&Receptor{})

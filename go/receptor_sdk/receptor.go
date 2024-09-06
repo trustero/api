@@ -53,6 +53,8 @@ type Receptor interface {
 	//      GroupId string `trustero:"display:Group Identifier;placeholder:abcdefg123"`
 	//      Token   string `trustero:"display:Access Token;placeholder:1234wxyz"`
 	//  }
+	// The metadata can be extracted and then printed out using the following command
+	// <receptor_type> descriptor
 	GetCredentialObj() (credentialObj interface{})
 
 	// GetConfigObj returns an instance of a Config object
@@ -60,6 +62,8 @@ type Receptor interface {
 
 	// GetConfigObjDesc returns an instance of struct that represents a json for the config object to be rendered
 	// in the receptor config modal
+	// To print what the config json will look like, use the following command
+	// <receptor_type> config
 	GetConfigObjDesc() (configObjDesc interface{})
 
 	// GetAuthMethods returns an instance of struct representing the authentication methods supported by the
@@ -88,7 +92,6 @@ type Receptor interface {
 
 	// Configure returns a ReceptorConfiguration object that represents the configuration of the receptor
 	// Configure is used when there special configurations required for the receptor that the user can set
-	// This method is invoked from the following CLI: <receptor_type> configure
 	Configure(credentials interface{}) (config *receptor_v1.ReceptorConfiguration, err error)
 
 	// GetLogo returns the content of the logo in svg format for the receptor
