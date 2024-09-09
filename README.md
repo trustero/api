@@ -53,11 +53,11 @@ func (r *Receptor) GetCredentialObj() (credentialObj interface{}) {
 	return r
 }
 
-func GetInstructionsImpl() (string, error) {
+func (r *Receptor) GetInstructionsImpl() (string, error) {
 	return
 }
 
-func GetLogoImpl() (string, error) {
+func (r *Receptor)GetLogoImpl() (string, error) {
 	return
 }
 
