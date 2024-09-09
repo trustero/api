@@ -57,7 +57,7 @@ func (r *Receptor) GetInstructions() (string, error) {
 	return
 }
 
-func (r *Receptor)GetLogo() (string, error) {
+func (r *Receptor) GetLogo() (string, error) {
 	return
 }
 
