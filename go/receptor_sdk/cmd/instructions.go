@@ -4,6 +4,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +35,7 @@ func (l *instruct) setup() {
 // Cobra executes this function on instructions command.
 func instructions(_ *cobra.Command, args []string) (err error) {
 	if instructions, err := receptorImpl.GetInstructions(); err == nil {
-		println(instructions)
+		fmt.Println(instructions)
 	}
 	return
 }
