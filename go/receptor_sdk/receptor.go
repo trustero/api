@@ -73,7 +73,7 @@ type Receptor interface {
 	//GetEvidenceInfo returns a list of Evidences that a receptor has implemented
 	//The metadata is extracted and then printed out
 	//<receptor_type> evidenceinfo
-	GetEvidenceInfo() (evidences []*Evidence)
+	GetEvidenceInfo(credentials interface{}) (evidences []*Evidence)
 
 	// Verify read-only access to a service provider account.  Return ok if the credentials are valid and err
 	// if any error is encountered in contacting the service provider.  This method is invoked from the following

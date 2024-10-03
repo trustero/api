@@ -68,7 +68,7 @@ func (r *Receptor) Report(credentials interface{}, config interface{}) (evidence
 
 // GetEvidenceInfo returns a list of all the possible evidence created. The return value should not have any actual
 // rows or source data, just the Caption and Description
-func (r *Receptor) GetEvidenceInfo() (evidences []*receptor_sdk.Evidence) {
+func (r *Receptor) GetEvidenceInfo(credentials interface{}) (evidences []*receptor_sdk.Evidence) {
 	return
 }
 
