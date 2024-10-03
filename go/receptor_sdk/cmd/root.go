@@ -43,7 +43,7 @@ var cmds = map[string]command{
 	"scan":         &scann{},
 	"services":     &svcs{},
 	"descriptor":   &desc{},
-	"evidences":    &evi{},
+	"evidenceinfo": &evi{},
 	"logo":         &logor{},
 	"instructions": &instruct{},
 }

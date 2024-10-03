@@ -1,10 +1,9 @@
-// This file is subject to the terms and conditions defined in
-// file 'LICENSE.txt', which is part of this source code package.
 package cmd
 
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -29,6 +28,8 @@ func (e *evi) setup() {
 		RunE:         printEvidenceInfo,
 		SilenceUsage: true,
 	}
+	addGrpcFlags(e.cmd)
+
 	e.cmd.FParseErrWhitelist.UnknownFlags = true
 }
 
@@ -38,23 +39,31 @@ type EvidenceInfo struct {
 }
 
 // Cobra executes this function on evidenceinfo command.
-func printEvidenceInfo(_ *cobra.Command, args []string) (err error) {
+func printEvidenceInfo(cmd *cobra.Command, args []string) (err error) {
+	var (
+		credentialStr string
+		credentialObj interface{}
+	)
 	var allEvs []EvidenceInfo
-
-	for _, e := range receptorImpl.GetEvidenceInfo() {
+	credentialStr, err = getCredentialStringFromCLI()
+	if err == nil && credentialStr != "" {
+		credentialObj, err = unmarshalCredentials(credentialStr, receptorImpl.GetCredentialObj())
+	}
+	for _, e := range receptorImpl.GetEvidenceInfo(credentialObj) {
 		if e != nil {
 			evidenceInfo := EvidenceInfo{
 				Caption:     e.Caption,
 				Description: e.Description,
 			}
 			allEvs = append(allEvs, evidenceInfo)
-
 		}
 	}
+
 	evS, err := json.MarshalIndent(allEvs, "", "    ")
 	if err != nil {
 		return err
 	}
+
 	if string(evS) == "null" {
 		println("{}")
 	} else {
