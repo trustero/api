@@ -25,6 +25,7 @@ var (
 	CredentialsBase64URL string // Service provider credentials as a base64 URL encoded json string.
 	ReceptorId           string // Trustero's persistent record ID of a record holding a receptor's service provider credentials.
 	ConfigBase64URL      string // Receptor configuration as a base64 URL encoded json string.
+	ReportInBatches      bool   // If true, report evidence in multiple batches.
 )
 
 // Receptor is the main interface for the Receptor implementor-facing  API.
@@ -89,6 +90,12 @@ type Receptor interface {
 	// if any error is encountered in contacting the service provider.  This method is invoked from the following
 	// CLI: <receptor_type> scan --find-evidence
 	Report(credentials interface{}, config interface{}) (evidences []*Evidence, err error)
+
+	// ReportBatch reports in-use service entity's configurations as evidence in batches.
+	// Returns a channel with array of [Evidence] and an error if any error is encountered in
+	// contacting the service provider.  This method is invoked from the following
+	// CLI: <receptor_type> scan --find-evidence
+	ReportBatch(credentials interface{}, evidenceChan chan []*Evidence)
 
 	// Configure returns a ReceptorConfiguration object that represents the configuration of the receptor
 	// Configure is used when there special configurations required for the receptor that the user can set
