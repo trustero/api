@@ -29,29 +29,28 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}, config inter
 	finding.ReceptorType = GetParsedReceptorType()
 	finding.ServiceProviderAccount = serviceProviderAccount
 
-	// receptor reports evidence in batches
-	if receptor_sdk.ReportInBatches {
-		evidenceChannel := make(chan []*receptor_sdk.Evidence)
-		go func() {
-			receptorImpl.ReportBatch(credentials, evidenceChannel)
-		}()
-
-		for evidences := range evidenceChannel {
-			// Receive evidence and report them one batch at a time
-			err = reportEvidence(rc, &finding, evidences)
-			if err != nil {
-				return err
-			}
-			finding.Evidences = []*receptor_v1.Evidence{} // Empty every time for new evidence
-		}
-
-	} else {
-		var evidences []*receptor_sdk.Evidence
-		if evidences, err = receptorImpl.Report(credentials, config); err != nil {
-			return
-		}
+	// report in single batch
+	var evidences []*receptor_sdk.Evidence
+	if evidences, err = receptorImpl.Report(credentials, config); err == nil && len(evidences) > 0 {
 		_ = reportEvidence(rc, &finding, evidences)
+	}
 
+	// report in multiple batches
+	evidenceChannel := make(chan []*receptor_sdk.Evidence)
+	go func() {
+		defer close(evidenceChannel)
+		receptorImpl.ReportBatch(credentials, evidenceChannel)
+	}()
+
+	for evidences := range evidenceChannel {
+		// Receive evidence and report them one batch at a time
+		err = reportEvidence(rc, &finding, evidences)
+		if err != nil {
+			log.Err(err).Msg("failed to report evidence")
+			//return err
+			continue
+		}
+		finding.Evidences = []*receptor_v1.Evidence{} // Empty every time for new evidence
 	}
 
 	return

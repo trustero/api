@@ -46,6 +46,7 @@ func (s *scann) setup() {
 	addGrpcFlags(s.cmd)
 	addBoolFlag(s.cmd, &receptor_sdk.FindEvidence, "find-evidence", "", false,
 		"Scan for evidences in a service provider account")
+
 }
 
 // Cobra executes this function on verify command.
