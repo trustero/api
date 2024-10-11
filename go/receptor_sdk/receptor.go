@@ -92,8 +92,7 @@ type Receptor interface {
 	Report(credentials interface{}, config interface{}) (evidences []*Evidence, err error)
 
 	// ReportBatch reports in-use service entity's configurations as evidence in batches.
-	// Returns a channel with array of [Evidence] and an error if any error is encountered in
-	// contacting the service provider.  This method is invoked from the following
+	// The receptor implementation should send the evidences to the evidenceChan.
 	// CLI: <receptor_type> scan --find-evidence
 	ReportBatch(credentials interface{}, evidenceChan chan []*Evidence)
 

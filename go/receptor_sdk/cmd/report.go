@@ -33,7 +33,6 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}, config inter
 	if receptor_sdk.ReportInBatches {
 		evidenceChannel := make(chan []*receptor_sdk.Evidence)
 		go func() {
-			defer close(evidenceChannel)
 			receptorImpl.ReportBatch(credentials, evidenceChannel)
 		}()
 
