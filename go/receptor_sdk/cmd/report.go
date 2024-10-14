@@ -26,17 +26,37 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}, config inter
 	if finding.Entities, err = receptorImpl.Discover(credentials, config); err != nil {
 		return
 	}
-
-	// Discover evidence
-	var evidences []*receptor_sdk.Evidence
-	if evidences, err = receptorImpl.Report(credentials, config); err != nil {
-		return
-	}
-
 	finding.ReceptorType = GetParsedReceptorType()
 	finding.ServiceProviderAccount = serviceProviderAccount
 
-	// Convert and append discovered evidences to reported evidences
+	// report in single batch
+	var evidences []*receptor_sdk.Evidence
+	if evidences, err = receptorImpl.Report(credentials, config); err == nil && len(evidences) > 0 {
+		_ = reportEvidence(rc, &finding, evidences)
+	}
+
+	// report in multiple batches
+	evidenceChannel := make(chan []*receptor_sdk.Evidence)
+	go func() {
+		defer close(evidenceChannel)
+		receptorImpl.ReportBatch(credentials, evidenceChannel)
+	}()
+
+	for evidences := range evidenceChannel {
+		// Receive evidence and report them one batch at a time
+		err = reportEvidence(rc, &finding, evidences)
+		if err != nil {
+			log.Err(err).Msg("failed to report evidence")
+			//return err
+			continue
+		}
+		finding.Evidences = []*receptor_v1.Evidence{} // Empty every time for new evidence
+	}
+
+	return
+}
+
+func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding, evidences []*receptor_sdk.Evidence) (err error) {
 	for _, evidence := range evidences {
 		reportStruct := receptor_v1.Struct{
 			Rows:            []*receptor_v1.Row{},
@@ -72,9 +92,9 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}, config inter
 	}
 
 	// Report evidence findings to Trustero
-	_, err = rc.Report(context.Background(), &finding)
-
+	_, err = rc.Report(context.Background(), finding)
 	return
+
 }
 
 // ExtractMetaData Extracts tag information from struct

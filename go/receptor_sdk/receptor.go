@@ -90,6 +90,11 @@ type Receptor interface {
 	// CLI: <receptor_type> scan --find-evidence
 	Report(credentials interface{}, config interface{}) (evidences []*Evidence, err error)
 
+	// ReportBatch reports in-use service entity's configurations as evidence in batches.
+	// The receptor implementation should send the evidences to the evidenceChan.
+	// CLI: <receptor_type> scan --find-evidence
+	ReportBatch(credentials interface{}, evidenceChan chan []*Evidence)
+
 	// Configure returns a ReceptorConfiguration object that represents the configuration of the receptor
 	// Configure is used when there special configurations required for the receptor that the user can set
 	Configure(credentials interface{}) (config *receptor_v1.ReceptorConfiguration, err error)
