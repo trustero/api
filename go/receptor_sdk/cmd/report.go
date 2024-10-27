@@ -58,6 +58,10 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}, config inter
 
 func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding, evidences []*receptor_sdk.Evidence) (err error) {
 	for _, evidence := range evidences {
+		// handle doc evidence
+		// if evidence. != nil {
+
+		// }
 		reportStruct := receptor_v1.Struct{
 			Rows:            []*receptor_v1.Row{},
 			ColDisplayNames: map[string]string{},
@@ -72,7 +76,17 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			EntityType:       evidence.EntityType,
 			Sources:          evidence.Sources,
 			ServiceAccountId: evidence.ServiceAccountId,
-			EvidenceType:     &receptor_v1.Evidence_Struct{Struct: &reportStruct},
+		}
+		// check if evidence.doc is not nil
+		if evidence.Document != nil {
+			reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
+				Doc: &receptor_v1.Document{
+					Body: evidence.Document.Body,
+					Mime: evidence.Document.Mime,
+				},
+			}
+		} else {
+			reportEvidence.EvidenceType = &receptor_v1.Evidence_Struct{Struct: &reportStruct}
 		}
 
 		// Convert rows
