@@ -72,7 +72,17 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			EntityType:       evidence.EntityType,
 			Sources:          evidence.Sources,
 			ServiceAccountId: evidence.ServiceAccountId,
-			EvidenceType:     &receptor_v1.Evidence_Struct{Struct: &reportStruct},
+		}
+		// check if evidence.doc is not nil
+		if evidence.Document != nil {
+			reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
+				Doc: &receptor_v1.Document{
+					Body: evidence.Document.Body,
+					Mime: evidence.Document.Mime,
+				},
+			}
+		} else {
+			reportEvidence.EvidenceType = &receptor_v1.Evidence_Struct{Struct: &reportStruct}
 		}
 
 		// Convert rows
