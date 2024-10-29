@@ -58,10 +58,6 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}, config inter
 
 func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding, evidences []*receptor_sdk.Evidence) (err error) {
 	for _, evidence := range evidences {
-		// handle doc evidence
-		// if evidence. != nil {
-
-		// }
 		reportStruct := receptor_v1.Struct{
 			Rows:            []*receptor_v1.Row{},
 			ColDisplayNames: map[string]string{},
