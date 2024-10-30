@@ -30,6 +30,7 @@ const (
 	Receptor_Report_FullMethodName           = "/receptor_v1.Receptor/Report"
 	Receptor_Notify_FullMethodName           = "/receptor_v1.Receptor/Notify"
 	Receptor_SetConfiguration_FullMethodName = "/receptor_v1.Receptor/SetConfiguration"
+	Receptor_StreamReport_FullMethodName     = "/receptor_v1.Receptor/StreamReport"
 )
 
 // ReceptorClient is the client API for Receptor service.
@@ -63,6 +64,7 @@ type ReceptorClient interface {
 	// SetConfiguration reports the configuration for receptors that need extra configuration to access a service.
 	// This call is typically made as a callback by a receptor after credential verification.
 	SetConfiguration(ctx context.Context, in *ReceptorConfiguration, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	StreamReport(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[ReportChunk, ReportResponse], error)
 }
 
 type receptorClient struct {
@@ -133,6 +135,19 @@ func (c *receptorClient) SetConfiguration(ctx context.Context, in *ReceptorConfi
 	return out, nil
 }
 
+func (c *receptorClient) StreamReport(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[ReportChunk, ReportResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Receptor_ServiceDesc.Streams[0], Receptor_StreamReport_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[ReportChunk, ReportResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Receptor_StreamReportClient = grpc.ClientStreamingClient[ReportChunk, ReportResponse]
+
 // ReceptorServer is the server API for Receptor service.
 // All implementations should embed UnimplementedReceptorServer
 // for forward compatibility.
@@ -164,6 +179,7 @@ type ReceptorServer interface {
 	// SetConfiguration reports the configuration for receptors that need extra configuration to access a service.
 	// This call is typically made as a callback by a receptor after credential verification.
 	SetConfiguration(context.Context, *ReceptorConfiguration) (*emptypb.Empty, error)
+	StreamReport(grpc.ClientStreamingServer[ReportChunk, ReportResponse]) error
 }
 
 // UnimplementedReceptorServer should be embedded to have
@@ -190,6 +206,9 @@ func (UnimplementedReceptorServer) Notify(context.Context, *JobResult) (*emptypb
 }
 func (UnimplementedReceptorServer) SetConfiguration(context.Context, *ReceptorConfiguration) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetConfiguration not implemented")
+}
+func (UnimplementedReceptorServer) StreamReport(grpc.ClientStreamingServer[ReportChunk, ReportResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method StreamReport not implemented")
 }
 func (UnimplementedReceptorServer) testEmbeddedByValue() {}
 
@@ -319,6 +338,13 @@ func _Receptor_SetConfiguration_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Receptor_StreamReport_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ReceptorServer).StreamReport(&grpc.GenericServerStream[ReportChunk, ReportResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Receptor_StreamReportServer = grpc.ClientStreamingServer[ReportChunk, ReportResponse]
+
 // Receptor_ServiceDesc is the grpc.ServiceDesc for Receptor service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -351,6 +377,12 @@ var Receptor_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Receptor_SetConfiguration_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamReport",
+			Handler:       _Receptor_StreamReport_Handler,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "receptor_v1/receptor.proto",
 }

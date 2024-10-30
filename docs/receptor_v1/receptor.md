@@ -11,6 +11,8 @@
     - [JobResult](#receptor_v1-JobResult)
     - [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration)
     - [ReceptorOID](#receptor_v1-ReceptorOID)
+    - [ReportChunk](#receptor_v1-ReportChunk)
+    - [ReportResponse](#receptor_v1-ReportResponse)
     - [Row](#receptor_v1-Row)
     - [Row.ColsEntry](#receptor_v1-Row-ColsEntry)
     - [ServiceEntities](#receptor_v1-ServiceEntities)
@@ -158,6 +160,42 @@ ReceptorOID is Trustero&#39;s receptor record identifier.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | receptor_object_id | [string](#string) |  | Receptor_object_id is the string representation of a Trustero persistent record. |
+
+
+
+
+
+
+<a name="receptor_v1-ReportChunk"></a>
+
+### ReportChunk
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| receptor_type | [string](#string) |  |  |
+| service_provider_account | [string](#string) |  |  |
+| data_chunk | [bytes](#bytes) |  | The chunk of the file/data (may contain either bytes or metadata) |
+| file_name | [string](#string) |  | Metadata or additional optional information for the stream |
+| mime_type | [string](#string) |  |  |
+| is_final_chunk | [bool](#bool) |  | Indicates if this is the final chunk in the stream |
+
+
+
+
+
+
+<a name="receptor_v1-ReportResponse"></a>
+
+### ReportResponse
+Server response after receiving the whole streamed report
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| status | [string](#string) |  | Could use &#34;ok&#34; or other status information |
+| file_path | [string](#string) |  | Optional: path where the server saved the chunked report |
 
 
 
@@ -353,6 +391,7 @@ and contains the service&#39;s configuration information. For example, an AWS S3
 | Report | [Finding](#receptor_v1-Finding) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report a finding to Trustero. A receptor or a Trustero client application reports its findings to Trustero on a periodic basis. This call returns a string value collection ID or an error. |
 | Notify | [JobResult](#receptor_v1-JobResult) | [.google.protobuf.Empty](#google-protobuf-Empty) | Notify Trustero a long running report finding or discover service entities receptor-request has completed. JobResult contains information about the receptor-request and it&#39;s corresponding result. |
 | SetConfiguration | [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration) | [.google.protobuf.Empty](#google-protobuf-Empty) | SetConfiguration reports the configuration for receptors that need extra configuration to access a service. This call is typically made as a callback by a receptor after credential verification. |
+| StreamReport | [ReportChunk](#receptor_v1-ReportChunk) stream | [ReportResponse](#receptor_v1-ReportResponse) |  |
 
  
 

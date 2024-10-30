@@ -44,6 +44,11 @@ service Receptor {
   // SetConfiguration reports the configuration for receptors that need extra configuration to access a service.
   // This call is typically made as a callback by a receptor after credential verification.
   rpc SetConfiguration(ReceptorConfiguration) returns (google.protobuf.Empty);
+
+
+  rpc StreamReport(stream ReportChunk) returns (ReportResponse);
+
+
 }
 
 
@@ -303,3 +308,24 @@ message JobResult {
   string exceptions = 5;
 
 }
+
+message ReportChunk {
+  string receptor_type = 1;
+  string service_provider_account = 2;
+
+  // The chunk of the file/data (may contain either bytes or metadata)
+  bytes data_chunk = 3;
+
+  // Metadata or additional optional information for the stream
+  string file_name = 4;
+  string mime_type = 5;
+
+  // Indicates if this is the final chunk in the stream
+  bool is_final_chunk = 6;
+}
+
+// Server response after receiving the whole streamed report
+message ReportResponse {
+  string status = 1;  // Could use "ok" or other status information
+  string file_path = 2;  // Optional: path where the server saved the chunked report
+} 
