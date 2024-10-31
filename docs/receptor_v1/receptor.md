@@ -66,6 +66,7 @@ Document is an unstructured evidence provided as a MIME document.
 | ----- | ---- | ----- | ----------- |
 | mime | [string](#string) |  | Mime is the document type defined using [MIME]. [MIME]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types |
 | body | [bytes](#bytes) |  | Body is the opaque document body. The document body must match the type defined by the mime attribute. |
+| stream_file_path | [string](#string) |  | Filepath for streaming large evidence - should be accessible by the server. |
 
 
 
@@ -174,12 +175,8 @@ ReceptorOID is Trustero&#39;s receptor record identifier.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receptor_type | [string](#string) |  |  |
-| service_provider_account | [string](#string) |  |  |
-| data_chunk | [bytes](#bytes) |  | The chunk of the file/data (may contain either bytes or metadata) |
-| file_name | [string](#string) |  | Metadata or additional optional information for the stream |
-| mime_type | [string](#string) |  |  |
-| is_final_chunk | [bool](#bool) |  | Indicates if this is the final chunk in the stream |
+| content | [bytes](#bytes) |  |  |
+| is_boundary | [bool](#bool) |  | Whether this chunk contains the boundary |
 
 
 
@@ -195,7 +192,6 @@ Server response after receiving the whole streamed report
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | status | [string](#string) |  | Could use &#34;ok&#34; or other status information |
-| file_path | [string](#string) |  | Optional: path where the server saved the chunked report |
 
 
 

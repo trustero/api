@@ -6,6 +6,8 @@ package cmd
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
 	"reflect"
 	"sort"
 	"strconv"
@@ -13,6 +15,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/trustero/api/go/receptor_sdk"
+	"github.com/trustero/api/go/receptor_sdk/multipartkit"
 	"github.com/trustero/api/go/receptor_v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -73,36 +76,79 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			Sources:          evidence.Sources,
 			ServiceAccountId: evidence.ServiceAccountId,
 		}
-		// check if evidence.doc is not nil
-		if evidence.Document != nil {
+		if evidence.Document != nil { // evidence is a blob or path to blob
+			// create a new finding from current finding and add evidence
 			reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
 				Doc: &receptor_v1.Document{
 					Body: evidence.Document.Body,
 					Mime: evidence.Document.Mime,
 				},
 			}
-		} else {
-			reportEvidence.EvidenceType = &receptor_v1.Evidence_Struct{Struct: &reportStruct}
-		}
+			contentType, streamFile, err := mulipartEvidence(&reportEvidence)
 
-		// Convert rows
-		var entityIdFieldName string
-		var rowFieldNames []string
-		for idx, row := range evidence.Rows {
-			if idx == 0 {
-				if entityIdFieldName, rowFieldNames, err = ExtractMetaData(row, &reportStruct); err != nil {
-					return // fail to extract metadata, likely an invalid row type
+			if err != nil {
+				log.Err(err).Msg("failed to create multipart evidence")
+				err = nil
+				continue
+			}
+
+			// make a multipart file and then stream it
+
+			stream, err := rc.StreamReport(context.Background())
+			defer stream.CloseSend()
+			if err != nil {
+				log.Err(err).Msg("failed to stream report")
+				continue
+			}
+			if err = stream.Send(&receptor_v1.ReportChunk{Content: []byte(contentType), IsBoundary: true}); err != nil {
+				log.Err(err).Msg("failed to send data chunk")
+				break
+			}
+
+			//read from the stream file path in chunks
+			file, err := os.Open(streamFile)
+			defer func() {
+				file.Close()
+				os.Remove(streamFile)
+			}()
+
+			if err != nil {
+				log.Err(err).Msg("failed to open file")
+				continue
+			}
+			buf := make([]byte, 1024)
+			for {
+				n, err := file.Read(buf)
+				if err != nil {
+					break
+				}
+				if err = stream.Send(&receptor_v1.ReportChunk{Content: buf[:n]}); err != nil {
+					log.Err(err).Msg("failed to send data chunk")
+					break
 				}
 			}
-			reportStruct.Rows = append(reportStruct.Rows, RowToStructRow(row, entityIdFieldName, rowFieldNames))
+		} else { // evidence is structured
+			reportEvidence.EvidenceType = &receptor_v1.Evidence_Struct{Struct: &reportStruct}
+
+			// Convert rows
+			var entityIdFieldName string
+			var rowFieldNames []string
+			for idx, row := range evidence.Rows {
+				if idx == 0 {
+					if entityIdFieldName, rowFieldNames, err = ExtractMetaData(row, &reportStruct); err != nil {
+						return // fail to extract metadata, likely an invalid row type
+					}
+				}
+				reportStruct.Rows = append(reportStruct.Rows, RowToStructRow(row, entityIdFieldName, rowFieldNames))
+			}
+
+			// Append to Finding
+			finding.Evidences = append(finding.Evidences, &reportEvidence)
 		}
 
-		// Append to Finding
-		finding.Evidences = append(finding.Evidences, &reportEvidence)
+		// Report evidence findings to Trustero
+		_, err = rc.Report(context.Background(), finding)
 	}
-
-	// Report evidence findings to Trustero
-	_, err = rc.Report(context.Background(), finding)
 	return
 
 }
@@ -255,6 +301,58 @@ func getField(v interface{}, field string) string {
 func assertStruct(rowType reflect.Type) (err error) {
 	if rowType.Kind() != reflect.Struct {
 		err = errors.New("evidence row must be a struct. " + rowType.String())
+	}
+	return
+}
+
+func mulipartEvidence(evidence *receptor_v1.Evidence) (contentType string, evidencePath string, err error) {
+	if evidence.GetDoc() == nil {
+		err = errors.New("evidence doc is nil")
+		log.Error().Msg("evidence doc is nil")
+	} else {
+		// evidence should be protobuf of evidence + blob in a mulitpart/mixed
+		// the mime of the part should be the mime from the evidence.doc.Mime
+		dstFile, err := os.CreateTemp("", "multipart-evidence_*.tmp")
+		if err != nil {
+			log.Error().Msgf("failed to create multipart file: %v", err)
+			return "", "", err
+		}
+		defer os.Remove(dstFile.Name())
+
+		mime := evidence.GetDoc().GetMime()
+		body := evidence.GetDoc().GetBody()
+		streamFilePath := evidence.GetDoc().GetStreamFilePath()
+
+		bufferSize := multipartkit.DefaultBufferSize
+
+		// Initialize the multipart builder
+		builder, err := multipartkit.NewMultipartBuilder(dstFile, bufferSize)
+		defer builder.Finalize()
+
+		if err != nil {
+			log.Error().Msgf("failed to create multipart builder: %v", err)
+			return "", "", err
+		}
+
+		boundary := builder.GetBoundary()
+		contentType = fmt.Sprintf("multipart/mixed; boundary=%s", boundary)
+		// empty out the evidence doc so we dont duplicate in the multipart
+		evidence.EvidenceType = &receptor_v1.Evidence_Struct{}
+
+		err = builder.AddProtobuf("receptor_v1.Evidence", evidence)
+		if err != nil {
+			log.Error().Msgf("failed to add protobuf message: %v", err)
+		}
+		if streamFilePath != "" {
+			err = builder.AddFile("blob", streamFilePath, mime)
+		} else {
+			err = builder.AddBytes("blob", evidence.Caption, mime, body)
+		}
+		if err != nil {
+			log.Error().Msgf("failed to add blob part: %v", err)
+		}
+
+		return contentType, dstFile.Name(), nil
 	}
 	return
 }

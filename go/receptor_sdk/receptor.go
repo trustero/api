@@ -134,13 +134,15 @@ type Evidence struct {
 	Rows             []interface{}         // Rows of formatted evidence represented by a Golang struct.
 	ServiceAccountId string                // AccountId of multi-account organization
 	Document         *Document             // Unstructured evidence in a Document format
+
 }
 
 // Document is a unstructured byte array that can be used to store any type of data
 // in Content field and Mime describes the Content type
 type Document struct {
-	Body []byte // Content of the document in bytes
-	Mime string // Mime type of the document
+	Body           []byte // Content of the document in bytes
+	Mime           string // Mime type of the document
+	StreamFilePath string // Path to the file containing the evidence
 }
 
 // Config with Field struct defines the json shape of the custom configurations for receptors that the app can use

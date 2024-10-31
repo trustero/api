@@ -104,6 +104,8 @@ message Evidence {
 
     // Struct is a structured evidence.
     Struct struct = 7;
+
+
   }
 
   // Service_account_id is the member account of the organization. For example, an AWS account number in an organization
@@ -132,6 +134,9 @@ message Document {
 
   // Body is the opaque document body.  The document body must match the type defined by the mime attribute.
   bytes body = 3;
+  
+  // Filepath for streaming large evidence - should be accessible by the server.
+  string stream_file_path = 4;
 }
 
 
@@ -310,22 +315,11 @@ message JobResult {
 }
 
 message ReportChunk {
-  string receptor_type = 1;
-  string service_provider_account = 2;
-
-  // The chunk of the file/data (may contain either bytes or metadata)
-  bytes data_chunk = 3;
-
-  // Metadata or additional optional information for the stream
-  string file_name = 4;
-  string mime_type = 5;
-
-  // Indicates if this is the final chunk in the stream
-  bool is_final_chunk = 6;
+  bytes content = 1;
+  bool is_boundary = 2; // Whether this chunk contains the boundary
 }
 
 // Server response after receiving the whole streamed report
 message ReportResponse {
   string status = 1;  // Could use "ok" or other status information
-  string file_path = 2;  // Optional: path where the server saved the chunked report
 } 
