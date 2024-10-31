@@ -80,12 +80,13 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			// create a new finding from current finding and add evidence
 			reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
 				Doc: &receptor_v1.Document{
-					Body: evidence.Document.Body,
-					Mime: evidence.Document.Mime,
+					Body:           evidence.Document.Body,
+					Mime:           evidence.Document.Mime,
+					StreamFilePath: evidence.Document.StreamFilePath,
 				},
 			}
 			contentType, streamFile, err := mulipartEvidence(&reportEvidence)
-
+			os.Remove(evidence.Document.StreamFilePath)
 			if err != nil {
 				log.Err(err).Msg("failed to create multipart evidence")
 				err = nil
@@ -317,7 +318,7 @@ func mulipartEvidence(evidence *receptor_v1.Evidence) (contentType string, evide
 			log.Error().Msgf("failed to create multipart file: %v", err)
 			return "", "", err
 		}
-		defer os.Remove(dstFile.Name())
+		//defer os.Remove(dstFile.Name())
 
 		mime := evidence.GetDoc().GetMime()
 		body := evidence.GetDoc().GetBody()
