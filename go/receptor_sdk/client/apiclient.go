@@ -61,6 +61,7 @@ func (sc *ServerConnection) Dial(token, host string, port int) (err error) {
 		grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(grpcCred),
 		sc.TlsDialOption,
+		grpc.WithStreamInterceptor(logStreamCall),
 	}
 
 	// Connect to local server
@@ -93,4 +94,18 @@ func logUnaryCall(ctx context.Context, method string, req, reply interface{}, cc
 	}()
 
 	return invoker(ctx, method, req, reply, cc, opts...)
+}
+
+func logStreamCall(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+	start := time.Now()
+	callId := RandString(8)
+	log.Trace().Msgf("grpc begin stream [%s-%s]", method, callId)
+	defer func() {
+		elapsed := time.Now().Sub(start)
+		log.Info().Msgf("grpc end stream [%s-%s], elapsed time: %fs", method, callId, elapsed.Seconds())
+	}()
+
+	// Invoke the streamer and return the stream
+	clientStream, err := streamer(ctx, desc, cc, method, opts...)
+	return clientStream, err
 }

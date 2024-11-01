@@ -3,7 +3,6 @@
 package multipartkit
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,8 +14,7 @@ import (
 
 // MultipartReader reads multipart data from a stream and supports configurable buffer size.
 type MultipartReader struct {
-	reader     *multipart.Reader
-	bufferSize int
+	reader *multipart.Reader
 }
 
 // PartMetadata describes metadata for each part of the multipart message.
@@ -31,15 +29,9 @@ func NewMultipartReader(r io.Reader, boundary string, bufferSize int) (*Multipar
 	if boundary == "" {
 		return nil, fmt.Errorf("boundary cannot be empty")
 	}
-	if bufferSize <= 0 {
-		bufferSize = DefaultBufferSize
-	}
-
-	bufReader := bufio.NewReader(r)
 
 	mr := &MultipartReader{
-		bufferSize: bufferSize,
-		reader:     multipart.NewReader(bufReader, boundary),
+		reader: multipart.NewReader(r, boundary),
 	}
 
 	return mr, nil
@@ -48,6 +40,7 @@ func NewMultipartReader(r io.Reader, boundary string, bufferSize int) (*Multipar
 // NextPart returns the next part of the multipart stream using the current reader.
 func (mr *MultipartReader) NextPart() (*multipart.Part, error) {
 	return mr.reader.NextPart()
+
 }
 
 // MetadataJSON streams the JSON representation of the metadata for all parts in the multipart message.
