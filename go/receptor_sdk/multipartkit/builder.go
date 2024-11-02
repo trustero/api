@@ -4,11 +4,10 @@ package multipartkit
 
 import (
 	"fmt"
+	"google.golang.org/protobuf/proto"
 	"io"
 	"mime/multipart"
 	"os"
-
-	"google.golang.org/protobuf/proto"
 )
 
 // DefaultBufferSize defines a default buffer size (5 MB) for writing parts.
@@ -40,29 +39,41 @@ func (mb *MultipartBuilder) GetBoundary() string {
 	return mb.writer.Boundary()
 }
 
-// AddProtobuf writes a Protobuf message as a part of the multipart stream, including Content-Size header.
-func (mb *MultipartBuilder) AddProtobuf(partName string, pb proto.Message) error {
-	// Marshal the protobuf into bytes.
-	marshaledData, err := proto.Marshal(pb)
-	if err != nil {
-		return fmt.Errorf("failed to marshal protobuf: %v", err)
+// AddProtobuf writes a single or slice of Protobuf messages as a part of the multipart stream,
+// including Content-Size header.
+func (mb *MultipartBuilder) AddProtobuf(partName string, pb interface{}) error {
+	switch v := pb.(type) {
+	case proto.Message:
+		return mb.addSingleOrMultipleProtobuf(partName, []proto.Message{v})
+
+	case []proto.Message:
+		return mb.addSingleOrMultipleProtobuf(partName, v)
+
+	default:
+		return fmt.Errorf("unsupported type: expected proto.Message or []proto.Message, got %T", pb)
+	}
+}
+
+func (mb *MultipartBuilder) addSingleOrMultipleProtobuf(partName string, pbs []proto.Message) error {
+	var concatenatedData []byte
+	for _, pb := range pbs {
+		marshaledData, err := proto.Marshal(pb)
+		if err != nil {
+			return fmt.Errorf("failed to marshal protobuf message: %v", err)
+		}
+		concatenatedData = append(concatenatedData, marshaledData...)
 	}
 
-	// Calculate the size of the protobuf content
-	contentSize := len(marshaledData)
-
-	// Create a part writer with Content-Size added
+	contentSize := len(concatenatedData)
 	partWriter, err := mb.writer.CreatePart(map[string][]string{
 		"Content-Disposition": {fmt.Sprintf(`protobuf; name="%s"`, partName)},
 		"Content-Type":        {"application/protobuf"},
-		"Content-Size":        {fmt.Sprintf("%d", contentSize)}, // Adding Content-Size header
+		"Content-Size":        {fmt.Sprintf("%d", contentSize)},
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create multipart part: %v", err)
 	}
-
-	// Write the protobuf data to the part.
-	_, err = partWriter.Write(marshaledData)
+	_, err = partWriter.Write(concatenatedData)
 	if err != nil {
 		return fmt.Errorf("failed to write protobuf part: %v", err)
 	}

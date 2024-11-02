@@ -341,6 +341,12 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 
 		// Initialize the multipart builder
 		builder, err := multipartkit.NewMultipartBuilder(dstFile, bufferSize)
+		defer func() {
+			err = builder.Finalize()
+			if err != nil {
+				log.Error().Msgf("failed to finalize multipart builder: %v", err)
+			}
+		}()
 		defer builder.Finalize()
 
 		if err != nil {
@@ -352,7 +358,7 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 		contentType = fmt.Sprintf("multipart/mixed; boundary=%s", boundary)
 		// 1. Part1 : protobuf of Finding without evidence
 		// empty evidence and add the Finding, evidence will be a separate part
-		finding.Evidences = []*receptor_v1.Evidence{}
+		//finding.Evidences = []*receptor_v1.Evidence{}
 		err = builder.AddProtobuf("receptor_v1.Finding", finding)
 		if err != nil {
 			log.Error().Msgf("failed to add protobuf message: %v", err)
@@ -368,6 +374,8 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 		}
 		//3. Part3 : Sources : TODO
 
+		err = builder.AddProtobuf("receptor_v1.Sources", evidence.Sources)
+		// evidence.Sources
 		return contentType, dstFile.Name(), nil
 	}
 	return
