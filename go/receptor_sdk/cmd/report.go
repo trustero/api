@@ -347,7 +347,6 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 				log.Error().Msgf("failed to finalize multipart builder: %v", err)
 			}
 		}()
-		defer builder.Finalize()
 
 		if err != nil {
 			log.Error().Msgf("failed to create multipart builder: %v", err)
