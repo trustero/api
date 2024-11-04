@@ -72,7 +72,6 @@ func (mb *MultipartBuilder) AddProtobuf(partName string, pb interface{}) error {
 			protoMessages := make([]proto.Message, rv.Len())
 			for i := 0; i < rv.Len(); i++ {
 				elem := rv.Index(i).Interface()
-
 				// Check if this element implements proto.Message
 				if msg, ok := elem.(proto.Message); ok {
 					protoMessages[i] = msg
