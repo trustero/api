@@ -40,17 +40,15 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}, config inter
 
 	// report in multiple batches
 	evidenceChannel := make(chan []*receptor_sdk.Evidence)
-	go func() {
-		defer close(evidenceChannel)
-		receptorImpl.ReportBatch(credentials, evidenceChannel)
-	}()
+
+	go receptorImpl.ReportBatch(credentials, evidenceChannel)
 
 	for evidences := range evidenceChannel {
 		// Receive evidence and report them one batch at a time
-		err = reportEvidence(rc, &finding, evidences)
+		err := reportEvidence(rc, &finding, evidences)
 		if err != nil {
 			log.Err(err).Msg("failed to report evidence")
-			//return err
+			// Continue on to next batch even after an error
 			continue
 		}
 		finding.Evidences = []*receptor_v1.Evidence{} // Empty every time for new evidence
@@ -103,7 +101,6 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			// make a multipart file and then stream it
 
 			stream, err := rc.StreamReport(context.Background())
-			defer stream.CloseSend()
 			if err != nil {
 				log.Err(err).Msg("failed to stream report")
 				continue
@@ -136,6 +133,11 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 					log.Err(err).Msg("failed to send data chunk")
 					break
 				}
+			}
+			_, err = stream.CloseAndRecv()
+			if err != nil {
+				log.Err(err).Msg("failed to close and receive stream")
+				continue
 			}
 		} else { // evidence is structured
 			reportEvidence.EvidenceType = &receptor_v1.Evidence_Struct{Struct: &reportStruct}
