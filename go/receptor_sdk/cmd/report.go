@@ -108,12 +108,14 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 				log.Err(err).Msg("failed to stream report")
 				continue
 			}
+
+			//send boundary of the multipart first
 			if err = stream.Send(&receptor_v1.ReportChunk{Content: []byte(contentType), IsBoundary: true}); err != nil {
 				log.Err(err).Msg("failed to send data chunk")
 				break
 			}
 
-			//read from the stream file path in chunks
+			//read from the file path and stream in chunks
 			file, err := os.Open(streamFile)
 			defer func() {
 				file.Close()
@@ -355,13 +357,13 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 
 		boundary := builder.GetBoundary()
 		contentType = fmt.Sprintf("multipart/mixed; boundary=%s", boundary)
+
 		// 1. Part1 : protobuf of Finding without evidence
-		// empty evidence and add the Finding, evidence will be a separate part
-		//finding.Evidences = []*receptor_v1.Evidence{}
 		err = builder.AddProtobuf("receptor_v1.Finding", finding)
 		if err != nil {
 			log.Error().Msgf("failed to add protobuf message: %v", err)
 		}
+
 		//2. Part2 : evidence blob
 		if streamFilePath != "" {
 			err = builder.AddFile(evidence.Caption, streamFilePath, mime)
@@ -371,8 +373,8 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 		if err != nil {
 			log.Error().Msgf("failed to add blob part: %v", err)
 		}
-		//3. Part3 : Sources : TODO
 
+		//3. Part3 : Sources
 		err = builder.AddProtobuf("receptor_v1.Sources", evidence.Sources)
 		// evidence.Sources
 		return contentType, dstFile.Name(), nil
