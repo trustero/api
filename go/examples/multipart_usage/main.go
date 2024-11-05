@@ -29,23 +29,13 @@ func main() {
 	// Get the boundary string
 	boundary := builder.GetBoundary()
 
-	// Add a Protobuf message
-	// protoMessage := &common.Identifier{
-	// 	ModelType: common.MODEL_TYPE_ACCOUNT,
-	// 	ModelID:   "123456",
-	// 	SubjectID: "7890",
-	// }
-	// err = builder.AddProtobuf("ModelProtoMessageExample", protoMessage)
-	// if err != nil {
-	// 	log.Fatalf("Failed to add protobuf message: %v", err)
-	// }
-
 	// Add a file part
 	err = builder.AddFile("test1.csv", "test1.csv", "application/csv")
 	if err != nil {
 		log.Fatalf("Failed to add file part: %v", err)
 	}
-	// Add a file part
+
+	// Add another file part
 	err = builder.AddFile("test2.docx", "test2.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 	if err != nil {
 		log.Fatalf("Failed to add file part: %v", err)
