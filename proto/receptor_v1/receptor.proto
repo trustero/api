@@ -124,6 +124,9 @@ message Source {
   string raw_api_response = 2;
 }
 
+message Sources {
+  repeated Source sources = 1;
+}
 
 // Document is an unstructured evidence provided as a MIME document.
 message Document {

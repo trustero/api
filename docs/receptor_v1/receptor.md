@@ -18,6 +18,7 @@
     - [ServiceEntities](#receptor_v1-ServiceEntities)
     - [ServiceEntity](#receptor_v1-ServiceEntity)
     - [Source](#receptor_v1-Source)
+    - [Sources](#receptor_v1-Sources)
     - [Struct](#receptor_v1-Struct)
     - [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry)
     - [Struct.ColTagsEntry](#receptor_v1-Struct-ColTagsEntry)
@@ -282,6 +283,21 @@ Source is the raw service provider API request and response.
 | ----- | ---- | ----- | ----------- |
 | raw_api_request | [string](#string) |  | Raw_api_request is the raw API request used to generate this evidence. |
 | raw_api_response | [string](#string) |  | Raw_api_response is the raw API response used to generate this evidence. |
+
+
+
+
+
+
+<a name="receptor_v1-Sources"></a>
+
+### Sources
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sources | [Source](#receptor_v1-Source) | repeated |  |
 
 
 

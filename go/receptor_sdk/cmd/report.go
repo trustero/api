@@ -377,7 +377,9 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 		}
 
 		//3. Part3 : Sources
-		err = builder.AddProtobuf("receptor_v1.Sources", evidence.Sources)
+		err = builder.AddProtobuf("receptor_v1.Sources", &receptor_v1.Sources{
+			Sources: evidence.Sources,
+		})
 		// evidence.Sources
 		return contentType, dstFile.Name(), nil
 	}
