@@ -11,11 +11,14 @@
     - [JobResult](#receptor_v1-JobResult)
     - [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration)
     - [ReceptorOID](#receptor_v1-ReceptorOID)
+    - [ReportChunk](#receptor_v1-ReportChunk)
+    - [ReportResponse](#receptor_v1-ReportResponse)
     - [Row](#receptor_v1-Row)
     - [Row.ColsEntry](#receptor_v1-Row-ColsEntry)
     - [ServiceEntities](#receptor_v1-ServiceEntities)
     - [ServiceEntity](#receptor_v1-ServiceEntity)
     - [Source](#receptor_v1-Source)
+    - [Sources](#receptor_v1-Sources)
     - [Struct](#receptor_v1-Struct)
     - [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry)
     - [Struct.ColTagsEntry](#receptor_v1-Struct-ColTagsEntry)
@@ -64,6 +67,7 @@ Document is an unstructured evidence provided as a MIME document.
 | ----- | ---- | ----- | ----------- |
 | mime | [string](#string) |  | Mime is the document type defined using [MIME]. [MIME]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types |
 | body | [bytes](#bytes) |  | Body is the opaque document body. The document body must match the type defined by the mime attribute. |
+| stream_file_path | [string](#string) |  | Filepath for streaming large evidence - should be accessible by the server. |
 
 
 
@@ -164,6 +168,37 @@ ReceptorOID is Trustero&#39;s receptor record identifier.
 
 
 
+<a name="receptor_v1-ReportChunk"></a>
+
+### ReportChunk
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| content | [bytes](#bytes) |  |  |
+| is_boundary | [bool](#bool) |  | Whether this chunk contains the boundary |
+
+
+
+
+
+
+<a name="receptor_v1-ReportResponse"></a>
+
+### ReportResponse
+Server response after receiving the whole streamed report
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| status | [string](#string) |  | Could use &#34;ok&#34; or other status information |
+
+
+
+
+
+
 <a name="receptor_v1-Row"></a>
 
 ### Row
@@ -248,6 +283,21 @@ Source is the raw service provider API request and response.
 | ----- | ---- | ----- | ----------- |
 | raw_api_request | [string](#string) |  | Raw_api_request is the raw API request used to generate this evidence. |
 | raw_api_response | [string](#string) |  | Raw_api_response is the raw API response used to generate this evidence. |
+
+
+
+
+
+
+<a name="receptor_v1-Sources"></a>
+
+### Sources
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sources | [Source](#receptor_v1-Source) | repeated |  |
 
 
 
@@ -353,6 +403,7 @@ and contains the service&#39;s configuration information. For example, an AWS S3
 | Report | [Finding](#receptor_v1-Finding) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report a finding to Trustero. A receptor or a Trustero client application reports its findings to Trustero on a periodic basis. This call returns a string value collection ID or an error. |
 | Notify | [JobResult](#receptor_v1-JobResult) | [.google.protobuf.Empty](#google-protobuf-Empty) | Notify Trustero a long running report finding or discover service entities receptor-request has completed. JobResult contains information about the receptor-request and it&#39;s corresponding result. |
 | SetConfiguration | [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration) | [.google.protobuf.Empty](#google-protobuf-Empty) | SetConfiguration reports the configuration for receptors that need extra configuration to access a service. This call is typically made as a callback by a receptor after credential verification. |
+| StreamReport | [ReportChunk](#receptor_v1-ReportChunk) stream | [ReportResponse](#receptor_v1-ReportResponse) |  |
 
  
 

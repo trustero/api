@@ -44,6 +44,11 @@ service Receptor {
   // SetConfiguration reports the configuration for receptors that need extra configuration to access a service.
   // This call is typically made as a callback by a receptor after credential verification.
   rpc SetConfiguration(ReceptorConfiguration) returns (google.protobuf.Empty);
+
+
+  rpc StreamReport(stream ReportChunk) returns (ReportResponse);
+
+
 }
 
 
@@ -99,6 +104,8 @@ message Evidence {
 
     // Struct is a structured evidence.
     Struct struct = 7;
+
+
   }
 
   // Service_account_id is the member account of the organization. For example, an AWS account number in an organization
@@ -117,6 +124,9 @@ message Source {
   string raw_api_response = 2;
 }
 
+message Sources {
+  repeated Source sources = 1;
+}
 
 // Document is an unstructured evidence provided as a MIME document.
 message Document {
@@ -127,6 +137,9 @@ message Document {
 
   // Body is the opaque document body.  The document body must match the type defined by the mime attribute.
   bytes body = 3;
+  
+  // Filepath for streaming large evidence - should be accessible by the server.
+  string stream_file_path = 4;
 }
 
 
@@ -303,3 +316,13 @@ message JobResult {
   string exceptions = 5;
 
 }
+
+message ReportChunk {
+  bytes content = 1;
+  bool is_boundary = 2; // Whether this chunk contains the boundary
+}
+
+// Server response after receiving the whole streamed report
+message ReportResponse {
+  string status = 1;  // Could use "ok" or other status information
+} 

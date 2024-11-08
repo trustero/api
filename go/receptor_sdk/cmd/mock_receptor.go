@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/trustero/api/go/receptor_v1"
 	receptor "github.com/trustero/api/go/receptor_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -132,4 +133,8 @@ func (rc *mockReceptorClient) SetConfiguration(ctx context.Context, c *receptor.
 	}
 	println(footer)
 	return
+}
+
+func (rc *mockReceptorClient) StreamReport(context.Context, ...grpc.CallOption) (grpc.ClientStreamingClient[receptor_v1.ReportChunk, receptor_v1.ReportResponse], error) {
+	return nil, nil
 }
