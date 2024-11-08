@@ -20,6 +20,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+const mulitpartPrefix = "multipart/tr-mixed"
+
 func report(rc receptor_v1.ReceptorClient, credentials interface{}, config interface{}) (err error) {
 
 	// Report discovered evidence to Trustero
@@ -75,7 +77,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			ServiceAccountId: evidence.ServiceAccountId,
 		}
 
-		if evidence.Document != nil { // evidence is a blob or path to blob
+		if evidence.Document != nil { // evidence is a blob and/or path to blob
 			// create a new finding from current finding and add evidence
 			reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
 				Doc: &receptor_v1.Document{
@@ -333,7 +335,7 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 		// the mime of the part should be the mime from the evidence.doc.Mime
 		dstFile, err := os.CreateTemp("", "multipart-evidence_*.tmp")
 		if err != nil {
-			log.Error().Msgf("failed to create multipart file: %v", err)
+			log.Err(err).Msg("failed to create multipart file")
 			return "", "", err
 		}
 
@@ -348,7 +350,7 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 		defer func() {
 			err = builder.Finalize()
 			if err != nil {
-				log.Error().Msgf("failed to finalize multipart builder: %v", err)
+				log.Err(err).Msg("failed to finalize multipart builder")
 			}
 		}()
 
@@ -358,7 +360,7 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 		}
 
 		boundary := builder.GetBoundary()
-		contentType = fmt.Sprintf("multipart/mixed; boundary=%s", boundary)
+		contentType = fmt.Sprintf("%s; %s; boundary=%s", mulitpartPrefix, mime, boundary)
 
 		// 1. Part1 : protobuf of Finding without evidence
 		err = builder.AddProtobuf("receptor_v1.Finding", finding)
@@ -367,13 +369,19 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 		}
 
 		//2. Part2 : evidence blob
+		if body != nil && len(body) > 0 {
+			err = builder.AddBytes(evidence.Caption, evidence.Caption, mime, body)
+			if err != nil {
+				log.Err(err).Msgf("failed to add blob part: %s", evidence.Caption)
+			}
+		}
+
+		//3. Part3 : evidence path
 		if streamFilePath != "" {
 			err = builder.AddFile(evidence.Caption, streamFilePath, mime)
-		} else {
-			err = builder.AddBytes(evidence.Caption, evidence.Caption, mime, body)
-		}
-		if err != nil {
-			log.Error().Msgf("failed to add blob part: %v", err)
+			if err != nil {
+				log.Err(err).Msgf("failed to add stream file : %s", evidence.Caption)
+			}
 		}
 
 		//3. Part3 : Sources

@@ -154,7 +154,7 @@ func (mb *MultipartBuilder) AddFile(partName, filePath, contentType string) erro
 
 	// Create the part with all headers, including Content-Hash
 	partWriter, err := mb.writer.CreatePart(map[string][]string{
-		"Content-Disposition": {fmt.Sprintf(`file; name="%s"; filename="%s"`, partName, filePath)},
+		"Content-Disposition": {fmt.Sprintf(`file; name="%s"; filename="%s"`, partName, partName)},
 		"Content-Type":        {contentType},
 		"Content-Size":        {fmt.Sprintf("%d", fileInfo.Size())},
 		"Content-Hash":        {contentHash},
