@@ -254,52 +254,58 @@ func RowToStructRow(row interface{}, entityIdFieldName string, rowFieldNames []s
 					BoolValue: v.Bool(),
 				},
 			}
-			break
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32:
 			reportRow.Cols[fieldName] = &receptor_v1.Value{
 				ValueType: &receptor_v1.Value_Int32Value{
 					Int32Value: int32(v.Int()),
 				},
 			}
-			break
 		case reflect.Int64:
 			reportRow.Cols[fieldName] = &receptor_v1.Value{
 				ValueType: &receptor_v1.Value_Int64Value{
 					Int64Value: v.Int(),
 				},
 			}
-			break
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
 			reportRow.Cols[fieldName] = &receptor_v1.Value{
 				ValueType: &receptor_v1.Value_Uint32Value{
 					Uint32Value: uint32(v.Uint()),
 				},
 			}
-			break
 		case reflect.Uint64:
 			reportRow.Cols[fieldName] = &receptor_v1.Value{
 				ValueType: &receptor_v1.Value_Uint64Value{
 					Uint64Value: v.Uint(),
 				},
 			}
-			break
 		case reflect.Float32, reflect.Float64:
 			reportRow.Cols[fieldName] = &receptor_v1.Value{
 				ValueType: &receptor_v1.Value_DoubleValue{
 					DoubleValue: v.Float(),
 				},
 			}
-			break
 		case reflect.String:
 			reportRow.Cols[fieldName] = &receptor_v1.Value{
 				ValueType: &receptor_v1.Value_StringValue{
 					StringValue: v.String(),
 				},
 			}
-			break
+		case reflect.Slice:
+			if v.Type().Elem().Kind() == reflect.String {
+				var stringArray receptor_v1.StringList
+				for i := 0; i < v.Len(); i++ {
+					stringArray.Values = append(stringArray.Values, v.Index(i).String())
+				}
+				reportRow.Cols[fieldName] = &receptor_v1.Value{
+					ValueType: &receptor_v1.Value_StringListValue{
+						StringListValue: &stringArray,
+					},
+				}
+			} else {
+				log.Warn().Msg("unsupported evidence row field (" + fieldName + ") type")
+			}
 		default:
 			log.Warn().Msg("unsupported evidence row field (" + fieldName + ") type")
-			break
 		}
 	}
 
