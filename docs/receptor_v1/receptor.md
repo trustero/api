@@ -19,6 +19,7 @@
     - [ServiceEntity](#receptor_v1-ServiceEntity)
     - [Source](#receptor_v1-Source)
     - [Sources](#receptor_v1-Sources)
+    - [StringList](#receptor_v1-StringList)
     - [Struct](#receptor_v1-Struct)
     - [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry)
     - [Struct.ColTagsEntry](#receptor_v1-Struct-ColTagsEntry)
@@ -304,6 +305,21 @@ Source is the raw service provider API request and response.
 
 
 
+<a name="receptor_v1-StringList"></a>
+
+### StringList
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| values | [string](#string) | repeated |  |
+
+
+
+
+
+
 <a name="receptor_v1-Struct"></a>
 
 ### Struct
@@ -374,6 +390,7 @@ Value is a [Struct.row.col] column value.  Value types can be simple protobuf sc
 | bool_value | [bool](#bool) |  |  |
 | string_value | [string](#string) |  |  |
 | timestamp_value | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
+| string_list_value | [StringList](#receptor_v1-StringList) |  |  |
 
 
 

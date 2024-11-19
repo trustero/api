@@ -193,9 +193,13 @@ message Value {
     bool bool_value = 7;
     string string_value = 8;
     google.protobuf.Timestamp timestamp_value = 9;
+    StringList string_list_value = 10;
   }
 }
 
+message StringList {
+  repeated string values = 1;
+}
 
 // ServiceEntities are configurable entities within a service provider account.  For example, service entities in
 // an AWS account include S3 buckets, ECS clusters, RDS database instances, etc.  The boundary of a service entity
