@@ -51,6 +51,7 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}, config inter
 		if err != nil {
 			log.Err(err).Msg("failed to report evidence")
 			// Continue on to next batch even after an error
+			finding.Evidences = []*receptor_v1.Evidence{} // Empty every time for new evidence
 			continue
 		}
 		finding.Evidences = []*receptor_v1.Evidence{} // Empty every time for new evidence
@@ -159,10 +160,10 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			// Append to Finding
 			finding.Evidences = append(finding.Evidences, &reportEvidence)
 		}
-
-		// Report evidence findings to Trustero
-		_, err = rc.Report(context.Background(), finding)
 	}
+	_, err = rc.Report(context.Background(), finding)
+	finding.Evidences = []*receptor_v1.Evidence{} // Empty every time for new evidence
+
 	return
 
 }
