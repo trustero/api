@@ -43,6 +43,10 @@ As a developer, you will need to implement the following functions to have a wor
 8. func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.ServiceEntity, err error) {}
 9. func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {}
 10. func (r *Receptor) GetEvidenceInfo() (evidences []*receptor_sdk.Evidence) {}
+11. func (r *Receptor) ReportBatch(credentials interface{}, evidenceChan chan []*receptor_sdk.Evidence) {}
+12. func (r *Receptor) Configure(credentials interface{}) (config *receptor_v1.ReceptorConfiguration, err error) {}
+13. func (r *Receptor) GetInstructions() (instructions string, err error) {}
+14. func (r *Receptor) GetLogo() (svgContent string, err error) {}
 
 ```go
 package main
@@ -104,9 +108,29 @@ func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Ev
 	return
 }
 
+func (r *Receptor) ReportBatch(credentials interface{}, evidenceChan chan []*receptor_sdk.Evidence) {
+	// YOUR CODE HERE
+	close(evidenceChan)
+}
+
 func (r *Receptor) GetEvidenceInfo() (evidences []*receptor_sdk.Evidence) {
    //YOUR CODE HERE
    return
+}
+
+func (r *Receptor) Configure(credentials interface{}) (config *receptor_v1.ReceptorConfiguration, err error) {
+	// YOUR CODE HERE
+	return 
+}
+
+func (r *Receptor) GetInstructions() (instructions string, err error) {
+	// YOUR CODE HERE
+	return
+}
+
+func (r *Receptor) GetLogo() (svgContent string, err error) {
+	// YOUR CODE HERE
+	return
 }
 
 func main() {
