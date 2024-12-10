@@ -16,7 +16,7 @@ from google.protobuf import wrappers_pb2 as google_dot_protobuf_dot_wrappers__pb
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1areceptor_v1/receptor.proto\x12\x0breceptor_v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9a\x01\n\x07\x46inding\x12\x15\n\rreceptor_type\x18\x01 \x01(\t\x12 \n\x18service_provider_account\x18\x02 \x01(\t\x12,\n\x08\x65ntities\x18\x03 \x03(\x0b\x32\x1a.receptor_v1.ServiceEntity\x12(\n\tevidences\x18\x04 \x03(\x0b\x32\x15.receptor_v1.Evidence\"\xdf\x01\n\x08\x45vidence\x12\x0f\n\x07\x63\x61ption\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x14\n\x0cservice_name\x18\x03 \x01(\t\x12\x13\n\x0b\x65ntity_type\x18\x04 \x01(\t\x12$\n\x07sources\x18\x05 \x03(\x0b\x32\x13.receptor_v1.Source\x12$\n\x03\x64oc\x18\x06 \x01(\x0b\x32\x15.receptor_v1.DocumentH\x00\x12%\n\x06struct\x18\x07 \x01(\x0b\x32\x13.receptor_v1.StructH\x00\x42\x0f\n\revidence_type\";\n\x06Source\x12\x17\n\x0fraw_api_request\x18\x01 \x01(\t\x12\x18\n\x10raw_api_response\x18\x02 \x01(\t\"&\n\x08\x44ocument\x12\x0c\n\x04mime\x18\x02 \x01(\t\x12\x0c\n\x04\x62ody\x18\x03 \x01(\x0c\"\xa4\x02\n\x06Struct\x12\x1e\n\x04rows\x18\x02 \x03(\x0b\x32\x10.receptor_v1.Row\x12\x43\n\x11\x63ol_display_names\x18\x03 \x03(\x0b\x32(.receptor_v1.Struct.ColDisplayNamesEntry\x12\x19\n\x11\x63ol_display_order\x18\x04 \x03(\t\x12\x32\n\x08\x63ol_tags\x18\x05 \x03(\x0b\x32 .receptor_v1.Struct.ColTagsEntry\x1a\x36\n\x14\x43olDisplayNamesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a.\n\x0c\x43olTagsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x8c\x01\n\x03Row\x12\x1a\n\x12\x65ntity_instance_id\x18\x01 \x01(\t\x12(\n\x04\x63ols\x18\x02 \x03(\x0b\x32\x1a.receptor_v1.Row.ColsEntry\x1a?\n\tColsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12!\n\x05value\x18\x02 \x01(\x0b\x32\x12.receptor_v1.Value:\x02\x38\x01\"\x87\x02\n\x05Value\x12\x16\n\x0c\x64ouble_value\x18\x01 \x01(\x01H\x00\x12\x15\n\x0b\x66loat_value\x18\x02 \x01(\x02H\x00\x12\x15\n\x0bint32_value\x18\x03 \x01(\x05H\x00\x12\x15\n\x0bint64_value\x18\x04 \x01(\x03H\x00\x12\x16\n\x0cuint32_value\x18\x05 \x01(\rH\x00\x12\x16\n\x0cuint64_value\x18\x06 \x01(\x04H\x00\x12\x14\n\nbool_value\x18\x07 \x01(\x08H\x00\x12\x16\n\x0cstring_value\x18\x08 \x01(\tH\x00\x12\x35\n\x0ftimestamp_value\x18\t \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x00\x42\x0c\n\nvalue_type\"x\n\x0fServiceEntities\x12\x15\n\rreceptor_type\x18\x01 \x01(\t\x12 \n\x18service_provider_account\x18\x02 \x01(\t\x12,\n\x08\x65ntities\x18\x03 \x03(\x0b\x32\x1a.receptor_v1.ServiceEntity\"t\n\rServiceEntity\x12\x14\n\x0cservice_name\x18\x01 \x01(\t\x12\x13\n\x0b\x65ntity_type\x18\x02 \x01(\t\x12\x1c\n\x14\x65ntity_instance_name\x18\x03 \x01(\t\x12\x1a\n\x12\x65ntity_instance_id\x18\x04 \x01(\t\"j\n\nCredential\x12\x1a\n\x12receptor_object_id\x18\x01 \x01(\t\x12\x12\n\ncredential\x18\x02 \x01(\t\x12\x1b\n\x13is_credential_valid\x18\x03 \x01(\x08\x12\x0f\n\x07message\x18\x04 \x01(\t\")\n\x0bReceptorOID\x12\x1a\n\x12receptor_object_id\x18\x01 \x01(\t\"y\n\x15ReceptorConfiguration\x12\x1a\n\x12receptor_object_id\x18\x01 \x01(\t\x12\x12\n\ncredential\x18\x02 \x01(\t\x12\x0e\n\x06\x63onfig\x18\x03 \x01(\t\x12 \n\x18service_provider_account\x18\x04 \x01(\t\"[\n\tJobResult\x12\x11\n\ttracer_id\x18\x01 \x01(\t\x12\x0f\n\x07\x63ommand\x18\x02 \x01(\t\x12\x0e\n\x06result\x18\x03 \x01(\t\x12\x1a\n\x12receptor_object_id\x18\x04 \x01(\t2\xdb\x02\n\x08Receptor\x12;\n\x08Verified\x12\x17.receptor_v1.Credential\x1a\x16.google.protobuf.Empty\x12P\n\x10GetConfiguration\x12\x18.receptor_v1.ReceptorOID\x1a\".receptor_v1.ReceptorConfiguration\x12H\n\nDiscovered\x12\x1c.receptor_v1.ServiceEntities\x1a\x1c.google.protobuf.StringValue\x12<\n\x06Report\x12\x14.receptor_v1.Finding\x1a\x1c.google.protobuf.StringValue\x12\x38\n\x06Notify\x12\x16.receptor_v1.JobResult\x1a\x16.google.protobuf.EmptyB(Z&github.com/trustero/api/go/receptor_v1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1areceptor_v1/receptor.proto\x12\x0breceptor_v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9a\x01\n\x07\x46inding\x12\x15\n\rreceptor_type\x18\x01 \x01(\t\x12 \n\x18service_provider_account\x18\x02 \x01(\t\x12,\n\x08\x65ntities\x18\x03 \x03(\x0b\x32\x1a.receptor_v1.ServiceEntity\x12(\n\tevidences\x18\x04 \x03(\x0b\x32\x15.receptor_v1.Evidence\"\xfb\x01\n\x08\x45vidence\x12\x0f\n\x07\x63\x61ption\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x14\n\x0cservice_name\x18\x03 \x01(\t\x12\x13\n\x0b\x65ntity_type\x18\x04 \x01(\t\x12$\n\x07sources\x18\x05 \x03(\x0b\x32\x13.receptor_v1.Source\x12$\n\x03\x64oc\x18\x06 \x01(\x0b\x32\x15.receptor_v1.DocumentH\x00\x12%\n\x06struct\x18\x07 \x01(\x0b\x32\x13.receptor_v1.StructH\x00\x12\x1a\n\x12service_account_id\x18\x08 \x01(\tB\x0f\n\revidence_type\";\n\x06Source\x12\x17\n\x0fraw_api_request\x18\x01 \x01(\t\x12\x18\n\x10raw_api_response\x18\x02 \x01(\t\"/\n\x07Sources\x12$\n\x07sources\x18\x01 \x03(\x0b\x32\x13.receptor_v1.Source\"@\n\x08\x44ocument\x12\x0c\n\x04mime\x18\x02 \x01(\t\x12\x0c\n\x04\x62ody\x18\x03 \x01(\x0c\x12\x18\n\x10stream_file_path\x18\x04 \x01(\t\"\xa4\x02\n\x06Struct\x12\x1e\n\x04rows\x18\x02 \x03(\x0b\x32\x10.receptor_v1.Row\x12\x43\n\x11\x63ol_display_names\x18\x03 \x03(\x0b\x32(.receptor_v1.Struct.ColDisplayNamesEntry\x12\x19\n\x11\x63ol_display_order\x18\x04 \x03(\t\x12\x32\n\x08\x63ol_tags\x18\x05 \x03(\x0b\x32 .receptor_v1.Struct.ColTagsEntry\x1a\x36\n\x14\x43olDisplayNamesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a.\n\x0c\x43olTagsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x8c\x01\n\x03Row\x12\x1a\n\x12\x65ntity_instance_id\x18\x01 \x01(\t\x12(\n\x04\x63ols\x18\x02 \x03(\x0b\x32\x1a.receptor_v1.Row.ColsEntry\x1a?\n\tColsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12!\n\x05value\x18\x02 \x01(\x0b\x32\x12.receptor_v1.Value:\x02\x38\x01\"\xbd\x02\n\x05Value\x12\x16\n\x0c\x64ouble_value\x18\x01 \x01(\x01H\x00\x12\x15\n\x0b\x66loat_value\x18\x02 \x01(\x02H\x00\x12\x15\n\x0bint32_value\x18\x03 \x01(\x05H\x00\x12\x15\n\x0bint64_value\x18\x04 \x01(\x03H\x00\x12\x16\n\x0cuint32_value\x18\x05 \x01(\rH\x00\x12\x16\n\x0cuint64_value\x18\x06 \x01(\x04H\x00\x12\x14\n\nbool_value\x18\x07 \x01(\x08H\x00\x12\x16\n\x0cstring_value\x18\x08 \x01(\tH\x00\x12\x35\n\x0ftimestamp_value\x18\t \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x00\x12\x34\n\x11string_list_value\x18\n \x01(\x0b\x32\x17.receptor_v1.StringListH\x00\x42\x0c\n\nvalue_type\"\x1c\n\nStringList\x12\x0e\n\x06values\x18\x01 \x03(\t\"x\n\x0fServiceEntities\x12\x15\n\rreceptor_type\x18\x01 \x01(\t\x12 \n\x18service_provider_account\x18\x02 \x01(\t\x12,\n\x08\x65ntities\x18\x03 \x03(\x0b\x32\x1a.receptor_v1.ServiceEntity\"\x90\x01\n\rServiceEntity\x12\x14\n\x0cservice_name\x18\x01 \x01(\t\x12\x13\n\x0b\x65ntity_type\x18\x02 \x01(\t\x12\x1c\n\x14\x65ntity_instance_name\x18\x03 \x01(\t\x12\x1a\n\x12\x65ntity_instance_id\x18\x04 \x01(\t\x12\x1a\n\x12service_account_id\x18\x05 \x01(\t\"~\n\nCredential\x12\x1a\n\x12receptor_object_id\x18\x01 \x01(\t\x12\x12\n\ncredential\x18\x02 \x01(\t\x12\x1b\n\x13is_credential_valid\x18\x03 \x01(\x08\x12\x0f\n\x07message\x18\x04 \x01(\t\x12\x12\n\nexceptions\x18\x05 \x01(\t\")\n\x0bReceptorOID\x12\x1a\n\x12receptor_object_id\x18\x01 \x01(\t\"\x8b\x01\n\x15ReceptorConfiguration\x12\x1a\n\x12receptor_object_id\x18\x01 \x01(\t\x12\x12\n\ncredential\x18\x02 \x01(\t\x12\x0e\n\x06\x63onfig\x18\x03 \x01(\t\x12 \n\x18service_provider_account\x18\x04 \x01(\t\x12\x10\n\x08model_id\x18\x05 \x01(\t\"o\n\tJobResult\x12\x11\n\ttracer_id\x18\x01 \x01(\t\x12\x0f\n\x07\x63ommand\x18\x02 \x01(\t\x12\x0e\n\x06result\x18\x03 \x01(\t\x12\x1a\n\x12receptor_object_id\x18\x04 \x01(\t\x12\x12\n\nexceptions\x18\x05 \x01(\t\"3\n\x0bReportChunk\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\x12\x13\n\x0bis_boundary\x18\x02 \x01(\x08\" \n\x0eReportResponse\x12\x0e\n\x06status\x18\x01 \x01(\t2\xf4\x03\n\x08Receptor\x12;\n\x08Verified\x12\x17.receptor_v1.Credential\x1a\x16.google.protobuf.Empty\x12P\n\x10GetConfiguration\x12\x18.receptor_v1.ReceptorOID\x1a\".receptor_v1.ReceptorConfiguration\x12H\n\nDiscovered\x12\x1c.receptor_v1.ServiceEntities\x1a\x1c.google.protobuf.StringValue\x12<\n\x06Report\x12\x14.receptor_v1.Finding\x1a\x1c.google.protobuf.StringValue\x12\x38\n\x06Notify\x12\x16.receptor_v1.JobResult\x1a\x16.google.protobuf.Empty\x12N\n\x10SetConfiguration\x12\".receptor_v1.ReceptorConfiguration\x1a\x16.google.protobuf.Empty\x12G\n\x0cStreamReport\x12\x18.receptor_v1.ReportChunk\x1a\x1b.receptor_v1.ReportResponse(\x01\x42(Z&github.com/trustero/api/go/receptor_v1b\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'receptor_v1.receptor_pb2', globals())
@@ -33,35 +33,43 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _FINDING._serialized_start=138
   _FINDING._serialized_end=292
   _EVIDENCE._serialized_start=295
-  _EVIDENCE._serialized_end=518
-  _SOURCE._serialized_start=520
-  _SOURCE._serialized_end=579
-  _DOCUMENT._serialized_start=581
-  _DOCUMENT._serialized_end=619
-  _STRUCT._serialized_start=622
-  _STRUCT._serialized_end=914
-  _STRUCT_COLDISPLAYNAMESENTRY._serialized_start=812
-  _STRUCT_COLDISPLAYNAMESENTRY._serialized_end=866
-  _STRUCT_COLTAGSENTRY._serialized_start=868
-  _STRUCT_COLTAGSENTRY._serialized_end=914
-  _ROW._serialized_start=917
-  _ROW._serialized_end=1057
-  _ROW_COLSENTRY._serialized_start=994
-  _ROW_COLSENTRY._serialized_end=1057
-  _VALUE._serialized_start=1060
-  _VALUE._serialized_end=1323
-  _SERVICEENTITIES._serialized_start=1325
-  _SERVICEENTITIES._serialized_end=1445
-  _SERVICEENTITY._serialized_start=1447
-  _SERVICEENTITY._serialized_end=1563
-  _CREDENTIAL._serialized_start=1565
-  _CREDENTIAL._serialized_end=1671
-  _RECEPTOROID._serialized_start=1673
-  _RECEPTOROID._serialized_end=1714
-  _RECEPTORCONFIGURATION._serialized_start=1716
-  _RECEPTORCONFIGURATION._serialized_end=1837
-  _JOBRESULT._serialized_start=1839
-  _JOBRESULT._serialized_end=1930
-  _RECEPTOR._serialized_start=1933
-  _RECEPTOR._serialized_end=2280
+  _EVIDENCE._serialized_end=546
+  _SOURCE._serialized_start=548
+  _SOURCE._serialized_end=607
+  _SOURCES._serialized_start=609
+  _SOURCES._serialized_end=656
+  _DOCUMENT._serialized_start=658
+  _DOCUMENT._serialized_end=722
+  _STRUCT._serialized_start=725
+  _STRUCT._serialized_end=1017
+  _STRUCT_COLDISPLAYNAMESENTRY._serialized_start=915
+  _STRUCT_COLDISPLAYNAMESENTRY._serialized_end=969
+  _STRUCT_COLTAGSENTRY._serialized_start=971
+  _STRUCT_COLTAGSENTRY._serialized_end=1017
+  _ROW._serialized_start=1020
+  _ROW._serialized_end=1160
+  _ROW_COLSENTRY._serialized_start=1097
+  _ROW_COLSENTRY._serialized_end=1160
+  _VALUE._serialized_start=1163
+  _VALUE._serialized_end=1480
+  _STRINGLIST._serialized_start=1482
+  _STRINGLIST._serialized_end=1510
+  _SERVICEENTITIES._serialized_start=1512
+  _SERVICEENTITIES._serialized_end=1632
+  _SERVICEENTITY._serialized_start=1635
+  _SERVICEENTITY._serialized_end=1779
+  _CREDENTIAL._serialized_start=1781
+  _CREDENTIAL._serialized_end=1907
+  _RECEPTOROID._serialized_start=1909
+  _RECEPTOROID._serialized_end=1950
+  _RECEPTORCONFIGURATION._serialized_start=1953
+  _RECEPTORCONFIGURATION._serialized_end=2092
+  _JOBRESULT._serialized_start=2094
+  _JOBRESULT._serialized_end=2205
+  _REPORTCHUNK._serialized_start=2207
+  _REPORTCHUNK._serialized_end=2258
+  _REPORTRESPONSE._serialized_start=2260
+  _REPORTRESPONSE._serialized_end=2292
+  _RECEPTOR._serialized_start=2295
+  _RECEPTOR._serialized_end=2795
 # @@protoc_insertion_point(module_scope)
