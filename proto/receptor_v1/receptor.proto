@@ -111,6 +111,9 @@ message Evidence {
   // Service_account_id is the member account of the organization. For example, an AWS account number in an organization
   // that has more than one account.
     string service_account_id = 8;
+
+  //Controls is a list of control names that the evidence is associated with.
+  repeated string controls = 9;
 }
 
 
