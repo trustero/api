@@ -134,6 +134,7 @@ type Evidence struct {
 	Rows             []interface{}         // Rows of formatted evidence represented by a Golang struct.
 	ServiceAccountId string                // AccountId of multi-account organization
 	Document         *Document             // Unstructured evidence in a Document format
+	Controls         []string              // Controls associated with the evidence
 
 }
 
