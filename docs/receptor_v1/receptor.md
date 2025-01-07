@@ -93,6 +93,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | struct | [Struct](#receptor_v1-Struct) |  | Struct is a structured evidence. |
 | service_account_id | [string](#string) |  | Service_account_id is the member account of the organization. For example, an AWS account number in an organization that has more than one account. |
 | controls | [string](#string) | repeated | Controls is a list of control names that the evidence is associated with. |
+| is_manual | [bool](#bool) |  | is_manual is a boolean that indicates whether the evidence was manually collected or not. |
 
 
 

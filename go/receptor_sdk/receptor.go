@@ -135,6 +135,7 @@ type Evidence struct {
 	ServiceAccountId string                // AccountId of multi-account organization
 	Document         *Document             // Unstructured evidence in a Document format
 	Controls         []string              // Controls associated with the evidence
+	IsManual         bool                  // If true, the evidence was manually collected
 
 }
 

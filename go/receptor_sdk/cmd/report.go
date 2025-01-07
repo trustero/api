@@ -76,6 +76,8 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			EntityType:       evidence.EntityType,
 			Sources:          evidence.Sources,
 			ServiceAccountId: evidence.ServiceAccountId,
+			Controls:         evidence.Controls,
+			IsManual:         evidence.IsManual,
 		}
 
 		if evidence.Document != nil { // evidence is a blob and/or path to blob
