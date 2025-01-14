@@ -55,7 +55,7 @@ jobs:
       - name: Setup Poetry
         uses: pronovic/setup-poetry@v1
         with:
-          version: "${{ inputs.poetry-version }}"
+          version: 1.8.5
           plugins: "poetry-dynamic-versioning[plugin]:0.22.0,${{ inputs.poetry-plugins }}"
           cache-venv: "${{ inputs.poetry-cache-venv }}"
           cache-poetry: "${{ inputs.poetry-cache-install }}"
