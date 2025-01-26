@@ -117,6 +117,13 @@ message Evidence {
 
   // is_manual is a boolean that indicates whether the evidence was manually collected or not.
   bool is_manual = 10;
+
+  // relevant_date is the date the evidence was collected.
+  google.protobuf.Timestamp relevant_date = 11;
+
+  // do_not_duplicate is a boolean that indicates whether the evidence should be duplicated or not.
+  bool do_not_duplicate = 12;
+
 }
 
 
