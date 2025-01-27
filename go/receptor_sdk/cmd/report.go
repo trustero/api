@@ -79,7 +79,6 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			Controls:         evidence.Controls,
 			IsManual:         evidence.IsManual,
 			RelevantDate:     &evidence.RelevantDate,
-			DoNotDuplicate:   evidence.DoNotDuplicate,
 		}
 
 		if evidence.Document != nil { // evidence is a blob and/or path to blob

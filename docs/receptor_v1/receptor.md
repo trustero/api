@@ -95,7 +95,6 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | controls | [string](#string) | repeated | Controls is a list of control names that the evidence is associated with. |
 | is_manual | [bool](#bool) |  | is_manual is a boolean that indicates whether the evidence was manually collected or not. |
 | relevant_date | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | relevant_date is the date the evidence was collected. |
-| do_not_duplicate | [bool](#bool) |  | do_not_duplicate is a boolean that indicates whether the evidence should be duplicated or not. |
 
 
 
