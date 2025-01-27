@@ -8,6 +8,7 @@ package receptor_sdk
 
 import (
 	"github.com/trustero/api/go/receptor_v1"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Global variables available to the receptor
@@ -136,6 +137,7 @@ type Evidence struct {
 	Document         *Document             // Unstructured evidence in a Document format
 	Controls         []string              // Controls associated with the evidence
 	IsManual         bool                  // If true, the evidence was manually collected
+	RelevantDate     timestamppb.Timestamp // Relevant date of the evidence
 
 }
 
