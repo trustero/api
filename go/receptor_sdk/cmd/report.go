@@ -295,7 +295,8 @@ func RowToStructRow(row interface{}, entityIdFieldName string, rowFieldNames []s
 				},
 			}
 		case reflect.Slice:
-			if v.Type().Elem().Kind() == reflect.String {
+			elemType := v.Type().Elem()
+			if elemType.Kind() == reflect.String {
 				var stringArray receptor_v1.StringList
 				for i := 0; i < v.Len(); i++ {
 					stringArray.Values = append(stringArray.Values, v.Index(i).String())
@@ -303,6 +304,23 @@ func RowToStructRow(row interface{}, entityIdFieldName string, rowFieldNames []s
 				reportRow.Cols[fieldName] = &receptor_v1.Value{
 					ValueType: &receptor_v1.Value_StringListValue{
 						StringListValue: &stringArray,
+					},
+				}
+			} else if elemType.Kind() == reflect.Struct {
+				var structList receptor_v1.StructList
+				for i := 0; i < v.Len(); i++ {
+					structElem := v.Index(i)
+					structMap := make(map[string]*receptor_v1.Value)
+					for j := 0; j < structElem.NumField(); j++ {
+						structField := structElem.Type().Field(j)
+						fieldVal := structElem.Field(j).Interface()
+						structMap[structField.Name] = mapToValue(fieldVal)
+					}
+					structList.Values = append(structList.Values, &receptor_v1.StructStruct{Fields: structMap})
+				}
+				reportRow.Cols[fieldName] = &receptor_v1.Value{
+					ValueType: &receptor_v1.Value_StructListValue{
+						StructListValue: &structList,
 					},
 				}
 			} else {
@@ -314,6 +332,53 @@ func RowToStructRow(row interface{}, entityIdFieldName string, rowFieldNames []s
 	}
 
 	return
+}
+
+func mapToValue(val interface{}) *receptor_v1.Value {
+	switch v := val.(type) {
+	case bool:
+		return &receptor_v1.Value{
+			ValueType: &receptor_v1.Value_BoolValue{BoolValue: v},
+		}
+	case int, int8, int16, int32:
+		return &receptor_v1.Value{
+			ValueType: &receptor_v1.Value_Int32Value{Int32Value: int32(reflect.ValueOf(v).Int())},
+		}
+	case int64:
+		return &receptor_v1.Value{
+			ValueType: &receptor_v1.Value_Int64Value{Int64Value: v},
+		}
+	case uint, uint8, uint16, uint32:
+		return &receptor_v1.Value{
+			ValueType: &receptor_v1.Value_Uint32Value{Uint32Value: uint32(reflect.ValueOf(v).Uint())},
+		}
+	case uint64:
+		return &receptor_v1.Value{
+			ValueType: &receptor_v1.Value_Uint64Value{Uint64Value: v},
+		}
+	case float32, float64:
+		return &receptor_v1.Value{
+			ValueType: &receptor_v1.Value_DoubleValue{DoubleValue: reflect.ValueOf(v).Float()},
+		}
+	case string:
+		return &receptor_v1.Value{
+			ValueType: &receptor_v1.Value_StringValue{StringValue: v},
+		}
+	case time.Time:
+		return &receptor_v1.Value{
+			ValueType: &receptor_v1.Value_TimestampValue{TimestampValue: timestamppb.New(v)},
+		}
+	case *time.Time:
+		if v != nil {
+			return &receptor_v1.Value{
+				ValueType: &receptor_v1.Value_TimestampValue{TimestampValue: timestamppb.New(*v)},
+			}
+		}
+		return &receptor_v1.Value{} // Return empty value for nil *time.Time
+	default:
+		// Handle unsupported types as needed
+		return &receptor_v1.Value{} // Return a default value if needed
+	}
 }
 
 func getField(v interface{}, field string) string {

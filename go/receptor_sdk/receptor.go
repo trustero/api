@@ -127,17 +127,18 @@ type Receptor interface {
 //	    Username string  `trustero:"id;display:User Name;order:1"`
 //	}
 type Evidence struct {
-	ServiceName      string                // ServiceName where this evidence was gathered. For example, "S3".
-	EntityType       string                // EntityType of rows of evidence.  For example, "bucket".
-	Caption          string                // Caption identifies the evidence.
-	Description      string                // Description provides additional information on origins of the evidence.
-	Sources          []*receptor_v1.Source // Sources of raw API request and response used to gather the evidence.
-	Rows             []interface{}         // Rows of formatted evidence represented by a Golang struct.
-	ServiceAccountId string                // AccountId of multi-account organization
-	Document         *Document             // Unstructured evidence in a Document format
-	Controls         []string              // Controls associated with the evidence
-	IsManual         bool                  // If true, the evidence was manually collected
-	RelevantDate     timestamppb.Timestamp // Relevant date of the evidence
+	ServiceName        string                         // ServiceName where this evidence was gathered. For example, "S3".
+	EntityType         string                         // EntityType of rows of evidence.  For example, "bucket".
+	Caption            string                         // Caption identifies the evidence.
+	Description        string                         // Description provides additional information on origins of the evidence.
+	Sources            []*receptor_v1.Source          // Sources of raw API request and response used to gather the evidence.
+	Rows               []interface{}                  // Rows of formatted evidence represented by a Golang struct.
+	ServiceAccountId   string                         // AccountId of multi-account organization
+	Document           *Document                      // Unstructured evidence in a Document format
+	Controls           []string                       // Controls associated with the evidence
+	IsManual           bool                           // If true, the evidence was manually collected
+	RelevantDate       timestamppb.Timestamp          // Relevant date of the evidence
+	EvidenceObjectType receptor_v1.EvidenceObjectType // Type of the evidence object - enum of receptor_v1.EvidenceObjectType
 
 }
 
@@ -174,4 +175,41 @@ type Field struct {
 type AuthMethod struct {
 	Display string `json:"display"` // Label for the authentication method
 	Value   string `json:"value"`   // Id/Name for the authentication method
+}
+
+type Control struct {
+	Id               string             `json:"id"`                 // Id of the control
+	Name             string             `json:"name"`               // Name of the control
+	Objective        string             `json:"objective"`          // Objective of the control
+	TestProcedure    string             `json:"test_procedure"`     // Test procedure of the control
+	Notes            string             `json:"notes"`              // Notes for the control
+	RequiredEvidence string             `json:"required_evidences"` // Required evidences for the control
+	ExternalId       string             `json:"external_id"`        // External id of the control
+	ExternalLink     string             `json:"external_link"`      // External link to the control
+	Procedures       []ControlProcedure `json:"control_procedures"` // Procedures for the control
+}
+
+type Policy struct {
+	Id           string `json:"id"`            // Id of the policy
+	Name         string `json:"name"`          // Name of the policy
+	Description  string `json:"description"`   // Description of the policy
+	Department   string `json:"department"`    // Department of the policy
+	ExternalId   string `json:"external_id"`   // External id of the policy
+	ExternalLink string `json:"external_link"` // External link to the policy
+}
+
+type ControlPolicyMapping struct {
+	ControlId string `json:"control_id"` // Id of the control
+	PolicyId  string `json:"policy_id"`  // Id of the policy
+}
+
+type ControlProcedure struct {
+	Id                string `json:"id"`
+	ControlName       string `json:"Control_Name"`
+	Description       string `json:"Description"`
+	ProcedureID       string `json:"Procedure_ID"`
+	ProcedureName     string `json:"Procedure_Name"`
+	TestingProcedures string `json:"Testing_Procedures"`
+	ExternalId        string `json:"external_id"`
+	ExternalLink      string `json:"external_link"`
 }
