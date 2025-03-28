@@ -184,18 +184,18 @@ type Control struct {
 	TestProcedure    string             `json:"test_procedure"`     // Test procedure of the control
 	Notes            string             `json:"notes"`              // Notes for the control
 	RequiredEvidence string             `json:"required_evidences"` // Required evidences for the control
-	ExternalId       string             `json:"external_id"`        // External id of the control
-	ExternalLink     string             `json:"external_link"`      // External link to the control
+	ImportKey        string             `json:"import_key"`         // External id of the control
+	ImportLink       string             `json:"import_link"`        // External link to the control
 	Procedures       []ControlProcedure `json:"control_procedures"` // Procedures for the control
 }
 
 type Policy struct {
-	Id           string   `json:"id"`            // Id of the policy
-	Name         string   `json:"name"`          // Name of the policy
-	Description  string   `json:"description"`   // Description of the policy
-	Departments  []string `json:"departments"`   // Department of the policy
-	ExternalId   string   `json:"external_id"`   // External id of the policy
-	ExternalLink string   `json:"external_link"` // External link to the policy
+	Id          string   `json:"id"`          // Id of the policy
+	Name        string   `json:"name"`        // Name of the policy
+	Description string   `json:"description"` // Description of the policy
+	Departments []string `json:"departments"` // Department of the policy
+	ImportKey   string   `json:"import_key"`  // External id of the control
+	ImportLink  string   `json:"import_link"` // External link to the control
 }
 
 type ControlPolicyMapping struct {
@@ -210,6 +210,6 @@ type ControlProcedure struct {
 	ProcedureID       string `json:"Procedure_ID"`
 	ProcedureName     string `json:"Procedure_Name"`
 	TestingProcedures string `json:"Testing_Procedures"`
-	ExternalId        string `json:"external_id"`
-	ExternalLink      string `json:"external_link"`
+	ImportKey         string `json:"import_key"`  // External id of the control
+	ImportLink        string `json:"import_link"` // External link to the control
 }
