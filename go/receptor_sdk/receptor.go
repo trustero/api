@@ -189,6 +189,11 @@ type Control struct {
 	Procedures       []ControlProcedure `json:"control_procedures"` // Procedures for the control
 }
 
+type ControlProcedureMapping struct {
+	ControlId          string `json:"control_id"`           // Id of the control
+	ControlProcedureId string `json:"control_procedure_id"` // Id of the policy
+}
+
 type Policy struct {
 	Id          string   `json:"id"`          // Id of the policy
 	Name        string   `json:"name"`        // Name of the policy
