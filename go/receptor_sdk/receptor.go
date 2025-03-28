@@ -190,12 +190,12 @@ type Control struct {
 }
 
 type Policy struct {
-	Id           string `json:"id"`            // Id of the policy
-	Name         string `json:"name"`          // Name of the policy
-	Description  string `json:"description"`   // Description of the policy
-	Department   string `json:"department"`    // Department of the policy
-	ExternalId   string `json:"external_id"`   // External id of the policy
-	ExternalLink string `json:"external_link"` // External link to the policy
+	Id           string   `json:"id"`            // Id of the policy
+	Name         string   `json:"name"`          // Name of the policy
+	Description  string   `json:"description"`   // Description of the policy
+	Departments  []string `json:"departments"`   // Department of the policy
+	ExternalId   string   `json:"external_id"`   // External id of the policy
+	ExternalLink string   `json:"external_link"` // External link to the policy
 }
 
 type ControlPolicyMapping struct {
