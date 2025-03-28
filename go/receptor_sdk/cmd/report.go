@@ -70,15 +70,16 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 		}
 
 		reportEvidence := receptor_v1.Evidence{
-			Caption:          evidence.Caption,
-			Description:      evidence.Description,
-			ServiceName:      evidence.ServiceName,
-			EntityType:       evidence.EntityType,
-			Sources:          evidence.Sources,
-			ServiceAccountId: evidence.ServiceAccountId,
-			Controls:         evidence.Controls,
-			IsManual:         evidence.IsManual,
-			RelevantDate:     &evidence.RelevantDate,
+			Caption:            evidence.Caption,
+			Description:        evidence.Description,
+			ServiceName:        evidence.ServiceName,
+			EntityType:         evidence.EntityType,
+			Sources:            evidence.Sources,
+			ServiceAccountId:   evidence.ServiceAccountId,
+			Controls:           evidence.Controls,
+			IsManual:           evidence.IsManual,
+			RelevantDate:       &evidence.RelevantDate,
+			EvidenceObjectType: evidence.EvidenceObjectType,
 		}
 
 		if evidence.Document != nil { // evidence is a blob and/or path to blob
