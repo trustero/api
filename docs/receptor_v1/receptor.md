@@ -467,6 +467,9 @@ EvidenceObjectType enum to identify the type of evidence object reported to Trus
 | POLICIES | 2 |  |
 | POLICY_DOCUMENT | 3 |  |
 | CONTROL_POLICY_MAPPING | 4 |  |
+| CONTROL_PROCEDURES | 5 |  |
+| CONTROL_CONTROL_PROCEDURE_MAPPING | 6 |  |
+| CONTROL_EVIDENCE_MAPPING | 7 |  |
 
 
  

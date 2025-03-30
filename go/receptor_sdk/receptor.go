@@ -178,29 +178,28 @@ type AuthMethod struct {
 }
 
 type Control struct {
-	Id               string             `json:"id"`                 // Id of the control
-	Name             string             `json:"name"`               // Name of the control
-	Objective        string             `json:"objective"`          // Objective of the control
-	TestProcedure    string             `json:"test_procedure"`     // Test procedure of the control
-	Notes            string             `json:"notes"`              // Notes for the control
-	RequiredEvidence string             `json:"required_evidences"` // Required evidences for the control
-	ImportKey        string             `json:"import_key"`         // External id of the control
-	ImportLink       string             `json:"import_link"`        // External link to the control
-	Procedures       []ControlProcedure `json:"control_procedures"` // Procedures for the control
+	Id               string `json:"id"`                 // Id of the control
+	Name             string `json:"name"`               // Name of the control
+	Objective        string `json:"objective"`          // Objective of the control
+	TestProcedure    string `json:"test_procedure"`     // Test procedure of the control
+	Notes            string `json:"notes"`              // Notes for the control
+	RequiredEvidence string `json:"required_evidences"` // Required evidences for the control
+	ImportKey        string `json:"import_key"`         // External id of the control
+	ImportLink       string `json:"import_link"`        // External link to the control
 }
 
 type ControlProcedureMapping struct {
 	ControlId          string `json:"control_id"`           // Id of the control
-	ControlProcedureId string `json:"control_procedure_id"` // Id of the policy
+	ControlProcedureId string `json:"control_procedure_id"` // Id of the control procedure
 }
 
 type Policy struct {
-	Id          string   `json:"id"`          // Id of the policy
-	Name        string   `json:"name"`        // Name of the policy
-	Description string   `json:"description"` // Description of the policy
-	Departments []string `json:"departments"` // Department of the policy
-	ImportKey   string   `json:"import_key"`  // External id of the control
-	ImportLink  string   `json:"import_link"` // External link to the control
+	Id          string `json:"id"`          // Id of the policy
+	Name        string `json:"name"`        // Name of the policy
+	Description string `json:"description"` // Description of the policy
+	Departments string `json:"departments"` // Departments of the policy in a csv string
+	ImportKey   string `json:"import_key"`  // External id of the control
+	ImportLink  string `json:"import_link"` // External link to the control
 }
 
 type ControlPolicyMapping struct {
@@ -212,7 +211,6 @@ type ControlProcedure struct {
 	Id                string `json:"id"`
 	ControlName       string `json:"Control_Name"`
 	Description       string `json:"Description"`
-	ProcedureID       string `json:"Procedure_ID"`
 	ProcedureName     string `json:"Procedure_Name"`
 	TestingProcedures string `json:"Testing_Procedures"`
 	ImportKey         string `json:"import_key"`  // External id of the control
