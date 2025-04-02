@@ -470,6 +470,7 @@ EvidenceObjectType enum to identify the type of evidence object reported to Trus
 | CONTROL_PROCEDURES | 5 |  |
 | CONTROL_CONTROL_PROCEDURE_MAPPING | 6 |  |
 | CONTROL_EVIDENCE_MAPPING | 7 |  |
+| EVIDENCES_META | 8 |  |
 
 
  
