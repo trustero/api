@@ -216,3 +216,20 @@ type ControlProcedure struct {
 	ImportKey         string `json:"import_key"`  // External id of the control
 	ImportLink        string `json:"import_link"` // External link to the control
 }
+
+type ControlEvidenceMapping struct {
+	ControlId  string `json:"control_id"`  // Id of the control
+	EvidenceId string `json:"evidence_id"` // Id of the evidence "{evidenceId}-{documentId}"
+}
+
+type ControlProcedureEvidenceMapping struct {
+	ControlProcedureId string `json:"control_procedure_id"` // Id of the control
+	EvidenceId         string `json:"evidence_id"`          // Id of the evidence "{evidenceId}-{documentId}"
+}
+type EvidenceMeta struct {
+	Id          string `json:"id"`          // Id of the evidence
+	Name        string `json:"name"`        // Name of the evidence
+	Description string `json:"description"` // Description of the evidence
+	ImportKey   string `json:"import_key"`  // External id of the evidence
+	ImportLink  string `json:"import_link"` // External link to the evidence
+}
