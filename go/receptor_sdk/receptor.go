@@ -148,6 +148,7 @@ type Document struct {
 	Body           []byte // Content of the document in bytes
 	Mime           string // Mime type of the document
 	StreamFilePath string // Path to the file containing the evidence
+	FileName       string // Name of the document
 }
 
 // Config with Field struct defines the json shape of the custom configurations for receptors that the app can use
@@ -230,6 +231,8 @@ type EvidenceMeta struct {
 	Id          string `json:"id"`          // Id of the evidence
 	Name        string `json:"name"`        // Name of the evidence
 	Description string `json:"description"` // Description of the evidence
+	FileName    string `json:"filename"`    // Filename of the attached document
 	ImportKey   string `json:"import_key"`  // External id of the evidence
 	ImportLink  string `json:"import_link"` // External link to the evidence
+
 }

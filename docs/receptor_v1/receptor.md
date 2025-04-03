@@ -74,6 +74,7 @@ Document is an unstructured evidence provided as a MIME document.
 | mime | [string](#string) |  | Mime is the document type defined using [MIME]. [MIME]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types |
 | body | [bytes](#bytes) |  | Body is the opaque document body. The document body must match the type defined by the mime attribute. |
 | stream_file_path | [string](#string) |  | Filepath for streaming large evidence - should be accessible by the server. |
+| file_name | [string](#string) |  | Filename is the name of the document |
 
 
 
@@ -101,6 +102,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | is_manual | [bool](#bool) |  | is_manual is a boolean that indicates whether the evidence was manually collected or not. |
 | relevant_date | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | relevant_date is the date the evidence was collected. |
 | evidence_object_type | [EvidenceObjectType](#receptor_v1-EvidenceObjectType) |  | evidence_object_type is an enum of EvidenceObjectType. For example, &#34;evidences&#34;, &#34;controls&#34;, &#34;policies&#34;, &#34;policy_document&#34;. |
+| evidence_key | [string](#string) |  | evidence_key is a unique key for the evidence object. This key is used to identify the evidence object in the external system. |
 
 
 

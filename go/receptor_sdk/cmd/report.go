@@ -89,6 +89,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 					Body:           evidence.Document.Body,
 					Mime:           evidence.Document.Mime,
 					StreamFilePath: evidence.Document.StreamFilePath,
+					FileName:       evidence.Document.FileName,
 				},
 			}
 			reportFinding := receptor_v1.Finding{

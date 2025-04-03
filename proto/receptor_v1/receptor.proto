@@ -123,6 +123,9 @@ message Evidence {
 
   // evidence_object_type is an enum of  EvidenceObjectType. For example, "evidences", "controls", "policies", "policy_document".
   EvidenceObjectType evidence_object_type = 12;
+
+  // evidence_key is a unique key for the evidence object. This key is used to identify the evidence object in the external system.
+  string evidence_key = 13;
 }
 
 
@@ -153,6 +156,9 @@ message Document {
   
   // Filepath for streaming large evidence - should be accessible by the server.
   string stream_file_path = 4;
+
+  // Filename is the name of the document
+  string file_name = 5; 
 }
 
 
