@@ -139,6 +139,7 @@ type Evidence struct {
 	IsManual           bool                           // If true, the evidence was manually collected
 	RelevantDate       timestamppb.Timestamp          // Relevant date of the evidence
 	EvidenceObjectType receptor_v1.EvidenceObjectType // Type of the evidence object - enum of receptor_v1.EvidenceObjectType
+	EvidenceKey        string                         // Key to identify evidence in the service provider
 
 }
 
@@ -234,5 +235,9 @@ type EvidenceMeta struct {
 	FileName    string `json:"filename"`    // Filename of the attached document
 	ImportKey   string `json:"import_key"`  // External id of the evidence
 	ImportLink  string `json:"import_link"` // External link to the evidence
+}
 
+type PolicyDocumentMapping struct {
+	PolicyId   string `json:"policy_id"`   // Id of the policy
+	DocumentId string `json:"document_id"` // Id of the document
 }
