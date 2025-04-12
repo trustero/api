@@ -126,6 +126,9 @@ message Evidence {
 
   // evidence_key is a unique key for the evidence object. This key is used to identify the evidence object in the external system.
   string evidence_key = 13;
+
+    // Policies is a list of policies names that the document is associated with.
+    repeated string policies = 14;
 }
 
 
@@ -373,4 +376,5 @@ enum EvidenceObjectType {
   EVIDENCES_META = 8;
   POLICY_DOCUMENT_POLICY_MAPPING = 9;
   POLICY_DOCUMENT_META = 10;
+  CONTROL_PROCEDURE_EVIDENCE_MAPPING = 11;
 }

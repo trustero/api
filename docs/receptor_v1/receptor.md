@@ -103,6 +103,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | relevant_date | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | relevant_date is the date the evidence was collected. |
 | evidence_object_type | [EvidenceObjectType](#receptor_v1-EvidenceObjectType) |  | evidence_object_type is an enum of EvidenceObjectType. For example, &#34;evidences&#34;, &#34;controls&#34;, &#34;policies&#34;, &#34;policy_document&#34;. |
 | evidence_key | [string](#string) |  | evidence_key is a unique key for the evidence object. This key is used to identify the evidence object in the external system. |
+| policies | [string](#string) | repeated | Policies is a list of policies names that the document is associated with. |
 
 
 
@@ -475,6 +476,7 @@ EvidenceObjectType enum to identify the type of evidence object reported to Trus
 | EVIDENCES_META | 8 |  |
 | POLICY_DOCUMENT_POLICY_MAPPING | 9 |  |
 | POLICY_DOCUMENT_META | 10 |  |
+| CONTROL_PROCEDURE_EVIDENCE_MAPPING | 11 |  |
 
 
  
