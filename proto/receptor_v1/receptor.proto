@@ -45,7 +45,8 @@ service Receptor {
   // This call is typically made as a callback by a receptor after credential verification.
   rpc SetConfiguration(ReceptorConfiguration) returns (google.protobuf.Empty);
 
-
+  // StreamReport is used to stream large reports to Trustero. The report is sent in chunks and the first chunk  
+  // contains the boundary with the mime type.
   rpc StreamReport(stream ReportChunk) returns (ReportResponse);
 
 
@@ -105,7 +106,6 @@ message Evidence {
     // Struct is a structured evidence.
     Struct struct = 7;
 
-
   }
 
   // Service_account_id is the member account of the organization. For example, an AWS account number in an organization
@@ -121,7 +121,16 @@ message Evidence {
   // relevant_date is the date the evidence was collected.
   google.protobuf.Timestamp relevant_date = 11;
 
+  // evidence_object_type is an enum of  EvidenceObjectType. For example, "evidences", "controls", "policies", "policy_document".
+  EvidenceObjectType evidence_object_type = 12;
+
+  // evidence_key is a unique key for the evidence object. This key is used to identify the evidence object in the external system.
+  string evidence_key = 13;
+
+    // Policies is a list of policies names that the document is associated with.
+    repeated string policies = 14;
 }
+
 
 
 // Source is the raw service provider API request and response.
@@ -150,6 +159,9 @@ message Document {
   
   // Filepath for streaming large evidence - should be accessible by the server.
   string stream_file_path = 4;
+
+  // Filename is the name of the document
+  string file_name = 5; 
 }
 
 
@@ -204,11 +216,20 @@ message Value {
     string string_value = 8;
     google.protobuf.Timestamp timestamp_value = 9;
     StringList string_list_value = 10;
+    StructList struct_list_value = 11;
   }
 }
 
 message StringList {
   repeated string values = 1;
+}
+
+message StructList {
+  repeated StructStruct values = 1; // Array of structs
+}
+
+message StructStruct {
+  map<string, Value> fields = 1; // Fields of the struct
 }
 
 // ServiceEntities are configurable entities within a service provider account.  For example, service entities in
@@ -340,3 +361,20 @@ message ReportChunk {
 message ReportResponse {
   string status = 1;  // Could use "ok" or other status information
 } 
+
+
+// EvidenceObjectType enum to identify the type of evidence object reported to Trustero. 
+enum EvidenceObjectType {
+  EVIDENCES = 0;
+  CONTROLS = 1;
+  POLICIES = 2;
+  POLICY_DOCUMENT = 3;
+  CONTROL_POLICY_MAPPING = 4;
+  CONTROL_PROCEDURES = 5;
+  CONTROL_CONTROL_PROCEDURE_MAPPING = 6;
+  CONTROL_EVIDENCE_MAPPING = 7;
+  EVIDENCES_META = 8;
+  POLICY_DOCUMENT_POLICY_MAPPING = 9;
+  POLICY_DOCUMENT_META = 10;
+  CONTROL_PROCEDURE_EVIDENCE_MAPPING = 11;
+}

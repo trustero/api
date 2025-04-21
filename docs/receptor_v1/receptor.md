@@ -23,7 +23,12 @@
     - [Struct](#receptor_v1-Struct)
     - [Struct.ColDisplayNamesEntry](#receptor_v1-Struct-ColDisplayNamesEntry)
     - [Struct.ColTagsEntry](#receptor_v1-Struct-ColTagsEntry)
+    - [StructList](#receptor_v1-StructList)
+    - [StructStruct](#receptor_v1-StructStruct)
+    - [StructStruct.FieldsEntry](#receptor_v1-StructStruct-FieldsEntry)
     - [Value](#receptor_v1-Value)
+  
+    - [EvidenceObjectType](#receptor_v1-EvidenceObjectType)
   
     - [Receptor](#receptor_v1-Receptor)
   
@@ -69,6 +74,7 @@ Document is an unstructured evidence provided as a MIME document.
 | mime | [string](#string) |  | Mime is the document type defined using [MIME]. [MIME]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types |
 | body | [bytes](#bytes) |  | Body is the opaque document body. The document body must match the type defined by the mime attribute. |
 | stream_file_path | [string](#string) |  | Filepath for streaming large evidence - should be accessible by the server. |
+| file_name | [string](#string) |  | Filename is the name of the document |
 
 
 
@@ -95,6 +101,9 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | controls | [string](#string) | repeated | Controls is a list of control names that the evidence is associated with. |
 | is_manual | [bool](#bool) |  | is_manual is a boolean that indicates whether the evidence was manually collected or not. |
 | relevant_date | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | relevant_date is the date the evidence was collected. |
+| evidence_object_type | [EvidenceObjectType](#receptor_v1-EvidenceObjectType) |  | evidence_object_type is an enum of EvidenceObjectType. For example, &#34;evidences&#34;, &#34;controls&#34;, &#34;policies&#34;, &#34;policy_document&#34;. |
+| evidence_key | [string](#string) |  | evidence_key is a unique key for the evidence object. This key is used to identify the evidence object in the external system. |
+| policies | [string](#string) | repeated | Policies is a list of policies names that the document is associated with. |
 
 
 
@@ -376,6 +385,52 @@ must have the same column name-value pairs.
 
 
 
+<a name="receptor_v1-StructList"></a>
+
+### StructList
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| values | [StructStruct](#receptor_v1-StructStruct) | repeated | Array of structs |
+
+
+
+
+
+
+<a name="receptor_v1-StructStruct"></a>
+
+### StructStruct
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| fields | [StructStruct.FieldsEntry](#receptor_v1-StructStruct-FieldsEntry) | repeated | Fields of the struct |
+
+
+
+
+
+
+<a name="receptor_v1-StructStruct-FieldsEntry"></a>
+
+### StructStruct.FieldsEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [Value](#receptor_v1-Value) |  |  |
+
+
+
+
+
+
 <a name="receptor_v1-Value"></a>
 
 ### Value
@@ -394,12 +449,35 @@ Value is a [Struct.row.col] column value.  Value types can be simple protobuf sc
 | string_value | [string](#string) |  |  |
 | timestamp_value | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
 | string_list_value | [StringList](#receptor_v1-StringList) |  |  |
+| struct_list_value | [StructList](#receptor_v1-StructList) |  |  |
 
 
 
 
 
  
+
+
+<a name="receptor_v1-EvidenceObjectType"></a>
+
+### EvidenceObjectType
+EvidenceObjectType enum to identify the type of evidence object reported to Trustero.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| EVIDENCES | 0 |  |
+| CONTROLS | 1 |  |
+| POLICIES | 2 |  |
+| POLICY_DOCUMENT | 3 |  |
+| CONTROL_POLICY_MAPPING | 4 |  |
+| CONTROL_PROCEDURES | 5 |  |
+| CONTROL_CONTROL_PROCEDURE_MAPPING | 6 |  |
+| CONTROL_EVIDENCE_MAPPING | 7 |  |
+| EVIDENCES_META | 8 |  |
+| POLICY_DOCUMENT_POLICY_MAPPING | 9 |  |
+| POLICY_DOCUMENT_META | 10 |  |
+| CONTROL_PROCEDURE_EVIDENCE_MAPPING | 11 |  |
+
 
  
 
@@ -423,7 +501,7 @@ and contains the service&#39;s configuration information. For example, an AWS S3
 | Report | [Finding](#receptor_v1-Finding) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report a finding to Trustero. A receptor or a Trustero client application reports its findings to Trustero on a periodic basis. This call returns a string value collection ID or an error. |
 | Notify | [JobResult](#receptor_v1-JobResult) | [.google.protobuf.Empty](#google-protobuf-Empty) | Notify Trustero a long running report finding or discover service entities receptor-request has completed. JobResult contains information about the receptor-request and it&#39;s corresponding result. |
 | SetConfiguration | [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration) | [.google.protobuf.Empty](#google-protobuf-Empty) | SetConfiguration reports the configuration for receptors that need extra configuration to access a service. This call is typically made as a callback by a receptor after credential verification. |
-| StreamReport | [ReportChunk](#receptor_v1-ReportChunk) stream | [ReportResponse](#receptor_v1-ReportResponse) |  |
+| StreamReport | [ReportChunk](#receptor_v1-ReportChunk) stream | [ReportResponse](#receptor_v1-ReportResponse) | StreamReport is used to stream large reports to Trustero. The report is sent in chunks and the first chunk contains the boundary with the mime type. |
 
  
 

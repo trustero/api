@@ -127,17 +127,20 @@ type Receptor interface {
 //	    Username string  `trustero:"id;display:User Name;order:1"`
 //	}
 type Evidence struct {
-	ServiceName      string                // ServiceName where this evidence was gathered. For example, "S3".
-	EntityType       string                // EntityType of rows of evidence.  For example, "bucket".
-	Caption          string                // Caption identifies the evidence.
-	Description      string                // Description provides additional information on origins of the evidence.
-	Sources          []*receptor_v1.Source // Sources of raw API request and response used to gather the evidence.
-	Rows             []interface{}         // Rows of formatted evidence represented by a Golang struct.
-	ServiceAccountId string                // AccountId of multi-account organization
-	Document         *Document             // Unstructured evidence in a Document format
-	Controls         []string              // Controls associated with the evidence
-	IsManual         bool                  // If true, the evidence was manually collected
-	RelevantDate     timestamppb.Timestamp // Relevant date of the evidence
+	ServiceName        string                         // ServiceName where this evidence was gathered. For example, "S3".
+	EntityType         string                         // EntityType of rows of evidence.  For example, "bucket".
+	Caption            string                         // Caption identifies the evidence.
+	Description        string                         // Description provides additional information on origins of the evidence.
+	Sources            []*receptor_v1.Source          // Sources of raw API request and response used to gather the evidence.
+	Rows               []interface{}                  // Rows of formatted evidence represented by a Golang struct.
+	ServiceAccountId   string                         // AccountId of multi-account organization
+	Document           *Document                      // Unstructured evidence in a Document format
+	Controls           []string                       // Controls associated with the evidence
+	IsManual           bool                           // If true, the evidence was manually collected
+	RelevantDate       timestamppb.Timestamp          // Relevant date of the evidence
+	EvidenceObjectType receptor_v1.EvidenceObjectType // Type of the evidence object - enum of receptor_v1.EvidenceObjectType
+	EvidenceKey        string                         // Key to identify evidence in the service provider
+	Policies           []string                       // Policies associated with the evidence/document
 
 }
 
@@ -147,6 +150,7 @@ type Document struct {
 	Body           []byte // Content of the document in bytes
 	Mime           string // Mime type of the document
 	StreamFilePath string // Path to the file containing the evidence
+	FileName       string // Name of the document
 }
 
 // Config with Field struct defines the json shape of the custom configurations for receptors that the app can use
@@ -174,4 +178,67 @@ type Field struct {
 type AuthMethod struct {
 	Display string `json:"display"` // Label for the authentication method
 	Value   string `json:"value"`   // Id/Name for the authentication method
+}
+
+type Control struct {
+	Id               string `json:"id"`                 // Id of the control
+	Name             string `json:"name"`               // Name of the control
+	Objective        string `json:"objective"`          // Objective of the control
+	TestProcedure    string `json:"test_procedure"`     // Test procedure of the control
+	Notes            string `json:"notes"`              // Notes for the control
+	RequiredEvidence string `json:"required_evidences"` // Required evidences for the control
+	ImportKey        string `json:"import_key"`         // External id of the control
+	ImportLink       string `json:"import_link"`        // External link to the control
+}
+
+type ControlProcedureMapping struct {
+	ControlId          string `json:"control_id"`           // Id of the control
+	ControlProcedureId string `json:"control_procedure_id"` // Id of the control procedure
+}
+
+type Policy struct {
+	Id          string `json:"id"`          // Id of the policy
+	Name        string `json:"name"`        // Name of the policy
+	Description string `json:"description"` // Description of the policy
+	Departments string `json:"departments"` // Departments of the policy in a csv string
+	ImportKey   string `json:"import_key"`  // External id of the control
+	ImportLink  string `json:"import_link"` // External link to the control
+}
+
+type ControlPolicyMapping struct {
+	ControlId string `json:"control_id"` // Id of the control
+	PolicyId  string `json:"policy_id"`  // Id of the policy
+}
+
+type ControlProcedure struct {
+	Id                string `json:"id"`
+	ControlName       string `json:"Control_Name"`
+	Description       string `json:"Description"`
+	ProcedureName     string `json:"Procedure_Name"`
+	TestingProcedures string `json:"Testing_Procedures"`
+	ImportKey         string `json:"import_key"`  // External id of the control
+	ImportLink        string `json:"import_link"` // External link to the control
+}
+
+type ControlEvidenceMapping struct {
+	ControlId  string `json:"control_id"`  // Id of the control
+	EvidenceId string `json:"evidence_id"` // Id of the evidence "{evidenceId}-{documentId}"
+}
+
+type ControlProcedureEvidenceMapping struct {
+	ControlProcedureId string `json:"control_procedure_id"` // Id of the control
+	EvidenceId         string `json:"evidence_id"`          // Id of the evidence "{evidenceId}-{documentId}"
+}
+type EvidenceMeta struct {
+	Id          string `json:"id"`          // Id of the evidence
+	Name        string `json:"name"`        // Name of the evidence
+	Description string `json:"description"` // Description of the evidence
+	FileName    string `json:"filename"`    // Filename of the attached document
+	ImportKey   string `json:"import_key"`  // External id of the evidence
+	ImportLink  string `json:"import_link"` // External link to the evidence
+}
+
+type PolicyDocumentMapping struct {
+	PolicyId   string `json:"policy_id"`   // Id of the policy
+	DocumentId string `json:"document_id"` // Id of the document
 }

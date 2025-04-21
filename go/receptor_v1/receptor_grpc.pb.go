@@ -64,6 +64,8 @@ type ReceptorClient interface {
 	// SetConfiguration reports the configuration for receptors that need extra configuration to access a service.
 	// This call is typically made as a callback by a receptor after credential verification.
 	SetConfiguration(ctx context.Context, in *ReceptorConfiguration, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// StreamReport is used to stream large reports to Trustero. The report is sent in chunks and the first chunk
+	// contains the boundary with the mime type.
 	StreamReport(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[ReportChunk, ReportResponse], error)
 }
 
@@ -179,6 +181,8 @@ type ReceptorServer interface {
 	// SetConfiguration reports the configuration for receptors that need extra configuration to access a service.
 	// This call is typically made as a callback by a receptor after credential verification.
 	SetConfiguration(context.Context, *ReceptorConfiguration) (*emptypb.Empty, error)
+	// StreamReport is used to stream large reports to Trustero. The report is sent in chunks and the first chunk
+	// contains the boundary with the mime type.
 	StreamReport(grpc.ClientStreamingServer[ReportChunk, ReportResponse]) error
 }
 
