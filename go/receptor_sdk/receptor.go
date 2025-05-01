@@ -141,7 +141,7 @@ type Evidence struct {
 	EvidenceObjectType receptor_v1.EvidenceObjectType // Type of the evidence object - enum of receptor_v1.EvidenceObjectType
 	EvidenceKey        string                         // Key to identify evidence in the service provider
 	Policies           []string                       // Policies associated with the evidence/document
-	RecordId           string                         // RecordId of the evidence in Trustero
+	RecordIds          []string                       // RecordIds of the evidence in Trustero
 
 }
 

@@ -130,8 +130,8 @@ message Evidence {
   // Policies is a list of policies names that the document is associated with.
     repeated string policies = 14;
 
-  // record_id is the unique ID for the evidence object. This ID is used to identify the evidence object in the Trustero system. 
-    string record_id = 15; 
+  // a list of record_id for the evidence object. This ID is used to identify the evidence object in the Trustero system. 
+    repeated string record_ids = 15; 
 }
 
 
