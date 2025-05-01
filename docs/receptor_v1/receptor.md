@@ -104,6 +104,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | evidence_object_type | [EvidenceObjectType](#receptor_v1-EvidenceObjectType) |  | evidence_object_type is an enum of EvidenceObjectType. For example, &#34;evidences&#34;, &#34;controls&#34;, &#34;policies&#34;, &#34;policy_document&#34;. |
 | evidence_key | [string](#string) |  | evidence_key is a unique key for the evidence object. This key is used to identify the evidence object in the external system. |
 | policies | [string](#string) | repeated | Policies is a list of policies names that the document is associated with. |
+| record_ids | [string](#string) | repeated | a list of record_id for the evidence object. This ID is used to identify the evidence object in the Trustero system. |
 
 
 
