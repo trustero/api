@@ -75,6 +75,7 @@ Document is an unstructured evidence provided as a MIME document.
 | body | [bytes](#bytes) |  | Body is the opaque document body. The document body must match the type defined by the mime attribute. |
 | stream_file_path | [string](#string) |  | Filepath for streaming large evidence - should be accessible by the server. |
 | file_name | [string](#string) |  | Filename is the name of the document |
+| last_modified | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | Last modified date of the document at the source |
 
 
 

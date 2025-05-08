@@ -86,13 +86,17 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 
 		if evidence.Document != nil { // evidence is a blob and/or path to blob
 			// create a new finding from current finding and add evidence
+			newDoc := receptor_v1.Document{
+				Body:           evidence.Document.Body,
+				Mime:           evidence.Document.Mime,
+				StreamFilePath: evidence.Document.StreamFilePath,
+				FileName:       evidence.Document.FileName,
+			}
+			if evidence.Document.LastModified != nil {
+				newDoc.LastModified = evidence.Document.LastModified
+			}
 			reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
-				Doc: &receptor_v1.Document{
-					Body:           evidence.Document.Body,
-					Mime:           evidence.Document.Mime,
-					StreamFilePath: evidence.Document.StreamFilePath,
-					FileName:       evidence.Document.FileName,
-				},
+				Doc: &newDoc,
 			}
 			reportFinding := receptor_v1.Finding{
 				ReceptorType:           finding.ReceptorType,

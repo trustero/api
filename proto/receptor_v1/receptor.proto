@@ -165,6 +165,9 @@ message Document {
 
   // Filename is the name of the document
   string file_name = 5; 
+
+  // Last modified date of the document at the source
+  google.protobuf.Timestamp last_modified = 6;
 }
 
 
