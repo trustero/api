@@ -106,6 +106,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | evidence_key | [string](#string) |  | evidence_key is a unique key for the evidence object. This key is used to identify the evidence object in the external system. |
 | policies | [string](#string) | repeated | Policies is a list of policies names that the document is associated with. |
 | record_ids | [string](#string) | repeated | a list of record_id for the evidence object. This ID is used to identify the evidence object in the Trustero system. |
+| exceptions | [string](#string) |  | exceptions is a list of exceptions for the evidence object. |
 
 
 
