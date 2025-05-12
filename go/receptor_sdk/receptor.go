@@ -142,6 +142,7 @@ type Evidence struct {
 	EvidenceKey        string                         // Key to identify evidence in the service provider
 	Policies           []string                       // Policies associated with the evidence/document
 	RecordIds          []string                       // RecordIds of the evidence in Trustero
+	Exceptions         string                         // Exception message if any error is encountered while collecting the evidence
 
 }
 
