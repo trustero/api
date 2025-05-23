@@ -84,6 +84,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			RecordIds:          evidence.RecordIds,
 			EvidenceKey:        evidence.EvidenceKey,
 			Exceptions:         evidence.Exceptions,
+			EvidenceLink:       evidence.EvidenceLink,
 		}
 
 		if evidence.Document != nil { // evidence is a blob and/or path to blob

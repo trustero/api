@@ -107,6 +107,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | policies | [string](#string) | repeated | Policies is a list of policies names that the document is associated with. |
 | record_ids | [string](#string) | repeated | a list of record_id for the evidence object. This ID is used to identify the evidence object in the Trustero system. |
 | exceptions | [string](#string) |  | exceptions is a list of exceptions for the evidence object. |
+| evidence_link | [string](#string) |  | link to the evidence object in the external system. |
 
 
 

@@ -135,6 +135,9 @@ message Evidence {
  
   // exceptions is a list of exceptions for the evidence object. 
   string exceptions = 16;
+
+  //// link to the evidence object in the external system.
+  string evidence_link = 17; 
 }
 
 

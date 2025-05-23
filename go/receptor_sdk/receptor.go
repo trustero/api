@@ -143,6 +143,7 @@ type Evidence struct {
 	Policies           []string                       // Policies associated with the evidence/document
 	RecordIds          []string                       // RecordIds of the evidence in Trustero
 	Exceptions         string                         // Exception message if any error is encountered while collecting the evidence
+	EvidenceLink       string                         //Link to the evidence in the service provider
 
 }
 
