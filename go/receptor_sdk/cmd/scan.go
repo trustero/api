@@ -92,7 +92,7 @@ func scan(_ *cobra.Command, args []string) (err error) {
 					ModelId:          receptorImpl.GetReceptorType(),
 				})
 			}
-			
+
 			// Report evidence discovered in the service provider account
 			if receptor_sdk.FindEvidence {
 				err = report(rc, credentials, config)
