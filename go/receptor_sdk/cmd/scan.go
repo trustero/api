@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -79,6 +80,19 @@ func scan(_ *cobra.Command, args []string) (err error) {
 			if !ok {
 				return
 			}
+			//Send the config back to Trustero if there is additional config
+			if config != nil {
+				jsonBytes, err := json.Marshal(receptorImpl.GetConfigObj())
+				if err != nil {
+					return err
+				}
+				_, err = rc.SetConfiguration(context.Background(), &receptor_v1.ReceptorConfiguration{
+					ReceptorObjectId: receptor_sdk.ReceptorId,
+					Config:           string(jsonBytes),
+					ModelId:          receptorImpl.GetReceptorType(),
+				})
+			}
+
 			// Report evidence discovered in the service provider account
 			if receptor_sdk.FindEvidence {
 				err = report(rc, credentials, config)
