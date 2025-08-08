@@ -42,6 +42,7 @@ const (
 	EvidenceObjectType_POLICY_DOCUMENT_POLICY_MAPPING     EvidenceObjectType = 9
 	EvidenceObjectType_POLICY_DOCUMENT_META               EvidenceObjectType = 10
 	EvidenceObjectType_CONTROL_PROCEDURE_EVIDENCE_MAPPING EvidenceObjectType = 11
+	EvidenceObjectType_WORKFLOW_TASK_EVIDENCE_MAPPING EvidenceObjectType = 12
 )
 
 // Enum value maps for EvidenceObjectType.
@@ -59,6 +60,7 @@ var (
 		9:  "POLICY_DOCUMENT_POLICY_MAPPING",
 		10: "POLICY_DOCUMENT_META",
 		11: "CONTROL_PROCEDURE_EVIDENCE_MAPPING",
+		12: "WORKFLOW_TASK_EVIDENCE_MAPPING",
 	}
 	EvidenceObjectType_value = map[string]int32{
 		"EVIDENCES":                          0,
@@ -73,6 +75,7 @@ var (
 		"POLICY_DOCUMENT_POLICY_MAPPING":     9,
 		"POLICY_DOCUMENT_META":               10,
 		"CONTROL_PROCEDURE_EVIDENCE_MAPPING": 11,
+		"WORKFLOW_TASK_EVIDENCE_MAPPING": 12,
 	}
 )
 
