@@ -194,7 +194,7 @@ type Control struct {
 	RequiredEvidence string   `json:"required_evidences"` // Required evidences for the control
 	ImportKey        string   `json:"import_key"`         // External id of the control
 	ImportLink       string   `json:"import_link"`        // External link to the control
-	SOC2Criteria     string   `json:"soc2_criteria"`      // SOC2 Framework criterias for the control
+	SOC2Criteria     []string `json:"soc2_criteria"`      // SOC2 Framework criterias for the control
 }
 
 type ControlProcedureMapping struct {
