@@ -17,6 +17,7 @@ import (
 
 // DefaultBufferSize defines a default buffer size (5 MB) for writing parts.
 const DefaultBufferSize = 5 * 1024 * 1024 // 5 MB
+const boundary = "trustero_boundary_v1_7f94c1b2c3"
 
 // MultipartBuilder is responsible for building multipart data with writers and buffer size.
 type MultipartBuilder struct {
@@ -30,6 +31,8 @@ func NewMultipartBuilder(w io.Writer, bufferSize int) (*MultipartBuilder, error)
 		bufferSize = DefaultBufferSize
 	}
 	writer := multipart.NewWriter(w)
+	// Set the boundary for the multipart writer
+	writer.SetBoundary(boundary)
 	return &MultipartBuilder{
 		writer:     writer,
 		bufferSize: bufferSize,

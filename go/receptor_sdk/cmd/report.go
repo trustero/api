@@ -90,10 +90,9 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 		if evidence.Document != nil { // evidence is a blob and/or path to blob
 			// create a new finding from current finding and add evidence
 			newDoc := receptor_v1.Document{
-				Body:           evidence.Document.Body,
-				Mime:           evidence.Document.Mime,
-				StreamFilePath: evidence.Document.StreamFilePath,
-				FileName:       evidence.Document.FileName,
+				Body:     evidence.Document.Body,
+				Mime:     evidence.Document.Mime,
+				FileName: evidence.Document.FileName,
 			}
 			if evidence.Document.LastModified != nil {
 				newDoc.LastModified = evidence.Document.LastModified
@@ -107,7 +106,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 				Entities:               finding.Entities,
 				Evidences:              []*receptor_v1.Evidence{&reportEvidence},
 			}
-			contentType, streamFile, err := multipartEvidence(&reportFinding)
+			contentType, streamFile, err := multipartEvidence(&reportFinding, evidence.Document.StreamFilePath)
 			os.Remove(evidence.Document.StreamFilePath)
 			if err != nil {
 				log.Err(err).Msg("failed to create multipart evidence")
@@ -116,7 +115,6 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			}
 
 			// make a multipart file and then stream it
-
 			stream, err := rc.StreamReport(context.Background())
 			if err != nil {
 				log.Err(err).Msg("failed to stream report")
@@ -405,7 +403,7 @@ func assertStruct(rowType reflect.Type) (err error) {
 	return
 }
 
-func multipartEvidence(finding *receptor_v1.Finding) (contentType string, evidencePath string, err error) {
+func multipartEvidence(finding *receptor_v1.Finding, streamFilePath string) (contentType string, evidencePath string, err error) {
 	if len(finding.Evidences) == 0 {
 		err = errors.New("no evidence found")
 		log.Error().Msg("no evidence found")
@@ -427,8 +425,6 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 
 		mime := evidence.GetDoc().GetMime()
 		body := evidence.GetDoc().GetBody()
-		streamFilePath := evidence.GetDoc().GetStreamFilePath()
-
 		bufferSize := multipartkit.DefaultBufferSize
 
 		// Initialize the multipart builder
@@ -449,6 +445,7 @@ func multipartEvidence(finding *receptor_v1.Finding) (contentType string, eviden
 		contentType = fmt.Sprintf("%s; %s; boundary=%s", mulitpartPrefix, mime, boundary)
 
 		// 1. Part1 : protobuf of Finding without evidence
+
 		err = builder.AddProtobuf("receptor_v1.Finding", finding)
 		if err != nil {
 			log.Error().Msgf("failed to add protobuf message: %v", err)
