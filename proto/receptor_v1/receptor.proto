@@ -106,6 +106,9 @@ message Evidence {
     // Struct is a structured evidence.
     Struct struct = 7;
 
+    // Documents is a group of documents that will be considered as a single evidence
+    Documents docs = 18;
+
   }
 
   // Service_account_id is the member account of the organization. For example, an AWS account number in an organization
@@ -176,6 +179,9 @@ message Document {
   google.protobuf.Timestamp last_modified = 6;
 }
 
+message Documents {
+  repeated Document docs = 1;
+}
 
 // Struct is a structured evidence defined in tabular form.  Each struct typically represent a service type (see
 // Evidence message definition).  Each struct consists of rows of data.  Each row typically represent a service

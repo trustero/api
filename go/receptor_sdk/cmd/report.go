@@ -87,27 +87,37 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			EvidenceLink:       evidence.EvidenceLink,
 		}
 
-		if evidence.Document != nil { // evidence is a blob and/or path to blob
-			// create a new finding from current finding and add evidence
-			newDoc := receptor_v1.Document{
-				Body:     evidence.Document.Body,
-				Mime:     evidence.Document.Mime,
-				FileName: evidence.Document.FileName,
-			}
-			if evidence.Document.LastModified != nil {
-				newDoc.LastModified = evidence.Document.LastModified
-			}
-			reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
-				Doc: &newDoc,
-			}
+		if evidence.Document != nil && len(*evidence.Document) > 0 {
+
 			reportFinding := receptor_v1.Finding{
 				ReceptorType:           finding.ReceptorType,
 				ServiceProviderAccount: finding.ServiceProviderAccount,
 				Entities:               finding.Entities,
 				Evidences:              []*receptor_v1.Evidence{&reportEvidence},
 			}
-			contentType, streamFile, err := multipartEvidence(&reportFinding, evidence.Document.StreamFilePath)
-			os.Remove(evidence.Document.StreamFilePath)
+			// create a new finding from current finding and add evidence
+			paths := []string{}
+			for _, doc := range *evidence.Document {
+				newDoc := receptor_v1.Document{
+					Body:     doc.Body,
+					Mime:     doc.Mime,
+					FileName: doc.FileName,
+				}
+				if doc.LastModified != nil {
+					newDoc.LastModified = doc.LastModified
+				}
+				reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
+					Doc: &newDoc,
+				}
+				paths = append(paths, doc.StreamFilePath)
+			}
+
+			contentType, streamFile, err := multipartEvidence(&reportFinding, paths)
+
+			for _, doc := range *evidence.Document {
+				os.Remove(doc.StreamFilePath)
+			}
+
 			if err != nil {
 				log.Err(err).Msg("failed to create multipart evidence")
 				err = nil
@@ -403,7 +413,7 @@ func assertStruct(rowType reflect.Type) (err error) {
 	return
 }
 
-func multipartEvidence(finding *receptor_v1.Finding, streamFilePath string) (contentType string, evidencePath string, err error) {
+func multipartEvidence(finding *receptor_v1.Finding, streamFilePaths []string) (contentType string, evidencePath string, err error) {
 	if len(finding.Evidences) == 0 {
 		err = errors.New("no evidence found")
 		log.Error().Msg("no evidence found")
@@ -415,7 +425,7 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePath string) (con
 		err = errors.New("evidence doc is nil")
 		log.Error().Msg("evidence doc is nil")
 	} else {
-		// evidence should be protobuf of evidence + blob in a mulitpart/mixed
+		// evidence should be protobuf of evidence + blob in a multipart/mixed
 		// the mime of the part should be the mime from the evidence.doc.Mime
 		dstFile, err := os.CreateTemp("", "multipart-evidence_*.tmp")
 		if err != nil {
@@ -445,36 +455,37 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePath string) (con
 		contentType = fmt.Sprintf("%s; %s; boundary=%s", mulitpartPrefix, mime, boundary)
 
 		// 1. Part1 : protobuf of Finding without evidence
-
 		err = builder.AddProtobuf("receptor_v1.Finding", finding)
 		if err != nil {
 			log.Error().Msgf("failed to add protobuf message: %v", err)
 		}
 
-		//2. Part2 : evidence blob
-		if body != nil && len(body) > 0 {
+		// 2. Part2 : evidence blob
+		if len(body) > 0 {
 			err = builder.AddBytes(evidence.Caption, evidence.Caption, mime, body)
 			if err != nil {
 				log.Err(err).Msgf("failed to add blob part: %s", evidence.Caption)
 			}
 		}
 
-		//3. Part3 : evidence path
-		if streamFilePath != "" {
-			err = builder.AddFile(evidence.Caption, streamFilePath, mime)
-			if err != nil {
-				log.Err(err).Msgf("failed to add stream file : %s", evidence.Caption)
+		// 3. Part3 : evidence paths
+		for _, streamFilePath := range streamFilePaths {
+			if streamFilePath != "" {
+				err = builder.AddFile(evidence.Caption, streamFilePath, mime)
+				if err != nil {
+					log.Err(err).Msgf("failed to add stream file: %s", streamFilePath)
+				}
 			}
 		}
 
-		//3. Part3 : Sources
+		// 4. Part4 : Sources
 		err = builder.AddProtobuf("receptor_v1.Sources", &receptor_v1.Sources{
 			Sources: evidence.Sources,
 		})
 		if err != nil {
 			log.Error().Msgf("failed to add sources part: %v", err)
 		}
-		// evidence.Sources
+
 		return contentType, dstFile.Name(), nil
 	}
 	return
