@@ -88,11 +88,10 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 		}
 
 		if evidence.Document != nil && len(*evidence.Document) > 0 {
-
+			// we can skip entitities for document evidence
 			reportFinding := receptor_v1.Finding{
 				ReceptorType:           finding.ReceptorType,
 				ServiceProviderAccount: finding.ServiceProviderAccount,
-				Entities:               finding.Entities,
 				Evidences:              []*receptor_v1.Evidence{&reportEvidence},
 			}
 			// create a new finding from current finding and add evidence
