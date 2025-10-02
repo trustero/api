@@ -134,7 +134,7 @@ type Evidence struct {
 	Sources            []*receptor_v1.Source          // Sources of raw API request and response used to gather the evidence.
 	Rows               []interface{}                  // Rows of formatted evidence represented by a Golang struct.
 	ServiceAccountId   string                         // AccountId of multi-account organization
-	Document           *Document                      // Unstructured evidence in a Document format
+	Document           *[]Document                    // Unstructured evidence in a Document format
 	Controls           []string                       // Controls associated with the evidence
 	IsManual           bool                           // If true, the evidence was manually collected
 	RelevantDate       timestamppb.Timestamp          // Relevant date of the evidence

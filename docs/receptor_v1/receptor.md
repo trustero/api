@@ -6,6 +6,7 @@
 - [receptor_v1/receptor.proto](#receptor_v1_receptor-proto)
     - [Credential](#receptor_v1-Credential)
     - [Document](#receptor_v1-Document)
+    - [Documents](#receptor_v1-Documents)
     - [Evidence](#receptor_v1-Evidence)
     - [Finding](#receptor_v1-Finding)
     - [JobResult](#receptor_v1-JobResult)
@@ -82,6 +83,21 @@ Document is an unstructured evidence provided as a MIME document.
 
 
 
+<a name="receptor_v1-Documents"></a>
+
+### Documents
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| docs | [Document](#receptor_v1-Document) | repeated |  |
+
+
+
+
+
+
 <a name="receptor_v1-Evidence"></a>
 
 ### Evidence
@@ -98,6 +114,7 @@ service provider account.  For example, the configuration of an S3 bucket in AWS
 | sources | [Source](#receptor_v1-Source) | repeated | Sources are raw service provider API requests and responses used to generate this evidence. The raw API requests and responses serve as proof the evidence correlates to real service configurations. |
 | doc | [Document](#receptor_v1-Document) |  | Document is an unstructured evidence. |
 | struct | [Struct](#receptor_v1-Struct) |  | Struct is a structured evidence. |
+| docs | [Documents](#receptor_v1-Documents) |  | Documents is a group of documents that will be considered as a single evidence |
 | service_account_id | [string](#string) |  | Service_account_id is the member account of the organization. For example, an AWS account number in an organization that has more than one account. |
 | controls | [string](#string) | repeated | Controls is a list of control names that the evidence is associated with. |
 | is_manual | [bool](#bool) |  | is_manual is a boolean that indicates whether the evidence was manually collected or not. |
