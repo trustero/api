@@ -95,12 +95,13 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 				Evidences:              []*receptor_v1.Evidence{&reportEvidence},
 			}
 			// create a new finding from current finding and add evidence
-			paths := []string{}
+			paths := []FilePathsInfo{}
 			for _, doc := range *evidence.Document {
 				newDoc := receptor_v1.Document{
 					Body:     doc.Body,
 					Mime:     doc.Mime,
 					FileName: doc.FileName,
+					Metadata: doc.Metadata,
 				}
 				if doc.LastModified != nil {
 					newDoc.LastModified = doc.LastModified
@@ -108,7 +109,10 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 				reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
 					Doc: &newDoc,
 				}
-				paths = append(paths, doc.StreamFilePath)
+				paths = append(paths, FilePathsInfo{
+					Path:     doc.StreamFilePath,
+					Metadata: doc.Metadata,
+				})
 			}
 
 			contentType, streamFile, err := multipartEvidence(&reportFinding, paths)
@@ -412,7 +416,12 @@ func assertStruct(rowType reflect.Type) (err error) {
 	return
 }
 
-func multipartEvidence(finding *receptor_v1.Finding, streamFilePaths []string) (contentType string, evidencePath string, err error) {
+type FilePathsInfo struct {
+	Path     string
+	Metadata map[string]string
+}
+
+func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FilePathsInfo) (contentType string, evidencePath string, err error) {
 	if len(finding.Evidences) == 0 {
 		err = errors.New("no evidence found")
 		log.Error().Msg("no evidence found")
@@ -468,11 +477,11 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePaths []string) (
 		}
 
 		// 3. Part3 : evidence paths
-		for _, streamFilePath := range streamFilePaths {
-			if streamFilePath != "" {
-				err = builder.AddFile(evidence.Caption, streamFilePath, mime)
+		for _, streamFilePathInfo := range streamFilePathsInfo {
+			if streamFilePathInfo.Path != "" {
+				err = builder.AddFile(evidence.Caption, streamFilePathInfo.Path, mime, streamFilePathInfo.Metadata)
 				if err != nil {
-					log.Err(err).Msgf("failed to add stream file: %s", streamFilePath)
+					log.Err(err).Msgf("failed to add stream file: %s", streamFilePathInfo.Path)
 				}
 			}
 		}

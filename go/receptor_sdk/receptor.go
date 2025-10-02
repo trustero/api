@@ -155,6 +155,7 @@ type Document struct {
 	StreamFilePath string                 // Path to the file containing the evidence
 	FileName       string                 // Name of the document
 	LastModified   *timestamppb.Timestamp // Last modified date of the document at the provider source
+	Metadata       map[string]string      // Additional metadata about the document
 }
 
 // Config with Field struct defines the json shape of the custom configurations for receptors that the app can use

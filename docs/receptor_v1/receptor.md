@@ -6,6 +6,7 @@
 - [receptor_v1/receptor.proto](#receptor_v1_receptor-proto)
     - [Credential](#receptor_v1-Credential)
     - [Document](#receptor_v1-Document)
+    - [Document.MetadataEntry](#receptor_v1-Document-MetadataEntry)
     - [Documents](#receptor_v1-Documents)
     - [Evidence](#receptor_v1-Evidence)
     - [Finding](#receptor_v1-Finding)
@@ -77,6 +78,23 @@ Document is an unstructured evidence provided as a MIME document.
 | stream_file_path | [string](#string) |  | Filepath for streaming large evidence - should be accessible by the server. |
 | file_name | [string](#string) |  | Filename is the name of the document |
 | last_modified | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | Last modified date of the document at the source |
+| metadata | [Document.MetadataEntry](#receptor_v1-Document-MetadataEntry) | repeated | Metadata is a map of key-value pairs that provide additional information about the document. |
+
+
+
+
+
+
+<a name="receptor_v1-Document-MetadataEntry"></a>
+
+### Document.MetadataEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [string](#string) |  |  |
 
 
 

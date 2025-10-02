@@ -177,6 +177,9 @@ message Document {
 
   // Last modified date of the document at the source
   google.protobuf.Timestamp last_modified = 6;
+
+  // Metadata is a map of key-value pairs that provide additional information about the document.
+  map<string, string> metadata = 7;
 }
 
 message Documents {

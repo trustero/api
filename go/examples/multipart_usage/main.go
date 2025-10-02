@@ -30,13 +30,13 @@ func main() {
 	boundary := builder.GetBoundary()
 
 	// Add a file part
-	err = builder.AddFile("test1.csv", "test1.csv", "application/csv")
+	err = builder.AddFile("test1.csv", "test1.csv", "application/csv", map[string]string{"Author": "Trustero Engi."})
 	if err != nil {
 		log.Fatalf("Failed to add file part: %v", err)
 	}
 
 	// Add another file part
-	err = builder.AddFile("test2.docx", "test2.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+	err = builder.AddFile("test2.docx", "test2.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", map[string]string{"Author": "Trustero Engi."})
 	if err != nil {
 		log.Fatalf("Failed to add file part: %v", err)
 	}
