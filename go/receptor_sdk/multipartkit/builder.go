@@ -128,7 +128,7 @@ func (mb *MultipartBuilder) addSingleOrMultipleProtobuf(partName string, pbs []p
 }
 
 // AddFile writes the content of a file as a part of the multipart stream with Content-Size and Content-Hash headers.
-func (mb *MultipartBuilder) AddFile(partName, filePath, contentType string) error {
+func (mb *MultipartBuilder) AddFile(partName, filePath, contentType string, contentMeta map[string]string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %v", err)
@@ -155,13 +155,20 @@ func (mb *MultipartBuilder) AddFile(partName, filePath, contentType string) erro
 		return fmt.Errorf("failed to seek file: %v", err)
 	}
 
-	// Create the part with all headers, including Content-Hash
-	partWriter, err := mb.writer.CreatePart(map[string][]string{
+	// common headers
+	headers := map[string][]string{
 		"Content-Disposition": {fmt.Sprintf(`file; name="%s"; filename="%s"`, partName, partName)},
 		"Content-Type":        {contentType},
 		"Content-Size":        {fmt.Sprintf("%d", fileInfo.Size())},
 		"Content-Hash":        {contentHash},
-	})
+	}
+
+	// Inject key-value pairs from contentMeta into headers
+	for key, value := range contentMeta {
+		headers[key] = []string{value}
+	}
+
+	partWriter, err := mb.writer.CreatePart(headers)
 	if err != nil {
 		return fmt.Errorf("failed to create multipart part: %v", err)
 	}
@@ -175,7 +182,7 @@ func (mb *MultipartBuilder) AddFile(partName, filePath, contentType string) erro
 }
 
 // AddBytes writes a file (provided as bytes) into the multipart builder with the given filename and MIME type.
-func (mb *MultipartBuilder) AddBytes(partName, fileName, contentType string, data []byte) error {
+func (mb *MultipartBuilder) AddBytes(partName, fileName, contentType string, data []byte, contentMeta map[string]string) error {
 	reader := bytes.NewReader(data)
 
 	// Compute the hash for the provided byte array
@@ -186,14 +193,20 @@ func (mb *MultipartBuilder) AddBytes(partName, fileName, contentType string, dat
 
 	// Rewind the reader after calculating the hash
 	reader.Seek(0, io.SeekStart)
-
-	// Create the part with all headers, including Content-Hash
-	partWriter, err := mb.writer.CreatePart(map[string][]string{
+	headers := map[string][]string{
 		"Content-Disposition": {fmt.Sprintf(`file; name="%s"; filename="%s"`, partName, fileName)},
 		"Content-Type":        {contentType},
 		"Content-Length":      {fmt.Sprintf("%d", len(data))},
 		"Content-Hash":        {contentHash},
-	})
+	}
+
+	// Inject key-value pairs from contentMeta into headers
+	for key, value := range contentMeta {
+		headers[key] = []string{value}
+	}
+
+	// Create the part with all headers, including Content-Hash
+	partWriter, err := mb.writer.CreatePart(headers)
 	if err != nil {
 		return fmt.Errorf("failed to create multipart part: %v", err)
 	}

@@ -51,10 +51,9 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}, config inter
 		if err != nil {
 			log.Err(err).Msg("failed to report evidence")
 			// Continue on to next batch even after an error
-			finding.Evidences = []*receptor_v1.Evidence{} // Empty every time for new evidence
 			continue
 		}
-		finding.Evidences = []*receptor_v1.Evidence{} // Empty every time for new evidence
+
 	}
 
 	return
@@ -68,7 +67,6 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			ColDisplayOrder: []string{},
 			ColTags:         map[string]string{},
 		}
-
 		reportEvidence := receptor_v1.Evidence{
 			Caption:            evidence.Caption,
 			Description:        evidence.Description,
@@ -88,31 +86,57 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 		}
 
 		if evidence.Document != nil && len(*evidence.Document) > 0 {
-			// we can skip entitities for document evidence
+			paths := []FilePathsInfo{}
+			evidenceDocuments := receptor_v1.Documents{}
+			evidenceDocuments.Docs = []*receptor_v1.Document{}
 			reportFinding := receptor_v1.Finding{
 				ReceptorType:           finding.ReceptorType,
 				ServiceProviderAccount: finding.ServiceProviderAccount,
-				Evidences:              []*receptor_v1.Evidence{&reportEvidence},
 			}
-			// create a new finding from current finding and add evidence
-			paths := []string{}
+
 			for _, doc := range *evidence.Document {
 				newDoc := receptor_v1.Document{
 					Body:     doc.Body,
 					Mime:     doc.Mime,
 					FileName: doc.FileName,
+					Metadata: doc.Metadata,
 				}
 				if doc.LastModified != nil {
 					newDoc.LastModified = doc.LastModified
 				}
-				reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
-					Doc: &newDoc,
+				evidenceDocuments.Docs = append(evidenceDocuments.Docs, &newDoc)
+				// add to paths only if it is NOT bytes
+				if len(doc.Body) == 0 {
+					paths = append(paths, FilePathsInfo{
+						Path:     doc.StreamFilePath,
+						Metadata: doc.Metadata,
+					})
 				}
-				paths = append(paths, doc.StreamFilePath)
 			}
+			if len(evidenceDocuments.Docs) == 1 { // single document
+				reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
+					Doc: evidenceDocuments.Docs[0],
+				}
+			} else if len(evidenceDocuments.Docs) > 1 {
+				reportEvidence.EvidenceType = &receptor_v1.Evidence_Docs{
+					Docs: &evidenceDocuments,
+				}
+			}
+			//extract sources and add to multipart and remove from finding
+			sources := []*receptor_v1.Source{}
+			for _, source := range evidence.Sources {
+				sources = append(sources, &receptor_v1.Source{
+					RawApiRequest:  source.RawApiRequest,
+					RawApiResponse: source.RawApiResponse,
+				})
+			}
+			reportEvidence.Sources = []*receptor_v1.Source{}
 
-			contentType, streamFile, err := multipartEvidence(&reportFinding, paths)
+			reportFinding.Evidences = append(reportFinding.Evidences, &reportEvidence)
 
+			contentType, streamFile, err := multipartEvidence(&reportFinding, paths, sources)
+
+			// have the streamFile from receptor - remove the temp evidence files
 			for _, doc := range *evidence.Document {
 				os.Remove(doc.StreamFilePath)
 			}
@@ -172,7 +196,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			for idx, row := range evidence.Rows {
 				if idx == 0 {
 					if entityIdFieldName, rowFieldNames, err = ExtractMetaData(row, &reportStruct); err != nil {
-						return // fail to extract metadata, likely an invalid row type
+						return // failed to extract metadata, likely an invalid row type
 					}
 				}
 				reportStruct.Rows = append(reportStruct.Rows, RowToStructRow(row, entityIdFieldName, rowFieldNames))
@@ -181,10 +205,10 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			// Append to Finding
 			finding.Evidences = append(finding.Evidences, &reportEvidence)
 		}
-	}
-	_, err = rc.Report(context.Background(), finding)
-	finding.Evidences = []*receptor_v1.Evidence{} // Empty every time for new evidence
 
+	}
+	// report all structured evidence at once
+	_, err = rc.Report(context.Background(), finding)
 	return
 
 }
@@ -412,7 +436,12 @@ func assertStruct(rowType reflect.Type) (err error) {
 	return
 }
 
-func multipartEvidence(finding *receptor_v1.Finding, streamFilePaths []string) (contentType string, evidencePath string, err error) {
+type FilePathsInfo struct {
+	Path     string
+	Metadata map[string]string
+}
+
+func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FilePathsInfo, sources []*receptor_v1.Source) (contentType string, evidencePath string, err error) {
 	if len(finding.Evidences) == 0 {
 		err = errors.New("no evidence found")
 		log.Error().Msg("no evidence found")
@@ -420,10 +449,12 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePaths []string) (
 	}
 
 	evidence := finding.Evidences[0]
-	if evidence.GetDoc() == nil {
-		err = errors.New("evidence doc is nil")
-		log.Error().Msg("evidence doc is nil")
+
+	if evidence.EvidenceType == nil {
+		err = errors.New("evidence doc(s) is nil")
+		log.Error().Msg("evidence doc(s) is nil")
 	} else {
+
 		// evidence should be protobuf of evidence + blob in a multipart/mixed
 		// the mime of the part should be the mime from the evidence.doc.Mime
 		dstFile, err := os.CreateTemp("", "multipart-evidence_*.tmp")
@@ -431,9 +462,7 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePaths []string) (
 			log.Err(err).Msg("failed to create multipart file")
 			return "", "", err
 		}
-
 		mime := evidence.GetDoc().GetMime()
-		body := evidence.GetDoc().GetBody()
 		bufferSize := multipartkit.DefaultBufferSize
 
 		// Initialize the multipart builder
@@ -454,36 +483,51 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePaths []string) (
 		contentType = fmt.Sprintf("%s; %s; boundary=%s", mulitpartPrefix, mime, boundary)
 
 		// 1. Part1 : protobuf of Finding without evidence
-		err = builder.AddProtobuf("receptor_v1.Finding", finding)
+
+		err = builder.AddProtobuf("receptor_v1.Finding", finding) // need to remove evidences from this finding ...
 		if err != nil {
 			log.Error().Msgf("failed to add protobuf message: %v", err)
 		}
 
 		// 2. Part2 : evidence blob
-		if len(body) > 0 {
-			err = builder.AddBytes(evidence.Caption, evidence.Caption, mime, body)
-			if err != nil {
-				log.Err(err).Msgf("failed to add blob part: %s", evidence.Caption)
-			}
-		}
+		docs := []*receptor_v1.Document{}
 
-		// 3. Part3 : evidence paths
-		for _, streamFilePath := range streamFilePaths {
-			if streamFilePath != "" {
-				err = builder.AddFile(evidence.Caption, streamFilePath, mime)
+		switch evidenceDocType := evidence.EvidenceType.(type) {
+		case *receptor_v1.Evidence_Doc:
+			log.Info().Msgf("%v", evidenceDocType.Doc.Mime)
+			docs = append(docs, evidenceDocType.Doc)
+		case *receptor_v1.Evidence_Docs:
+			log.Info().Msg("docs...")
+			docs = evidence.GetDocs().Docs
+		}
+		for _, doc := range docs {
+			if len(doc.Body) > 0 {
+				err = builder.AddBytes(evidence.Caption, evidence.Caption, mime, doc.GetBody(), doc.GetMetadata())
 				if err != nil {
-					log.Err(err).Msgf("failed to add stream file: %s", streamFilePath)
+					log.Err(err).Msgf("failed to add blob part: %s", evidence.Caption)
+				}
+			}
+
+		}
+		// 3. Part3 : evidence paths
+		for _, streamFilePathInfo := range streamFilePathsInfo {
+			if streamFilePathInfo.Path != "" {
+				err = builder.AddFile(evidence.Caption, streamFilePathInfo.Path, mime, streamFilePathInfo.Metadata)
+				if err != nil {
+					log.Err(err).Msgf("failed to add stream file: %s", streamFilePathInfo.Path)
 				}
 			}
 		}
 
 		// 4. Part4 : Sources
 		err = builder.AddProtobuf("receptor_v1.Sources", &receptor_v1.Sources{
-			Sources: evidence.Sources,
+			Sources: sources,
 		})
 		if err != nil {
 			log.Error().Msgf("failed to add sources part: %v", err)
 		}
+		// clear evidences from the temp finding
+		finding.Evidences = []*receptor_v1.Evidence{}
 
 		return contentType, dstFile.Name(), nil
 	}
