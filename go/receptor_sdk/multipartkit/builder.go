@@ -128,7 +128,7 @@ func (mb *MultipartBuilder) addSingleOrMultipleProtobuf(partName string, pbs []p
 }
 
 // AddFile writes the content of a file as a part of the multipart stream with Content-Size and Content-Hash headers.
-func (mb *MultipartBuilder) AddFile(partName, filePath, contentType string, contentMeta map[string]string) error {
+func (mb *MultipartBuilder) AddFile(partName, fileName, filePath, contentType string, contentMeta map[string]string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %v", err)
@@ -157,7 +157,7 @@ func (mb *MultipartBuilder) AddFile(partName, filePath, contentType string, cont
 
 	// common headers
 	headers := map[string][]string{
-		"Content-Disposition": {fmt.Sprintf(`file; name="%s"; filename="%s"`, partName, partName)},
+		"Content-Disposition": {fmt.Sprintf(`file; name="%s"; filename="%s"`, partName, fileName)},
 		"Content-Type":        {contentType},
 		"Content-Size":        {fmt.Sprintf("%d", fileInfo.Size())},
 		"Content-Hash":        {contentHash},
