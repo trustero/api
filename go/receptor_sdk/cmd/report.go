@@ -110,8 +110,11 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 					paths = append(paths, FilePathsInfo{
 						Path:     doc.StreamFilePath,
 						Metadata: doc.Metadata,
+<<<<<<< HEAD
 						FileName:  doc.FileName,
 						PartName: doc.FileName,
+=======
+>>>>>>> main
 					})
 				}
 			}
@@ -439,8 +442,11 @@ func assertStruct(rowType reflect.Type) (err error) {
 }
 
 type FilePathsInfo struct {
+<<<<<<< HEAD
 	FileName string
 	PartName string
+=======
+>>>>>>> main
 	Path     string
 	Metadata map[string]string
 }
@@ -466,8 +472,12 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FileP
 			log.Err(err).Msg("failed to create multipart file")
 			return "", "", err
 		}
+<<<<<<< HEAD
 		// TOD: Adjust mime for multiple document evidences
 		mime := evidence.GetDoc().GetMime() 
+=======
+		mime := evidence.GetDoc().GetMime()
+>>>>>>> main
 		bufferSize := multipartkit.DefaultBufferSize
 
 		// Initialize the multipart builder
