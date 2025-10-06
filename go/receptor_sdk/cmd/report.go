@@ -110,11 +110,8 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 					paths = append(paths, FilePathsInfo{
 						Path:     doc.StreamFilePath,
 						Metadata: doc.Metadata,
-<<<<<<< HEAD
 						FileName:  doc.FileName,
 						PartName: doc.FileName,
-=======
->>>>>>> main
 					})
 				}
 			}
