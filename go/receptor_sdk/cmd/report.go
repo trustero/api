@@ -110,6 +110,8 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 					paths = append(paths, FilePathsInfo{
 						Path:     doc.StreamFilePath,
 						Metadata: doc.Metadata,
+						FileName: doc.FileName,
+						PartName: doc.FileName,
 					})
 				}
 			}
@@ -437,6 +439,8 @@ func assertStruct(rowType reflect.Type) (err error) {
 }
 
 type FilePathsInfo struct {
+	FileName string
+	PartName string
 	Path     string
 	Metadata map[string]string
 }
@@ -462,6 +466,7 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FileP
 			log.Err(err).Msg("failed to create multipart file")
 			return "", "", err
 		}
+		// TOD: Adjust mime for multiple document evidences
 		mime := evidence.GetDoc().GetMime()
 		bufferSize := multipartkit.DefaultBufferSize
 
@@ -494,15 +499,20 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FileP
 
 		switch evidenceDocType := evidence.EvidenceType.(type) {
 		case *receptor_v1.Evidence_Doc:
-			log.Info().Msgf("%v", evidenceDocType.Doc.Mime)
 			docs = append(docs, evidenceDocType.Doc)
+			mime = evidence.GetDoc().GetMime()
 		case *receptor_v1.Evidence_Docs:
-			log.Info().Msg("docs...")
 			docs = evidence.GetDocs().Docs
+			mime = "application/tr-archive"
 		}
+		contentType = fmt.Sprintf("%s; %s; boundary=%s", mulitpartPrefix, mime, boundary)
 		for _, doc := range docs {
 			if len(doc.Body) > 0 {
-				err = builder.AddBytes(evidence.Caption, evidence.Caption, mime, doc.GetBody(), doc.GetMetadata())
+				name := evidence.Caption
+				if doc.FileName != "" {
+					name = doc.FileName
+				}
+				err = builder.AddBytes(name, name, mime, doc.GetBody(), doc.GetMetadata())
 				if err != nil {
 					log.Err(err).Msgf("failed to add blob part: %s", evidence.Caption)
 				}
@@ -512,7 +522,7 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FileP
 		// 3. Part3 : evidence paths
 		for _, streamFilePathInfo := range streamFilePathsInfo {
 			if streamFilePathInfo.Path != "" {
-				err = builder.AddFile(evidence.Caption, streamFilePathInfo.Path, mime, streamFilePathInfo.Metadata)
+				err = builder.AddFile(streamFilePathInfo.PartName, streamFilePathInfo.FileName, streamFilePathInfo.Path, mime, streamFilePathInfo.Metadata)
 				if err != nil {
 					log.Err(err).Msgf("failed to add stream file: %s", streamFilePathInfo.Path)
 				}
