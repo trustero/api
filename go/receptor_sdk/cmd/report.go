@@ -112,6 +112,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 						Metadata: doc.Metadata,
 						FileName: doc.FileName,
 						PartName: doc.FileName,
+						Mime:     doc.Mime,
 					})
 				}
 			}
@@ -443,6 +444,7 @@ type FilePathsInfo struct {
 	PartName string
 	Path     string
 	Metadata map[string]string
+	Mime     string
 }
 
 func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FilePathsInfo, sources []*receptor_v1.Source) (contentType string, evidencePath string, err error) {
@@ -512,7 +514,7 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FileP
 				if doc.FileName != "" {
 					name = doc.FileName
 				}
-				err = builder.AddBytes(name, name, mime, doc.GetBody(), doc.GetMetadata())
+				err = builder.AddBytes(name, name, doc.GetMime(), doc.GetBody(), doc.GetMetadata())
 				if err != nil {
 					log.Err(err).Msgf("failed to add blob part: %s", evidence.Caption)
 				}
@@ -522,7 +524,7 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FileP
 		// 3. Part3 : evidence paths
 		for _, streamFilePathInfo := range streamFilePathsInfo {
 			if streamFilePathInfo.Path != "" {
-				err = builder.AddFile(streamFilePathInfo.PartName, streamFilePathInfo.FileName, streamFilePathInfo.Path, mime, streamFilePathInfo.Metadata)
+				err = builder.AddFile(streamFilePathInfo.PartName, streamFilePathInfo.FileName, streamFilePathInfo.Path, streamFilePathInfo.Mime, streamFilePathInfo.Metadata)
 				if err != nil {
 					log.Err(err).Msgf("failed to add stream file: %s", streamFilePathInfo.Path)
 				}
