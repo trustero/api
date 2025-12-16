@@ -212,6 +212,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 	}
 	// report all structured evidence at once
 	_, err = rc.Report(context.Background(), finding)
+	finding.Evidences = []*receptor_v1.Evidence{} // reset evidences
 	return
 
 }
