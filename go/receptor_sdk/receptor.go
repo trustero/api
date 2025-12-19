@@ -186,16 +186,17 @@ type AuthMethod struct {
 }
 
 type Control struct {
-	Id               string   `json:"id"`                 // Id of the control
-	Name             string   `json:"name"`               // Name of the control
-	Objective        string   `json:"objective"`          // Objective of the control
-	TestProcedure    string   `json:"test_procedure"`     // Test procedure of the control
-	Frameworks       []string `json:"frameworks"`         // Frameworks applicable to the control
-	Notes            string   `json:"notes"`              // Notes for the control
-	RequiredEvidence string   `json:"required_evidences"` // Required evidences for the control
-	ImportKey        string   `json:"import_key"`         // External id of the control
-	ImportLink       string   `json:"import_link"`        // External link to the control
-	SOC2Criteria     []string `json:"soc2_criteria"`      // SOC2 Framework criterias for the control
+	Id                      string   `json:"id"`                       // Id of the control
+	Name                    string   `json:"name"`                     // Name of the control
+	Objective               string   `json:"objective"`                // Objective of the control
+	TestProcedure           string   `json:"test_procedure"`           // Test procedure of the control
+	Frameworks              []string `json:"frameworks"`               // Frameworks applicable to the control
+	Notes                   string   `json:"notes"`                    // Notes for the control
+	RequiredEvidence        string   `json:"required_evidences"`       // Required evidences for the control
+	ImportKey               string   `json:"import_key"`               // External id of the control
+	ImportLink              string   `json:"import_link"`              // External link to the control
+	SOC2Criteria            []string `json:"soc2_criteria"`            // SOC2 Framework criterias for the control
+	ImplementationProcedure string   `json:"implementation_procedure"` // Implementation procedure of the control
 }
 
 type ControlProcedureMapping struct {
@@ -218,13 +219,14 @@ type ControlPolicyMapping struct {
 }
 
 type ControlProcedure struct {
-	Id                string `json:"id"`
-	ControlName       string `json:"Control_Name"`
-	Description       string `json:"Description"`
-	ProcedureName     string `json:"Procedure_Name"`
-	TestingProcedures string `json:"Testing_Procedures"`
-	ImportKey         string `json:"import_key"`  // External id of the control
-	ImportLink        string `json:"import_link"` // External link to the control
+	Id                      string `json:"id"`
+	ControlName             string `json:"Control_Name"`
+	Description             string `json:"Description"`
+	ProcedureName           string `json:"Procedure_Name"`
+	TestingProcedures       string `json:"Testing_Procedures"`
+	ImplementationProcedure string `json:"Implementation_Procedure"`
+	ImportKey               string `json:"import_key"`  // External id of the control
+	ImportLink              string `json:"import_link"` // External link to the control
 }
 
 type ControlEvidenceMapping struct {
