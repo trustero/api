@@ -10,7 +10,6 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
 
-
 // Receptor service, or a Trustero client application, collects findings supporting the use of services from a
 // service provider account.  For example, AWS is a service provider, AWS account is a service provider account,
 // and S3 is a service.  Trustero associates collected evidence to business controls in support of the business'
@@ -45,13 +44,11 @@ service Receptor {
   // This call is typically made as a callback by a receptor after credential verification.
   rpc SetConfiguration(ReceptorConfiguration) returns (google.protobuf.Empty);
 
-  // StreamReport is used to stream large reports to Trustero. The report is sent in chunks and the first chunk  
+  // StreamReport is used to stream large reports to Trustero. The report is sent in chunks and the first chunk
   // contains the boundary with the mime type.
   rpc StreamReport(stream ReportChunk) returns (ReportResponse);
 
-
 }
-
 
 // Finding is a set of evidence(s) collected from a service provider account.
 message Finding {
@@ -70,8 +67,10 @@ message Finding {
   // One or more evidence collected by a typical receptor scan.
   repeated Evidence evidences = 4;
 
-}
+  // discovery_id is the unique identifier for the discovery process that led to this finding.
+  string discovery_id = 5;
 
+}
 
 // Evidence is a unstructured or structured document that represent the how a service is being used within a
 // service provider account.  For example, the configuration of an S3 bucket in AWS.
@@ -113,7 +112,7 @@ message Evidence {
 
   // Service_account_id is the member account of the organization. For example, an AWS account number in an organization
   // that has more than one account.
-    string service_account_id = 8;
+  string service_account_id = 8;
 
   // Controls is a list of control names that the evidence is associated with.
   repeated string controls = 9;
@@ -133,17 +132,15 @@ message Evidence {
   // Policies is a list of policies names that the document is associated with.
   repeated string policies = 14;
 
-  // a list of record_id for the evidence object. This ID is used to identify the evidence object in the Trustero system. 
-  repeated string record_ids = 15; 
- 
-  // exceptions is a list of exceptions for the evidence object. 
+  // a list of record_id for the evidence object. This ID is used to identify the evidence object in the Trustero system.
+  repeated string record_ids = 15;
+
+  // exceptions is a list of exceptions for the evidence object.
   string exceptions = 16;
 
   //// link to the evidence object in the external system.
-  string evidence_link = 17; 
+  string evidence_link = 17;
 }
-
-
 
 // Source is the raw service provider API request and response.
 message Source {
@@ -168,12 +165,12 @@ message Document {
 
   // Body is the opaque document body.  The document body must match the type defined by the mime attribute.
   bytes body = 3;
-  
+
   // Filepath for streaming large evidence - should be accessible by the server.
   string stream_file_path = 4;
 
   // Filename is the name of the document
-  string file_name = 5; 
+  string file_name = 5;
 
   // Last modified date of the document at the source
   google.protobuf.Timestamp last_modified = 6;
@@ -209,7 +206,6 @@ message Struct {
   map<string, string> col_tags = 5;
 }
 
-
 // Row is a row of structured data.
 message Row {
 
@@ -223,21 +219,20 @@ message Row {
   map<string, Value> cols = 2;
 }
 
-
 // Value is a [Struct.row.col] column value.  Value types can be simple protobuf scalar or [google.proto.Timestamp].
 message Value {
   oneof value_type {
-    double double_value = 1;
-    float float_value = 2;
-    int32 int32_value = 3;
-    int64 int64_value = 4;
-    uint32 uint32_value = 5;
-    uint64 uint64_value = 6;
-    bool bool_value = 7;
-    string string_value = 8;
-    google.protobuf.Timestamp timestamp_value = 9;
-    StringList string_list_value = 10;
-    StructList struct_list_value = 11;
+    double                    double_value      = 1;
+    float                     float_value       = 2;
+    int32                     int32_value       = 3;
+    int64                     int64_value       = 4;
+    uint32                    uint32_value      = 5;
+    uint64                    uint64_value      = 6;
+    bool                      bool_value        = 7;
+    string                    string_value      = 8;
+    google.protobuf.Timestamp timestamp_value   = 9;
+    StringList                string_list_value = 10;
+    StructList                struct_list_value = 11;
   }
 }
 
@@ -271,7 +266,6 @@ message ServiceEntities {
   repeated ServiceEntity entities = 3;
 }
 
-
 // ServiceEntity is a discovered service entity instance which represents a configurable entity provided by the
 // service.  For example, an AWS ECS cluster or a GitLab repository.  These service entities are associated with
 // detailed configurations collected by Receptor.Reported() calls.  Service entities allows Trustero to filter
@@ -299,9 +293,8 @@ message ServiceEntity {
 
   // Service_account_id is the member account of the organization. For example, an AWS account number in a an organization
   // that has more than one account.
-  string service_account_id=5;
+  string service_account_id = 5;
 }
-
 
 // Credential is returned by a Verified request noting if a given service provider account credential is  valid.
 message Credential {
@@ -324,14 +317,12 @@ message Credential {
   string exceptions = 5;
 }
 
-
 // ReceptorOID is Trustero's receptor record identifier.
 message ReceptorOID {
 
   // Receptor_object_id is the string representation of a Trustero persistent record.
   string receptor_object_id = 1;
 }
-
 
 // ReceptorConfiguration contains a configurations a receptor needs to access a service provider account.
 message ReceptorConfiguration {
@@ -351,7 +342,6 @@ message ReceptorConfiguration {
   // Model_id is the receptor model id
   string model_id = 5;
 }
-
 
 // JobResult reports the result of a receptor request.
 message JobResult {
@@ -374,29 +364,28 @@ message JobResult {
 }
 
 message ReportChunk {
-  bytes content = 1;
-  bool is_boundary = 2; // Whether this chunk contains the boundary
+  bytes content     = 1;
+  bool  is_boundary = 2; // Whether this chunk contains the boundary
 }
 
 // Server response after receiving the whole streamed report
 message ReportResponse {
-  string status = 1;  // Could use "ok" or other status information
-} 
+  string status = 1; // Could use "ok" or other status information
+}
 
-
-// EvidenceObjectType enum to identify the type of evidence object reported to Trustero. 
+// EvidenceObjectType enum to identify the type of evidence object reported to Trustero.
 enum EvidenceObjectType {
-  EVIDENCES = 0;
-  CONTROLS = 1;
-  POLICIES = 2;
-  POLICY_DOCUMENT = 3;
-  CONTROL_POLICY_MAPPING = 4;
-  CONTROL_PROCEDURES = 5;
-  CONTROL_CONTROL_PROCEDURE_MAPPING = 6;
-  CONTROL_EVIDENCE_MAPPING = 7;
-  EVIDENCES_META = 8;
-  POLICY_DOCUMENT_POLICY_MAPPING = 9;
-  POLICY_DOCUMENT_META = 10;
+  EVIDENCES                          = 0;
+  CONTROLS                           = 1;
+  POLICIES                           = 2;
+  POLICY_DOCUMENT                    = 3;
+  CONTROL_POLICY_MAPPING             = 4;
+  CONTROL_PROCEDURES                 = 5;
+  CONTROL_CONTROL_PROCEDURE_MAPPING  = 6;
+  CONTROL_EVIDENCE_MAPPING           = 7;
+  EVIDENCES_META                     = 8;
+  POLICY_DOCUMENT_POLICY_MAPPING     = 9;
+  POLICY_DOCUMENT_META               = 10;
   CONTROL_PROCEDURE_EVIDENCE_MAPPING = 11;
-  WORKFLOW_TASK_EVIDENCE_MAPPING = 12;
+  WORKFLOW_TASK_EVIDENCE_MAPPING     = 12;
 }
