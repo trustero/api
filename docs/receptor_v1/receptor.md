@@ -161,6 +161,7 @@ Finding is a set of evidence(s) collected from a service provider account.
 | service_provider_account | [string](#string) |  | The receptor&#39;s evidence source. |
 | entities | [ServiceEntity](#receptor_v1-ServiceEntity) | repeated | Entities is a list of service entity configurations in the service provider account. |
 | evidences | [Evidence](#receptor_v1-Evidence) | repeated | One or more evidence collected by a typical receptor scan. |
+| discovery_id | [string](#string) |  | discovery_id is the unique identifier for the discovery process that led to this finding. |
 
 
 

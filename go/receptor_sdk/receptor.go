@@ -26,6 +26,7 @@ var (
 	CredentialsBase64URL string // Service provider credentials as a base64 URL encoded json string.
 	ReceptorId           string // Trustero's persistent record ID of a record holding a receptor's service provider credentials.
 	ConfigBase64URL      string // Receptor configuration as a base64 URL encoded json string.
+	DiscoveryId          string // Trustero discovery identifier
 )
 
 // Receptor is the main interface for the Receptor implementor-facing  API.

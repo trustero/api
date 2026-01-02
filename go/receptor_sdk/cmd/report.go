@@ -33,7 +33,7 @@ func report(rc receptor_v1.ReceptorClient, credentials interface{}, config inter
 	}
 	finding.ReceptorType = GetParsedReceptorType()
 	finding.ServiceProviderAccount = serviceProviderAccount
-
+	finding.DiscoveryId = receptor_sdk.DiscoveryId
 	// report in single batch
 	var evidences []*receptor_sdk.Evidence
 	if evidences, err = receptorImpl.Report(credentials, config); err == nil && len(evidences) > 0 {

@@ -105,6 +105,7 @@ func addGrpcFlags(cmd *cobra.Command) {
 	addStrFlag(cmd, &receptor_sdk.Notify, "notify", "", "", "Notify Trustero with Tracer ID on command completion")
 	addStrFlag(cmd, &receptor_sdk.CredentialsBase64URL, "credentials", "", "", "Base64 URL encoded service provider credential")
 	addStrFlag(cmd, &receptor_sdk.ConfigBase64URL, "config", "", "", "Base64 URL encoded receptor configuration")
+	addStrFlag(cmd, &receptor_sdk.DiscoveryId, "discovery-id", "", "", "Trustero discovery identifier")
 
 }
 
