@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"strconv"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
 )
 
@@ -55,10 +57,10 @@ func InitGRPCClient(cert, override string) {
 // Dial makes a GRPC connection to Trustero GRPC service.  A Trustero JWT bearer token must be provided.
 func (sc *ServerConnection) Dial(token, host string, port int) (err error) {
 	// Dial options
-	grpcCred := oauth.NewOauthAccess(&oauth2.Token{AccessToken: token})
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	grpcCred := oauth.TokenSource{TokenSource: ts}
 	opts := []grpc.DialOption{
 		grpc.WithUnaryInterceptor(logUnaryCall),
-		grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(grpcCred),
 		sc.TlsDialOption,
 		grpc.WithStreamInterceptor(logStreamCall),
@@ -67,8 +69,36 @@ func (sc *ServerConnection) Dial(token, host string, port int) (err error) {
 
 	// Connect to local server
 	addr := host + ":" + strconv.Itoa(port)
-	sc.Connection, err = grpc.Dial(addr, opts...)
+	sc.Connection, err = grpc.NewClient(addr, opts...)
 	return
+}
+
+// DialAndWait dials and waits for the connection to reach Ready state or timeout.
+// This preserves old blocking behavior safely, avoiding deprecated WithBlock.
+func (sc *ServerConnection) DialAndWait(token, host string, port int, timeout time.Duration) error {
+	if err := sc.Dial(token, host, port); err != nil {
+		return err
+	}
+	if sc.Connection == nil {
+		return errors.New("grpc connection is nil after dial")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	for {
+		state := sc.Connection.GetState()
+		if state == connectivity.Ready {
+			return nil
+		}
+		sc.Connection.Connect()
+		if ok := sc.Connection.WaitForStateChange(ctx, state); !ok {
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			return errors.New("grpc wait for state change failed")
+		}
+	}
 }
 
 // CloseClient closes a previously dialed Trustero GRPC connection.
