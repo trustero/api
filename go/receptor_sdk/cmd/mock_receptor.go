@@ -124,7 +124,6 @@ func toYaml(v interface{}) (yamld string, err error) {
 	return
 }
 
-// Verified implements a mock [receptor_v1.Receptor.GetConfiguration] method for testing.
 func (rc *mockReceptorClient) SetConfiguration(ctx context.Context, c *receptor.ReceptorConfiguration, opts ...grpc.CallOption) (e *emptypb.Empty, err error) {
 	println(header + "SetConfiguration(...)")
 	var yamld string

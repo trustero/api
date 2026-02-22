@@ -18,7 +18,7 @@ const (
 	configureLong  = `
 Configure service provider account information.  Configure command
 decodes the base64 URL encoded credentials from the '--credentials' command
-line flag, gets the configuration for the service provider account and sends to Trustero..  If 'dryrun' is specified instead of a
+line flag, gets the configuration for the service provider account and sends to Trustero.  If 'dryrun' is specified instead of a
 Trustero access token, the configure command will not report the results to
 Trustero and instead print the configuration results to console.`
 )
@@ -46,19 +46,6 @@ func (v *confi) setup() {
 
 	addGrpcFlags(v.cmd)
 }
-
-// func conf(rc receptor_v1.ReceptorClient, credentials interface{}) (err error) {
-
-// 	// Receptor configuration setup
-// 	var config *receptor_v1.ReceptorConfiguration
-// 	if config, err = receptorImpl.Configure(credentials); err != nil || config == nil {
-// 		return
-// 	}
-
-// 	// Send receptor configuration to Trustero
-// 	_, err = rc.SetConfiguration(context.Background(), config)
-// 	return
-// }
 
 // Cobra executes this function on verify command.
 func configure(_ *cobra.Command, args []string) (err error) {

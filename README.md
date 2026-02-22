@@ -18,7 +18,6 @@ ReceptorSDK is an open source Trustero project and contributions are welcome.
 
 ReceptorSDK is periodically refreshed to reflect the newest additions to the Trustero API. Users of the SDK are advised to track the latest releases rather closely to ensure proper function in the unlikely event of an incompatible change to a Trustero API.
 
-
 ## Usage
 
 The developer needs to implement the [Receptor interface](https://pkg.go.dev/github.com/trustero/api/go/receptor_sdk#Receptor) in their project to create a Receptor.
@@ -27,14 +26,14 @@ The developer needs to implement the [Receptor interface](https://pkg.go.dev/git
 package main
 
 import (
-	"github.com/trustero/api/go/receptor_sdk"
-	"github.com/trustero/api/go/receptor_sdk/cmd"
-	"github.com/trustero/api/go/receptor_v1"
+ "github.com/trustero/api/go/receptor_sdk"
+ "github.com/trustero/api/go/receptor_sdk/cmd"
+ "github.com/trustero/api/go/receptor_v1"
 )
 
 const (
-	receptorName = "trr-custom"
-	serviceName = "Custom Service"
+ receptorName = "trr-custom"
+ serviceName = "Custom Service"
 )
 
 type Receptor struct {
@@ -42,44 +41,64 @@ type Receptor struct {
 }
 
 func (r *Receptor) GetReceptorType() string {
-	return receptorName
+ return receptorName
 }
 
 func (r *Receptor) GetKnownServices() []string {
-	return []string{serviceName}
+ return []string{serviceName}
 }
 
 func (r *Receptor) GetCredentialObj() (credentialObj interface{}) {
-	return r
+ return r
 }
 
 func (r *Receptor) GetInstructions() (string, error) {
-	return
+ return
 }
 
 func (r *Receptor) GetLogo() (string, error) {
-	return
+ return
 }
 
+func (r *Receptor) GetConfigObj(credentials interface{}) (err error) {
+  // YOUR CODE HERE
+ return
+}
+
+func (r *Receptor) GetEvidenceInfo(credentials interface{}) (evidences []*receptor_sdk.Evidence) {
+ // YOUR CODE HERE
+}
+
+func (r *Receptor) Configure(credentials interface{}) (config *receptor_v1.ReceptorConfiguration, err error) {
+ // YOUR CODE HERE
+}
 
 func (r *Receptor) Verify(credentials interface{}) (ok bool, err error) {
   // YOUR CODE HERE
-	return
+ return
 }
 
 func (r *Receptor) Discover(credentials interface{}) (svcs []*receptor_v1.ServiceEntity, err error) {
   // YOUR CODE HERE
-	return
+ return
 }
 
 func (r *Receptor) Report(credentials interface{}) (evidences []*receptor_sdk.Evidence, err error) {
   // YOUR CODE HERE
-	return
+ return
 }
 
+func (r *Receptor) ReportBatch(credentials interface{}, evidenceChan chan []*receptor_sdk.Evidence) {
+  
+ defer func() {
+  close(evidenceChan)
+ }()
+ // YOUR CODE HERE
+ return
+}
 
 func main() {
-	cmd.Execute(&Receptor{})
+ cmd.Execute(&Receptor{})
 }
 ```
 
@@ -98,7 +117,7 @@ If a client needs to be generated for debugging or other use cases, it may be do
 rc = client.ServerConn.GetReceptorClient()
 
 if receptorInfo, err = getReceptorConfig(rc); err != nil {
-	log.Error().Err(err)
+ log.Error().Err(err)
 }
 
 credentialString = receptorInfo.GetCredential()
