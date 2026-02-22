@@ -82,7 +82,7 @@ func scan(_ *cobra.Command, args []string) (err error) {
 			}
 			//Send the config back to Trustero if there is additional config
 			if config != nil {
-				jsonBytes, err := json.Marshal(receptorImpl.GetConfigObj())
+				jsonBytes, err := json.Marshal(receptorImpl.GetConfigObj(credentials))
 				if err != nil {
 					return err
 				}

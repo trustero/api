@@ -10,6 +10,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"strings"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	"golang.org/x/net/context"
@@ -46,6 +47,7 @@ var cmds = map[string]command{
 	"evidenceinfo": &evi{},
 	"logo":         &logor{},
 	"instructions": &instruct{},
+	"configure":    &confi{},
 }
 
 // Execute is the entry point into the CLI framework.  Receptor author implements the [receptor_sdk.Receptor]
@@ -106,6 +108,7 @@ func addGrpcFlags(cmd *cobra.Command) {
 	addStrFlag(cmd, &receptor_sdk.CredentialsBase64URL, "credentials", "", "", "Base64 URL encoded service provider credential")
 	addStrFlag(cmd, &receptor_sdk.ConfigBase64URL, "config", "", "", "Base64 URL encoded receptor configuration")
 	addStrFlag(cmd, &receptor_sdk.DiscoveryId, "discovery-id", "", "", "Trustero discovery identifier")
+	addIntFlag(cmd, &receptor_sdk.ConnectTimeout, "connect-timeout", "", 10, "Timeout in seconds to wait for GRPC connection readiness")
 
 }
 
@@ -240,9 +243,9 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 
 	// Unmarshal json string config
 	if len(configStr) > 0 && configStr != "{}" {
-		configObj, err = unmarshalConfig(configStr, receptorImpl.GetConfigObj())
+		configObj, err = unmarshalConfig(configStr, receptorImpl.GetConfigObj(credentialObj))
 	} else {
-		configObj = receptorImpl.GetConfigObj()
+		configObj = receptorImpl.GetConfigObj(credentialObj)
 	}
 
 	// Invoke receptor's method
@@ -264,7 +267,14 @@ func getReceptorClient(token string) (rc receptor.ReceptorClient, err error) {
 		rc = &mockReceptorClient{}
 	} else {
 		// Connect to Trustero grpc server
-		if err = client.ServerConn.Dial(token, receptor_sdk.Host, receptor_sdk.Port); err != nil {
+		// timeout range check: minimum 10 second, maximum 60 seconds, default 10 seconds
+		timeout := time.Duration(receptor_sdk.ConnectTimeout) * time.Second
+		if timeout < 10 {
+			timeout = 10 * time.Second
+		} else if timeout > 60*time.Second {
+			timeout = 60 * time.Second
+		}
+		if err = client.ServerConn.DialAndWait(token, receptor_sdk.Host, receptor_sdk.Port, timeout); err != nil {
 			return
 		}
 		// Get grpc client

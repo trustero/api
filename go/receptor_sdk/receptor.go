@@ -27,6 +27,7 @@ var (
 	ReceptorId           string // Trustero's persistent record ID of a record holding a receptor's service provider credentials.
 	ConfigBase64URL      string // Receptor configuration as a base64 URL encoded json string.
 	DiscoveryId          string // Trustero discovery identifier
+	ConnectTimeout       int    // Timeout in seconds to wait for GRPC connection readiness
 )
 
 // Receptor is the main interface for the Receptor implementor-facing  API.
@@ -60,7 +61,9 @@ type Receptor interface {
 	GetCredentialObj() (credentialObj interface{})
 
 	// GetConfigObj returns an instance of a Config object
-	GetConfigObj() (configObj interface{})
+	// used for additional configuration from users when the default credentials are not sufficient for the receptor
+	// to collect evidence and needs service provider account specific configuration.
+	GetConfigObj(credentials interface{}) (configObj interface{})
 
 	// GetConfigObjDesc returns an instance of struct that represents a json for the config object to be rendered
 	// in the receptor config modal
