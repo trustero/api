@@ -18,3 +18,4 @@
 build/
 **/coverage.txt
 .DS_Store
+CLAUDE.md

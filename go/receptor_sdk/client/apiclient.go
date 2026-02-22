@@ -64,7 +64,7 @@ func (sc *ServerConnection) Dial(token, host string, port int) (err error) {
 		grpc.WithPerRPCCredentials(grpcCred),
 		sc.TlsDialOption,
 		grpc.WithStreamInterceptor(logStreamCall),
-		grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(500 * 1024 * 1024)),
+		grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(2048 * 1024 * 1024)),
 	}
 
 	// Connect to local server
