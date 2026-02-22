@@ -47,6 +47,7 @@ var cmds = map[string]command{
 	"evidenceinfo": &evi{},
 	"logo":         &logor{},
 	"instructions": &instruct{},
+	"configure":    &confi{},
 }
 
 // Execute is the entry point into the CLI framework.  Receptor author implements the [receptor_sdk.Receptor]
@@ -242,9 +243,9 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 
 	// Unmarshal json string config
 	if len(configStr) > 0 && configStr != "{}" {
-		configObj, err = unmarshalConfig(configStr, receptorImpl.GetConfigObj())
+		configObj, err = unmarshalConfig(configStr, receptorImpl.GetConfigObj(credentialObj))
 	} else {
-		configObj = receptorImpl.GetConfigObj()
+		configObj = receptorImpl.GetConfigObj(credentialObj)
 	}
 
 	// Invoke receptor's method
