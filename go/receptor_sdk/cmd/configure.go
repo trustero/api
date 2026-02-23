@@ -61,17 +61,13 @@ func configure(_ *cobra.Command, args []string) (err error) {
 				if receptor_sdk.NoSave {
 					println(string(jsonBytes))
 
-					// print to console instead of sending to Trustero when 'dryrun' is specified
-
-					return nil
-
 				} else {
+					_, err = rc.SetConfiguration(context.Background(), &receptor_v1.ReceptorConfiguration{
+						ReceptorObjectId: receptor_sdk.ReceptorId,
+						Config:           string(jsonBytes),
+						ModelId:          receptorImpl.GetReceptorType(),
+					})
 				}
-				_, err = rc.SetConfiguration(context.Background(), &receptor_v1.ReceptorConfiguration{
-					ReceptorObjectId: receptor_sdk.ReceptorId,
-					Config:           string(jsonBytes),
-					ModelId:          receptorImpl.GetReceptorType(),
-				})
 			}
 			return
 		})
