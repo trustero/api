@@ -17,6 +17,7 @@ import (
 	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/trustero/api/go/receptor_sdk/multipartkit"
 	"github.com/trustero/api/go/receptor_v1"
+	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -84,6 +85,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			Exceptions:         evidence.Exceptions,
 			EvidenceLink:       evidence.EvidenceLink,
 		}
+		addContentTypeUnknownField(&reportEvidence, evidence.ContentType)
 
 		if evidence.Document != nil && len(*evidence.Document) > 0 {
 			paths := []FilePathsInfo{}
@@ -215,6 +217,14 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 	finding.Evidences = []*receptor_v1.Evidence{} // reset evidences
 	return
 
+}
+
+func addContentTypeUnknownField(ev *receptor_v1.Evidence, contentType int32) {
+	// content_type is field number 19 in receptor_v1.Evidence.
+	unknown := ev.ProtoReflect().GetUnknown()
+	encoded := protowire.AppendTag(nil, 19, protowire.VarintType)
+	encoded = protowire.AppendVarint(encoded, uint64(contentType))
+	ev.ProtoReflect().SetUnknown(append(unknown, encoded...))
 }
 
 // ExtractMetaData Extracts tag information from struct
