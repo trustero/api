@@ -131,23 +131,24 @@ type Receptor interface {
 //	    Username string  `trustero:"id;display:User Name;order:1"`
 //	}
 type Evidence struct {
-	ServiceName        string                         // ServiceName where this evidence was gathered. For example, "S3".
-	EntityType         string                         // EntityType of rows of evidence.  For example, "bucket".
-	Caption            string                         // Caption identifies the evidence.
-	Description        string                         // Description provides additional information on origins of the evidence.
-	Sources            []*receptor_v1.Source          // Sources of raw API request and response used to gather the evidence.
-	Rows               []interface{}                  // Rows of formatted evidence represented by a Golang struct.
-	ServiceAccountId   string                         // AccountId of multi-account organization
-	Document           *[]Document                    // Unstructured evidence in a Document format
-	Controls           []string                       // Controls associated with the evidence
-	IsManual           bool                           // If true, the evidence was manually collected
-	RelevantDate       timestamppb.Timestamp          // Relevant date of the evidence
-	EvidenceObjectType receptor_v1.EvidenceObjectType // Type of the evidence object - enum of receptor_v1.EvidenceObjectType
-	EvidenceKey        string                         // Key to identify evidence in the service provider
-	Policies           []string                       // Policies associated with the evidence/document
-	RecordIds          []string                       // RecordIds of the evidence in Trustero
-	Exceptions         string                         // Exception message if any error is encountered while collecting the evidence
-	EvidenceLink       string                         //Link to the evidence in the service provider
+	ServiceName           string                         // ServiceName where this evidence was gathered. For example, "S3".
+	EntityType            string                         // EntityType of rows of evidence.  For example, "bucket".
+	Caption               string                         // Caption identifies the evidence.
+	Description           string                         // Description provides additional information on origins of the evidence.
+	Sources               []*receptor_v1.Source          // Sources of raw API request and response used to gather the evidence.
+	Rows                  []interface{}                  // Rows of formatted evidence represented by a Golang struct.
+	ServiceAccountId      string                         // AccountId of multi-account organization
+	Document              *[]Document                    // Unstructured evidence in a Document format
+	Controls              []string                       // Controls associated with the evidence
+	IsManual              bool                           // If true, the evidence was manually collected
+	RelevantDate          timestamppb.Timestamp          // Relevant date of the evidence
+	EvidenceObjectType    receptor_v1.EvidenceObjectType // Type of the evidence object - enum of receptor_v1.EvidenceObjectType
+	SummaryGenerationMode int32                          // Summary generation mode. 0 = static, 1 = dynamic.
+	EvidenceKey           string                         // Key to identify evidence in the service provider
+	Policies              []string                       // Policies associated with the evidence/document
+	RecordIds             []string                       // RecordIds of the evidence in Trustero
+	Exceptions            string                         // Exception message if any error is encountered while collecting the evidence
+	EvidenceLink          string                         //Link to the evidence in the service provider
 
 }
 
