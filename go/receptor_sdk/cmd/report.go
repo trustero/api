@@ -17,7 +17,6 @@ import (
 	"github.com/trustero/api/go/receptor_sdk"
 	"github.com/trustero/api/go/receptor_sdk/multipartkit"
 	"github.com/trustero/api/go/receptor_v1"
-	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -69,23 +68,23 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			ColTags:         map[string]string{},
 		}
 		reportEvidence := receptor_v1.Evidence{
-			Caption:            evidence.Caption,
-			Description:        evidence.Description,
-			ServiceName:        evidence.ServiceName,
-			EntityType:         evidence.EntityType,
-			Sources:            evidence.Sources,
-			ServiceAccountId:   evidence.ServiceAccountId,
-			Controls:           evidence.Controls,
-			IsManual:           evidence.IsManual,
-			RelevantDate:       &evidence.RelevantDate,
-			EvidenceObjectType: evidence.EvidenceObjectType,
-			Policies:           evidence.Policies,
-			RecordIds:          evidence.RecordIds,
-			EvidenceKey:        evidence.EvidenceKey,
-			Exceptions:         evidence.Exceptions,
-			EvidenceLink:       evidence.EvidenceLink,
+			Caption:               evidence.Caption,
+			Description:           evidence.Description,
+			ServiceName:           evidence.ServiceName,
+			EntityType:            evidence.EntityType,
+			Sources:               evidence.Sources,
+			ServiceAccountId:      evidence.ServiceAccountId,
+			Controls:              evidence.Controls,
+			IsManual:              evidence.IsManual,
+			RelevantDate:          &evidence.RelevantDate,
+			EvidenceObjectType:    evidence.EvidenceObjectType,
+			Policies:              evidence.Policies,
+			RecordIds:             evidence.RecordIds,
+			EvidenceKey:           evidence.EvidenceKey,
+			Exceptions:            evidence.Exceptions,
+			EvidenceLink:          evidence.EvidenceLink,
+			SummaryGenerationMode: evidence.SummaryGenerationMode,
 		}
-		addSummaryGenerationModeUnknownField(&reportEvidence, evidence.SummaryGenerationMode)
 
 		if evidence.Document != nil && len(*evidence.Document) > 0 {
 			paths := []FilePathsInfo{}
@@ -217,14 +216,6 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 	finding.Evidences = []*receptor_v1.Evidence{} // reset evidences
 	return
 
-}
-
-func addSummaryGenerationModeUnknownField(ev *receptor_v1.Evidence, summaryGenerationMode int32) {
-	// summary_generation_mode is field number 19 in receptor_v1.Evidence.
-	unknown := ev.ProtoReflect().GetUnknown()
-	encoded := protowire.AppendTag(nil, 19, protowire.VarintType)
-	encoded = protowire.AppendVarint(encoded, uint64(summaryGenerationMode))
-	ev.ProtoReflect().SetUnknown(append(unknown, encoded...))
 }
 
 // ExtractMetaData Extracts tag information from struct
