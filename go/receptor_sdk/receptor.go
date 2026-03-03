@@ -143,7 +143,7 @@ type Evidence struct {
 	IsManual           bool                           // If true, the evidence was manually collected
 	RelevantDate       timestamppb.Timestamp          // Relevant date of the evidence
 	EvidenceObjectType receptor_v1.EvidenceObjectType // Type of the evidence object - enum of receptor_v1.EvidenceObjectType
-	ContentType        int32                          // Evidence content category. 0 = static, 1 = dynamic.
+	SummaryGenerationMode int32                       // Summary generation mode. 0 = static, 1 = dynamic.
 	EvidenceKey        string                         // Key to identify evidence in the service provider
 	Policies           []string                       // Policies associated with the evidence/document
 	RecordIds          []string                       // RecordIds of the evidence in Trustero

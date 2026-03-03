@@ -85,7 +85,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 			Exceptions:         evidence.Exceptions,
 			EvidenceLink:       evidence.EvidenceLink,
 		}
-		addContentTypeUnknownField(&reportEvidence, evidence.ContentType)
+		addSummaryGenerationModeUnknownField(&reportEvidence, evidence.SummaryGenerationMode)
 
 		if evidence.Document != nil && len(*evidence.Document) > 0 {
 			paths := []FilePathsInfo{}
@@ -219,11 +219,11 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 
 }
 
-func addContentTypeUnknownField(ev *receptor_v1.Evidence, contentType int32) {
-	// content_type is field number 19 in receptor_v1.Evidence.
+func addSummaryGenerationModeUnknownField(ev *receptor_v1.Evidence, summaryGenerationMode int32) {
+	// summary_generation_mode is field number 19 in receptor_v1.Evidence.
 	unknown := ev.ProtoReflect().GetUnknown()
 	encoded := protowire.AppendTag(nil, 19, protowire.VarintType)
-	encoded = protowire.AppendVarint(encoded, uint64(contentType))
+	encoded = protowire.AppendVarint(encoded, uint64(summaryGenerationMode))
 	ev.ProtoReflect().SetUnknown(append(unknown, encoded...))
 }
 
