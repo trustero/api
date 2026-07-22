@@ -50,7 +50,7 @@ func (rc *mockReceptorClient) GetConfiguration(ctx context.Context, in *receptor
 	return
 }
 
-// Verified implements a mock [receptor_v1.Receptor.GetLaunchConfig] method for testing.
+// GetLaunchConfig implements a mock [receptor_v1.Receptor.GetLaunchConfig] method for testing.
 func (rc *mockReceptorClient) GetLaunchConfig(ctx context.Context, in *receptor.LaunchConfigID, opts ...grpc.CallOption) (c *receptor.ReceptorConfiguration, err error) {
 	c = &receptor.ReceptorConfiguration{
 		ReceptorObjectId:       "",
