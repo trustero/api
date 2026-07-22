@@ -214,7 +214,9 @@ func invokeWithContext(token string, run commandInContext) (err error) {
 	// Get service provider account credentialStr from --credentials CLI flag
 	credentialStr, err = getCredentialStringFromCLI()
 	// Get receptor configuration from --config CLI flag
-	configStr, err = getConfigStringFromCLI()
+	if configStr, err = getConfigStringFromCLI(); err == nil && len(configStr) > 0 {
+		configStr, err = resolveLaunchConfig(rc, configStr)
+	}
 	// If credentialStr not provided on CLI, get it from Trustero server
 	if !receptor_sdk.NoSave {
 		// Get service provider account credentialStr and config from Trustero.
@@ -330,6 +332,32 @@ func getConfigStringFromCLI() (config string, err error) {
 		}
 		config = string(receptor_config)
 	}
+	return
+}
+
+type launchConfigEnvelope struct {
+	LaunchConfigID string `json:"$trusteroLaunchConfigId"`
+}
+
+func resolveLaunchConfig(rc receptor.ReceptorClient, configStr string) (config string, err error) {
+	var probe map[string]json.RawMessage
+	if jsonErr := json.Unmarshal([]byte(configStr), &probe); jsonErr != nil || len(probe) != 1 {
+		return configStr, nil
+	}
+	var envelope launchConfigEnvelope
+	if jsonErr := json.Unmarshal([]byte(configStr), &envelope); jsonErr != nil || envelope.LaunchConfigID == "" {
+		return configStr, nil
+	}
+
+	var launchConfig *receptor.ReceptorConfiguration
+	if launchConfig, err = rc.GetLaunchConfig(context.Background(), &receptor.LaunchConfigID{LaunchConfigId: envelope.LaunchConfigID}); err != nil {
+		return
+	}
+	var receptor_config []byte
+	if receptor_config, err = base64.URLEncoding.DecodeString(launchConfig.GetConfig()); err != nil {
+		return
+	}
+	config = string(receptor_config)
 	return
 }
 

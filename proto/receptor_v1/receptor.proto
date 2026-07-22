@@ -44,6 +44,12 @@ service Receptor {
   // This call is typically made as a callback by a receptor after credential verification.
   rpc SetConfiguration(ReceptorConfiguration) returns (google.protobuf.Empty);
 
+  // GetLaunchConfig resolves a launch config identifier - handed to the receptor process on the
+  // command line in place of an inline configuration payload - to the actual per-launch receptor
+  // configuration. Unlike GetConfiguration, this call requires the receptor's bearer token and the
+  // token's receptor identifier must match the configuration's receptor_object_id.
+  rpc GetLaunchConfig(LaunchConfigID) returns (ReceptorConfiguration);
+
   // StreamReport is used to stream large reports to Trustero. The report is sent in chunks and the first chunk
   // contains the boundary with the mime type.
   rpc StreamReport(stream ReportChunk) returns (ReportResponse);
@@ -326,6 +332,13 @@ message ReceptorOID {
 
   // Receptor_object_id is the string representation of a Trustero persistent record.
   string receptor_object_id = 1;
+}
+
+// LaunchConfigID identifies a record holding a receptor's per-launch configuration.
+message LaunchConfigID {
+
+  // Launch_config_id is the record identifier handed to the receptor process on the command line.
+  string launch_config_id = 1;
 }
 
 // ReceptorConfiguration contains a configurations a receptor needs to access a service provider account.

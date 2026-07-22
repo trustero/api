@@ -50,6 +50,24 @@ func (rc *mockReceptorClient) GetConfiguration(ctx context.Context, in *receptor
 	return
 }
 
+// GetLaunchConfig implements a mock [receptor_v1.Receptor.GetLaunchConfig] method for testing.
+func (rc *mockReceptorClient) GetLaunchConfig(ctx context.Context, in *receptor.LaunchConfigID, opts ...grpc.CallOption) (c *receptor.ReceptorConfiguration, err error) {
+	c = &receptor.ReceptorConfiguration{
+		ReceptorObjectId:       "",
+		Credential:             "",
+		Config:                 "",
+		ServiceProviderAccount: "",
+	}
+
+	println(header + "GetLaunchConfig(...)")
+	var yamld string
+	if yamld, err = toYaml(in); err == nil {
+		println(string(yamld))
+	}
+	println(footer)
+	return
+}
+
 // Verified implements a mock [receptor_v1.Receptor.Discovered] method for testing.
 func (rc *mockReceptorClient) Discovered(ctx context.Context, in *receptor.ServiceEntities, opts ...grpc.CallOption) (s *wrapperspb.StringValue, err error) {
 	s = &wrapperspb.StringValue{Value: ""}

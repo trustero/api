@@ -11,6 +11,7 @@
     - [Evidence](#receptor_v1-Evidence)
     - [Finding](#receptor_v1-Finding)
     - [JobResult](#receptor_v1-JobResult)
+    - [LaunchConfigID](#receptor_v1-LaunchConfigID)
     - [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration)
     - [ReceptorOID](#receptor_v1-ReceptorOID)
     - [ReportChunk](#receptor_v1-ReportChunk)
@@ -182,6 +183,21 @@ JobResult reports the result of a receptor request.
 | result | [string](#string) |  | Result is receptor request result. One of &#34;success&#34;, &#34;fail&#34;, or &#34;error&#34;. |
 | receptor_object_id | [string](#string) |  | Receptor_object_id is Trustero&#39;s receptor record identifier. |
 | exceptions | [string](#string) |  | Exceptions contain information about the error like permission missing for the credentials provided. |
+
+
+
+
+
+
+<a name="receptor_v1-LaunchConfigID"></a>
+
+### LaunchConfigID
+LaunchConfigID identifies a record holding a receptor&#39;s per-launch configuration.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| launch_config_id | [string](#string) |  | Launch_config_id is the record identifier handed to the receptor process on the command line. |
 
 
 
@@ -543,6 +559,7 @@ and contains the service&#39;s configuration information. For example, an AWS S3
 | Report | [Finding](#receptor_v1-Finding) | [.google.protobuf.StringValue](#google-protobuf-StringValue) | Report a finding to Trustero. A receptor or a Trustero client application reports its findings to Trustero on a periodic basis. This call returns a string value collection ID or an error. |
 | Notify | [JobResult](#receptor_v1-JobResult) | [.google.protobuf.Empty](#google-protobuf-Empty) | Notify Trustero a long running report finding or discover service entities receptor-request has completed. JobResult contains information about the receptor-request and it&#39;s corresponding result. |
 | SetConfiguration | [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration) | [.google.protobuf.Empty](#google-protobuf-Empty) | SetConfiguration reports the configuration for receptors that need extra configuration to access a service. This call is typically made as a callback by a receptor after credential verification. |
+| GetLaunchConfig | [LaunchConfigID](#receptor_v1-LaunchConfigID) | [ReceptorConfiguration](#receptor_v1-ReceptorConfiguration) | GetLaunchConfig resolves a launch config identifier - handed to the receptor process on the command line in place of an inline configuration payload - to the actual per-launch receptor configuration. Unlike GetConfiguration, this call requires the receptor&#39;s bearer token and the token&#39;s receptor identifier must match the configuration&#39;s receptor_object_id. |
 | StreamReport | [ReportChunk](#receptor_v1-ReportChunk) stream | [ReportResponse](#receptor_v1-ReportResponse) | StreamReport is used to stream large reports to Trustero. The report is sent in chunks and the first chunk contains the boundary with the mime type. |
 
  
