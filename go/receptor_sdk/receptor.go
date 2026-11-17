@@ -202,6 +202,18 @@ type Control struct {
 	ImportLink              string   `json:"import_link"`              // External link to the control
 	SOC2Criteria            []string `json:"soc2_criteria"`            // SOC2 Framework criterias for the control
 	ImplementationProcedure string   `json:"implementation_procedure"` // Implementation procedure of the control
+
+	// CustomFields are values for the account's control custom fields, named rather
+	// than keyed by id because a receptor does not know the account's field ids.
+	// Trustero matches each Name to one of the account's control custom fields,
+	// ignoring case, and skips a name the account has no field for.
+	CustomFields []CustomFieldValue `json:"custom_fields"`
+}
+
+// CustomFieldValue is one custom field's value on a control.
+type CustomFieldValue struct {
+	Name  string `json:"name"`  // Name of the custom field, as the account defines it
+	Value string `json:"value"` // Markdown; empty clears the value
 }
 
 type ControlProcedureMapping struct {

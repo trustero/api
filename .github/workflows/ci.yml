@@ -51,7 +51,10 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "${{ matrix.python }}"
+          # No matrix is defined, so this used to fall back to the runner's default
+          # Python. That moved to 3.14, where the pinned astroid 2.15 (pylint 2.17)
+          # fails on the removed ast.Str; pin until pylint is upgraded.
+          python-version: "3.12"
       - name: Setup Poetry
         uses: pronovic/setup-poetry@v1
         with:
