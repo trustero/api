@@ -161,6 +161,38 @@ type Document struct {
 	FileName       string                 // Name of the document
 	LastModified   *timestamppb.Timestamp // Last modified date of the document at the provider source
 	Metadata       map[string]string      // Additional metadata about the document
+	Parts          []DocumentPart         // Sub-objects of the document the receptor holds separately (optional)
+}
+
+// PartKind says what a DocumentPart is to the document it belongs to.
+type PartKind string
+
+const (
+	PartKindDocument   PartKind = "document"   // A whole document found inside the document
+	PartKindPage       PartKind = "page"       // A text rendering of (part of) the document
+	PartKindImage      PartKind = "image"      // A picture shown in the document
+	PartKindEmbedded   PartKind = "embedded"   // An object embedded in the document (a spreadsheet in a page)
+	PartKindAttachment PartKind = "attachment" // A file attached to the document
+)
+
+// DocumentPart is a sub-object of a Document that the receptor already holds
+// apart from the document's own bytes: a picture embedded in a page, a file
+// attached to a message. Trustero stores the document and its parts together
+// and shows and indexes every part on its own, so a receptor that has the
+// real bytes and names of a page's images should report them as parts rather
+// than leaving them for Trustero to dig out of the document.
+//
+// A page can refer to a part from its HTML with src="tr-part:<Name>" (see
+// receptor_sdk/htmlkit); Trustero resolves the reference when it stores the
+// page. Parts are optional: a Document without them is reported exactly as
+// before.
+type DocumentPart struct {
+	Name           string            // Unique within the document; shown as the part's file name
+	Mime           string            // Mime type of the part
+	Kind           PartKind          // What the part is to the document
+	Body           []byte            // Content of the part in bytes
+	StreamFilePath string            // Read instead of Body when Body is empty; removed after the report like Document.StreamFilePath
+	Locator        map[string]string // Where the part came from at the provider, e.g. page_id and attachment_id
 }
 
 // Config with Field struct defines the json shape of the custom configurations for receptors that the app can use
