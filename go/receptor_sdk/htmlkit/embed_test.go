@@ -162,13 +162,18 @@ func TestEmbedImagesFallbackTextAndSkippedSchemes(t *testing.T) {
 		calls++
 		return Result{FallbackText: "<:smile:>"}
 	}
-	html := `<p><img src="cid:abc"><img src="javascript:x"><img src="https://wiki/emoji.png" data-emoji-fallback=":smile:"></p>`
+	html := `<p><img src="cid:abc"><img src="javascript:x"><img src="VBScript:y"><img src="tr-part:z.png"><img src="//wiki/rel.png"><img src="/wiki/path.png"><img src="https://wiki/emoji.png" data-emoji-fallback=":smile:"></p>`
 	out := EmbedImages(html, fetch, Options{})
-	if calls != 1 {
-		t.Errorf("cid: and javascript: sources should not be fetched; %d fetches", calls)
+	if calls != 3 {
+		t.Errorf("only web and relative sources are fetched; %d fetches", calls)
 	}
-	if out.HTML != `<p><img src="cid:abc"><img src="javascript:x">&lt;:smile:&gt;</p>` {
+	if out.HTML != `<p><img src="cid:abc"><img src="javascript:x"><img src="VBScript:y"><img src="tr-part:z.png">&lt;:smile:&gt;&lt;:smile:&gt;&lt;:smile:&gt;</p>` {
 		t.Errorf("got %s", out.HTML)
+	}
+	for src, want := range map[string]string{"https://x/a": "https", "HTTP://x": "http", "/wiki/a.png": "", "a.png": "", "mailto:x": "mailto", ":x": "", "data:image/png;base64,AA": "data", "c:\\x": "c"} {
+		if got := srcScheme(src); got != want {
+			t.Errorf("srcScheme(%q) = %q, want %q", src, got, want)
+		}
 	}
 }
 

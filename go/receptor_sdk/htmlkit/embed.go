@@ -161,11 +161,11 @@ type Output struct {
 // references to them.
 var keptAttrs = []string{"alt", "title", "width", "height"}
 
-// EmbedImages rewrites the <img> tags of htmlBody. Every tag is offered to
-// fetch except those whose src is a cid:, javascript: or tr-part: reference
-// and those already inlined (data:); in ModeParts an inlined picture above
-// the part size floor is made a part without a fetch. The rest of the page
-// is copied byte for byte.
+// EmbedImages rewrites the <img> tags of htmlBody. A tag is offered to fetch
+// when its src is a web URL or a relative reference; one already inlined
+// (data:) is, in ModeParts, made a part without a fetch when it is a picture
+// above the part size floor; any other scheme (cid:, javascript:, a part
+// reference) is left as it is. The rest of the page is copied byte for byte.
 func EmbedImages(htmlBody string, fetch Fetcher, opts Options) Output {
 	opts = opts.withDefaults()
 	e := &embedder{opts: opts, fetch: fetch, bySrc: map[string]*fetched{}, names: map[string]bool{}}
@@ -231,11 +231,8 @@ type embedder struct {
 
 // rewrite returns the tag's replacement, or false to leave the tag as it is.
 func (e *embedder) rewrite(tag Tag) (string, bool) {
-	lower := strings.ToLower(tag.Src)
-	if strings.HasPrefix(lower, "cid:") || strings.HasPrefix(lower, "javascript:") || strings.HasPrefix(lower, PartScheme) {
-		return "", false
-	}
-	if strings.HasPrefix(lower, "data:") {
+	scheme := srcScheme(tag.Src)
+	if scheme == "data" {
 		// Already inlined. In parts mode a picture worth a part becomes one;
 		// anything else stays as it is, byte for byte.
 		if e.opts.Mode != ModeParts {
@@ -253,6 +250,11 @@ func (e *embedder) rewrite(tag Tag) (string, bool) {
 		f := &fetched{img: img, src: e.embedPart(img)}
 		e.bySrc[tag.Src] = f
 		return e.replacement(tag, f)
+	}
+	if !fetchableSchemes[scheme] {
+		// cid:, javascript:, vbscript:, a part reference, anything else:
+		// not a picture to download; the tag stays as it is.
+		return "", false
 	}
 	if tag.Src != "" {
 		if f, ok := e.bySrc[tag.Src]; ok {
@@ -386,6 +388,29 @@ func (e *embedder) uniqueName(img *Image) string {
 	}
 	e.names[candidate] = true
 	return candidate
+}
+
+// fetchableSchemes are the only src schemes offered to the Fetcher: a web
+// URL, or a relative or protocol-relative reference (no scheme), which the
+// receptor resolves against its provider.
+var fetchableSchemes = map[string]bool{"": true, "http": true, "https": true}
+
+// srcScheme returns the lower-cased scheme of a src, "" when it has none.
+func srcScheme(src string) string {
+	for i, r := range src {
+		switch {
+		case r == ':':
+			if i == 0 {
+				return ""
+			}
+			return strings.ToLower(src[:i])
+		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z':
+		case i > 0 && (r >= '0' && r <= '9' || r == '+' || r == '-' || r == '.'):
+		default:
+			return ""
+		}
+	}
+	return ""
 }
 
 // DataURI inlines bytes as a data URI.
