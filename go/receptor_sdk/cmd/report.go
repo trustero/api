@@ -4,9 +4,13 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"reflect"
 	"sort"
@@ -88,6 +92,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 
 		if evidence.Document != nil && len(*evidence.Document) > 0 {
 			paths := []FilePathsInfo{}
+			parts := []documentPart{}
 			evidenceDocuments := receptor_v1.Documents{}
 			evidenceDocuments.Docs = []*receptor_v1.Document{}
 			reportFinding := receptor_v1.Finding{
@@ -116,6 +121,7 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 						Mime:     doc.Mime,
 					})
 				}
+				parts = append(parts, documentParts(evidence.Caption, doc)...)
 			}
 			if len(evidenceDocuments.Docs) == 1 { // single document
 				reportEvidence.EvidenceType = &receptor_v1.Evidence_Doc{
@@ -138,11 +144,16 @@ func reportEvidence(rc receptor_v1.ReceptorClient, finding *receptor_v1.Finding,
 
 			reportFinding.Evidences = append(reportFinding.Evidences, &reportEvidence)
 
-			contentType, streamFile, err := multipartEvidence(&reportFinding, paths, sources)
+			contentType, streamFile, err := multipartEvidence(&reportFinding, paths, parts, sources)
 
 			// have the streamFile from receptor - remove the temp evidence files
 			for _, doc := range *evidence.Document {
 				os.Remove(doc.StreamFilePath)
+				for _, part := range doc.Parts {
+					if part.StreamFilePath != "" {
+						os.Remove(part.StreamFilePath)
+					}
+				}
 			}
 
 			if err != nil {
@@ -452,7 +463,91 @@ type FilePathsInfo struct {
 	Mime     string
 }
 
-func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FilePathsInfo, sources []*receptor_v1.Source) (contentType string, evidencePath string, err error) {
+// documentPart is one receptor_sdk.DocumentPart ready for the envelope: its
+// headers, and its bytes or the file holding them.
+type documentPart struct {
+	Info multipartkit.PartInfo
+	Body []byte
+	Path string
+}
+
+// documentParts lists a document's parts with the envelope name of the file
+// part they belong to as their parent: the document's file name, or the
+// evidence caption for an in-memory document without one, exactly as
+// multipartEvidence names the file part.
+func documentParts(caption string, doc receptor_sdk.Document) []documentPart {
+	parent := doc.FileName
+	if len(doc.Body) > 0 && parent == "" {
+		parent = caption
+	}
+	parts := make([]documentPart, 0, len(doc.Parts))
+	for _, part := range doc.Parts {
+		parts = append(parts, documentPart{
+			Info: multipartkit.PartInfo{
+				Name:        part.Name,
+				Parent:      parent,
+				ContentType: part.Mime,
+				Kind:        string(part.Kind),
+				Locator:     part.Locator,
+			},
+			Body: part.Body,
+			Path: part.StreamFilePath,
+		})
+	}
+	return parts
+}
+
+// withPartsHash gives a file part that has document parts a Content-Hash
+// covering the parts as well as the file. Trustero keeps the file part's
+// hash as the document's payload hash and compares it with the next scan's
+// to tell an unchanged document; a page in parts mode refers to its
+// pictures by name only, so without this a replaced picture would look like
+// an unchanged page. The hash is the sha256 of the file followed by each
+// part's hash in order, url-safe base64 like every other Content-Hash. A
+// document without parts keeps the builder's plain hash.
+func withPartsHash(meta map[string]string, parent string, file io.Reader, parts []documentPart) map[string]string {
+	h := sha256.New()
+	n := 0
+	for _, part := range parts {
+		if part.Info.Parent != parent {
+			continue
+		}
+		var partHash string
+		var err error
+		if len(part.Body) > 0 {
+			partHash, err = multipartkit.ComputeHash(bytes.NewReader(part.Body), min(multipartkit.DefaultBufferSize, len(part.Body)))
+		} else if part.Path != "" {
+			var f *os.File
+			if f, err = os.Open(part.Path); err == nil {
+				partHash, err = multipartkit.ComputeHash(f, multipartkit.DefaultBufferSize)
+				f.Close()
+			}
+		}
+		if err != nil {
+			log.Err(err).Msgf("failed to hash document part %s", part.Info.Name)
+			continue
+		}
+		if n == 0 {
+			if _, err := io.Copy(h, file); err != nil {
+				log.Err(err).Msgf("failed to hash document %s", parent)
+				return meta
+			}
+		}
+		h.Write([]byte(partHash))
+		n++
+	}
+	if n == 0 {
+		return meta
+	}
+	out := make(map[string]string, len(meta)+1)
+	for k, v := range meta {
+		out[k] = v
+	}
+	out["Content-Hash"] = base64.URLEncoding.EncodeToString(h.Sum(nil))
+	return out
+}
+
+func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FilePathsInfo, parts []documentPart, sources []*receptor_v1.Source) (contentType string, evidencePath string, err error) {
 	if len(finding.Evidences) == 0 {
 		err = errors.New("no evidence found")
 		log.Error().Msg("no evidence found")
@@ -473,6 +568,8 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FileP
 			log.Err(err).Msg("failed to create multipart file")
 			return "", "", err
 		}
+		// Registered before the builder's Finalize below, so it runs after it.
+		defer dstFile.Close()
 		// TOD: Adjust mime for multiple document evidences
 		mime := evidence.GetDoc().GetMime()
 		bufferSize := multipartkit.DefaultBufferSize
@@ -519,7 +616,8 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FileP
 				if doc.FileName != "" {
 					name = doc.FileName
 				}
-				err = builder.AddBytes(name, name, doc.GetMime(), doc.GetBody(), doc.GetMetadata())
+				meta := withPartsHash(doc.GetMetadata(), name, bytes.NewReader(doc.GetBody()), parts)
+				err = builder.AddBytes(name, name, doc.GetMime(), doc.GetBody(), meta)
 				if err != nil {
 					log.Err(err).Msgf("failed to add blob part: %s", evidence.Caption)
 				}
@@ -529,14 +627,35 @@ func multipartEvidence(finding *receptor_v1.Finding, streamFilePathsInfo []FileP
 		// 3. Part3 : evidence paths
 		for _, streamFilePathInfo := range streamFilePathsInfo {
 			if streamFilePathInfo.Path != "" {
-				err = builder.AddFile(streamFilePathInfo.PartName, streamFilePathInfo.FileName, streamFilePathInfo.Path, streamFilePathInfo.Mime, streamFilePathInfo.Metadata)
+				meta := streamFilePathInfo.Metadata
+				if f, openErr := os.Open(streamFilePathInfo.Path); openErr == nil {
+					meta = withPartsHash(meta, streamFilePathInfo.PartName, f, parts)
+					f.Close()
+				}
+				err = builder.AddFile(streamFilePathInfo.PartName, streamFilePathInfo.FileName, streamFilePathInfo.Path, streamFilePathInfo.Mime, meta)
 				if err != nil {
 					log.Err(err).Msgf("failed to add stream file: %s", streamFilePathInfo.Path)
 				}
 			}
 		}
 
-		// 4. Part4 : Sources
+		// 4. Document parts, after every file part: readers take the second
+		// part of the envelope as the file, and a server that does not know
+		// the "part" disposition skips these.
+		for _, part := range parts {
+			if len(part.Body) > 0 {
+				err = builder.AddPartBytes(part.Info, part.Body)
+			} else if part.Path != "" {
+				err = builder.AddPartFile(part.Info, part.Path)
+			} else {
+				continue
+			}
+			if err != nil {
+				log.Err(err).Msgf("failed to add document part: %s", part.Info.Name)
+			}
+		}
+
+		// 5. Sources
 		err = builder.AddProtobuf("receptor_v1.Sources", &receptor_v1.Sources{
 			Sources: sources,
 		})

@@ -11,6 +11,7 @@ import (
 	"mime/multipart"
 	"os"
 	"reflect"
+	"strings"
 
 	"google.golang.org/protobuf/proto"
 )
@@ -157,7 +158,7 @@ func (mb *MultipartBuilder) AddFile(partName, fileName, filePath, contentType st
 
 	// common headers
 	headers := map[string][]string{
-		"Content-Disposition": {fmt.Sprintf(`file; name="%s"; filename="%s"`, partName, fileName)},
+		"Content-Disposition": {fileDisposition(partName, fileName)},
 		"Content-Type":        {contentType},
 		"Content-Size":        {fmt.Sprintf("%d", fileInfo.Size())},
 		"Content-Hash":        {contentHash},
@@ -194,7 +195,7 @@ func (mb *MultipartBuilder) AddBytes(partName, fileName, contentType string, dat
 	// Rewind the reader after calculating the hash
 	reader.Seek(0, io.SeekStart)
 	headers := map[string][]string{
-		"Content-Disposition": {fmt.Sprintf(`file; name="%s"; filename="%s"`, partName, fileName)},
+		"Content-Disposition": {fileDisposition(partName, fileName)},
 		"Content-Type":        {contentType},
 		"Content-Length":      {fmt.Sprintf("%d", len(data))},
 		"Content-Hash":        {contentHash},
@@ -217,6 +218,17 @@ func (mb *MultipartBuilder) AddBytes(partName, fileName, contentType string, dat
 	}
 
 	return nil
+}
+
+// quoteParam escapes a value for a quoted Content-Disposition parameter, so
+// a file name with a quote or backslash still parses on the other side.
+var quoteParam = strings.NewReplacer(`\`, `\\`, `"`, `\"`, "\r", " ", "\n", " ")
+
+// fileDisposition is the Content-Disposition of a file part. The shape is
+// the one every server and app reader expects, name and filename quoted,
+// with only the two characters a quoted string cannot hold escaped.
+func fileDisposition(partName, fileName string) string {
+	return fmt.Sprintf(`file; name="%s"; filename="%s"`, quoteParam.Replace(partName), quoteParam.Replace(fileName))
 }
 
 // Finalize writes the ending boundary and closes the multipart writer.
